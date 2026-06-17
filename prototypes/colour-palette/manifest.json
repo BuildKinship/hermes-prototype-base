@@ -1,0 +1,15 @@
+{
+  "slug": "colour-palette",
+  "name": "Kinship Colour Palette",
+  "description": "A visual reference of all Kinship design token swatches — brand colors, subject colors, and CSS variable names.",
+  "prompt": "Build a small prototype showing the Kinship colour palette as design token swatches.",
+  "created_by_name": "Hermes (test)",
+  "created_by_slack_id": "U0ASCCEV1JT",
+  "created_at": "2026-06-17T10:00:00.000Z",
+  "type": "other",
+  "tags": ["design-system", "tokens", "colours", "reference"],
+  "branch": "prototype/colour-palette-2026-06-17",
+  "url": "https://hermes-prototype-base-ten.vercel.app/colour-palette",
+  "short_url": "",
+  "thumbnail": "thumbnail.png"
+}

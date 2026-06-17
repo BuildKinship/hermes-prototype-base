@@ -294,3 +294,38 @@ Hermes writes a `docs/PROTOTYPE.md` on each branch with:
 - Any research notes relevant to the content
 
 Read it before starting.
+
+---
+
+## The Gallery System — Rules for Coding Agents
+
+Every prototype is automatically listed in the **Prototype Gallery** at `/gallery`. The gallery
+is powered by a manifest file — not by code you write. **You do not touch the gallery page.**
+
+### What you must NOT do
+
+- Do **not** modify `app/gallery/page.tsx` or `app/gallery/client.tsx`
+- Do **not** modify `app/page.tsx` or `app/home.tsx`
+- Do **not** create or edit any file in `prototypes/` — Hermes manages that
+- Do **not** modify `types/manifest.ts`
+
+### What the manifest system is (for context only)
+
+When Hermes deploys your prototype, it automatically:
+1. Takes a screenshot of your finished page
+2. Creates `prototypes/<slug>/manifest.json` — metadata the gallery reads
+3. Commits that to `main`, then redeploys so the gallery shows your prototype
+
+The gallery discovers all manifests at build time with `fs.readdirSync`. No database, no
+central file that causes merge conflicts. Each prototype slug gets its own folder that only
+Hermes writes to.
+
+### Your job
+
+Build the prototype page(s) at `app/<slug>/page.tsx`. That's it. Follow all the rules above
+(design tokens, mock data, no shadows, etc.). Hermes handles the gallery.
+
+### The `prototypes/` folder
+
+If you see a `prototypes/` directory at the repo root, leave it alone. It contains
+`manifest.json` files that drive the gallery. Do not read, write, or delete anything there.

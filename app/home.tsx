@@ -401,6 +401,37 @@ export function HomePage() {
           </div>
         </motion.div>
 
+        {/* Gallery CTA */}
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1], delay: 0.4 }}
+          className="mt-10"
+        >
+          <a
+            href="/gallery"
+            className="flex items-center justify-between rounded-lg border p-5 group transition-colors duration-150"
+            style={{
+              borderColor: "color-mix(in oklch, var(--kinship-mid) 30%, transparent)",
+              background: "color-mix(in oklch, var(--kinship-mid) 5%, white)",
+            }}
+          >
+            <div>
+              <p className="section-label mb-1">prototype gallery</p>
+              <p className="text-sm font-medium" style={{ color: "var(--kinship-ink)" }}>
+                Browse everything the team has built
+              </p>
+              <p className="text-xs mt-0.5" style={{ color: "var(--kinship-mid)" }}>
+                Search, filter by type, and explore every prototype by creator and prompt.
+              </p>
+            </div>
+            <ArrowRight
+              className="w-5 h-5 flex-shrink-0 transition-transform duration-150 group-hover:translate-x-1"
+              style={{ color: "var(--kinship-mid)" }}
+            />
+          </a>
+        </motion.div>
+
         {/* Footer */}
         <div className="mt-16 pt-8 border-t border-[color-mix(in_oklch,var(--kinship-dim)_20%,transparent)]">
           <p className="text-xs text-[var(--kinship-dim)] text-center">

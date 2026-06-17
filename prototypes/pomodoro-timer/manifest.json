@@ -1,0 +1,15 @@
+{
+  "slug": "pomodoro-timer",
+  "name": "Pomodoro Timer",
+  "description": "A focused study timer built on the Pomodoro technique, with Kinship branding and subject-aware session tracking.",
+  "prompt": "Build a pomodoro timer prototype for Kinship students.",
+  "created_by_name": "Azim",
+  "created_by_slack_id": "U0AQ7SJRQ93",
+  "created_at": "2026-06-16T00:00:00.000Z",
+  "type": "dashboard",
+  "tags": ["student", "productivity", "timer"],
+  "branch": "prototype/pomodoro-timer-2026-06-16",
+  "url": "https://hermes-prototype-base-ten.vercel.app/pomodoro-timer",
+  "short_url": "",
+  "thumbnail": "thumbnail.png"
+}

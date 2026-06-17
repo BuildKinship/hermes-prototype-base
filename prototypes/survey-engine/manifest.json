@@ -1,0 +1,15 @@
+{
+  "slug": "survey-engine",
+  "name": "Survey Engine",
+  "description": "A Typeform-style one-question-at-a-time survey system with an admin results view and in-memory response store.",
+  "prompt": "Build a survey engine for Kinship with a typeform-style UX and an admin view of results.",
+  "created_by_name": "Azim",
+  "created_by_slack_id": "U0AQ7SJRQ93",
+  "created_at": "2026-06-17T00:00:00.000Z",
+  "type": "survey",
+  "tags": ["survey", "admin", "forms", "typeform"],
+  "branch": "prototype/survey-engine-2025-06-17",
+  "url": "https://hermes-prototype-base-ten.vercel.app/survey-engine",
+  "short_url": "",
+  "thumbnail": "thumbnail.png"
+}
