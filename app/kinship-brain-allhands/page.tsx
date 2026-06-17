@@ -1,12 +1,11 @@
 "use client";
 // slide deck presentation — keyboard nav, interactive ask-the-room prompts
 
-import { useState, useCallback, useEffect, useRef } from "react";
+import React, { useState, useCallback, useEffect, useRef, type ReactNode } from "react";
 import { motion, AnimatePresence, type Transition } from "framer-motion";
 import {
   Brain,
   Zap,
-  Users,
   Calendar,
   MessageSquare,
   Database,
@@ -16,19 +15,12 @@ import {
   ChevronRight,
   Sparkles,
   ArrowRight,
-  Network,
   BookOpen,
   Mic,
   Star,
   CheckCircle2,
   Layers,
 } from "lucide-react";
-
-// ─── Types ────────────────────────────────────────────────────────────────────
-interface SlideProps {
-  slideNumber: number;
-  totalSlides: number;
-}
 
 // ─── Motion constants ─────────────────────────────────────────────────────────
 const EASE_OUT = [0.22, 1, 0.36, 1] as unknown as Transition["ease"];
@@ -63,7 +55,7 @@ function SlideTitle({ title, subtitle, eyebrow, dark = false }: { title: string;
   );
 }
 
-function SectionLabel({ children, dark = false }: { children: React.ReactNode; dark?: boolean }) {
+function SectionLabel({ children, dark = false }: { children: ReactNode; dark?: boolean }) {
   return (
     <p className="text-xs font-mono tracking-[0.2em] uppercase mb-10" style={{ color: dark ? "oklch(60% 0.05 293)" : "var(--kinship-mid)" }}>
       {children}
@@ -71,7 +63,7 @@ function SectionLabel({ children, dark = false }: { children: React.ReactNode; d
   );
 }
 
-function Pill({ children, accent = false }: { children: React.ReactNode; accent?: boolean }) {
+function Pill({ children, accent = false }: { children: ReactNode; accent?: boolean }) {
   return (
     <span
       className="inline-block px-3 py-1 rounded-full text-sm font-medium border"
@@ -86,7 +78,7 @@ function Pill({ children, accent = false }: { children: React.ReactNode; accent?
   );
 }
 
-function Card({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+function Card({ children, className = "" }: { children: ReactNode; className?: string }) {
   return (
     <div
       className={"rounded-2xl border p-8 " + className}
@@ -97,7 +89,7 @@ function Card({ children, className = "" }: { children: React.ReactNode; classNa
   );
 }
 
-function DarkCard({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+function DarkCard({ children, className = "" }: { children: ReactNode; className?: string }) {
   return (
     <div
       className={"rounded-2xl border p-8 " + className}
@@ -108,7 +100,7 @@ function DarkCard({ children, className = "" }: { children: React.ReactNode; cla
   );
 }
 
-function AskBubble({ children }: { children: React.ReactNode }) {
+function AskBubble({ children }: { children: ReactNode }) {
   return (
     <div
       className="rounded-2xl p-8 text-center max-w-3xl"
