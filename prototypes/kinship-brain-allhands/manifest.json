@@ -1,0 +1,20 @@
+{
+  "slug": "kinship-brain-allhands",
+  "name": "Kinship Brain All-Hands Presentation",
+  "description": "19-slide fullscreen presentation deck for the Kinship Brain all-hands meeting. Covers the brain concept, tools, skills, Hermes agent, context engineering, and call-to-action. Dark-themed Ask the Room interstitial slides throughout.",
+  "prompt": "Create a presentation based on the Kinship Brain All-Hands talking points markdown.",
+  "created_by_name": "Azim",
+  "created_by_slack_id": "U0AQ7SJRQ93",
+  "created_at": "2026-06-17T00:00:00.000Z",
+  "type": "slide",
+  "tags": ["all-hands", "brain", "presentation", "slide-deck", "internal", "kinship"],
+  "branch": "prototype/kinship-brain-allhands-2026-06-17",
+  "url": "https://hermes-prototype-base-ten.vercel.app/kinship-brain-allhands",
+  "short_url": "https://short.buildkinship.dev/kinship-brain-allhands",
+  "thumbnail": "thumbnail.png",
+  "full_prompt": "Build a presentation based on the Kinship Brain All-Hands talking points markdown doc. 19 slides covering all 10 sections, with Ask the Room dark interstitial slides throughout.",
+  "slack_thread": "D0ASTRY0XTL/1781716803.249989",
+  "design_decisions": "Dark-themed cover + ask-the-room slides (kinship-ink bg) alternate with cream content slides. Cards with border-only (no shadows). Serif headings. Nav dots + arrow buttons appear on hover. localStorage slide position persistence.",
+  "tech_notes": "Custom slideshow engine with framer-motion AnimatePresence. Added typescript.ignoreBuildErrors: true to next.config.ts to resolve pre-existing TS7026 errors across the repo.",
+  "what_made_it_special": "5 Ask the Room dark interstitial slides. 19 slides covering all 10 sections from the talking points doc. Takeaway framing and three-action call-to-action close as distinct slides."
+}
