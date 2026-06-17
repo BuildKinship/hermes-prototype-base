@@ -8,6 +8,7 @@ import {
   Sparkles,
   Box,
   LayoutDashboard,
+  ClipboardList,
   Copy,
   Check,
   ArrowRight,
@@ -149,6 +150,34 @@ const prototypeTypes: PrototypeType[] = [
     color: "var(--kinship-ink)",
     bgClass:
       "bg-[color-mix(in_oklch,var(--kinship-ink)_6%,var(--kinship-cream))]",
+  },
+  {
+    id: "survey",
+    icon: ClipboardList,
+    title: "Surveys",
+    description:
+      "Typeform-style one-question-at-a-time surveys — beautiful, animated, and brand-consistent. Includes an admin results view with sorting, filtering, and CSV export.",
+    capability:
+      "Single-question flow with Framer Motion transitions. Supports single/multiple choice (keyboard shortcuts, auto-advance), short text, long text, rating scales, email, and number fields. In-memory response store + 4-digit protected admin view.",
+    examples: [
+      {
+        label: "Teacher feedback",
+        prompt:
+          "Build a survey to collect teacher feedback on Kinship — how long they've been using it, what features they use, satisfaction rating, what's working, and what needs improvement.",
+      },
+      {
+        label: "Pilot intake",
+        prompt:
+          "Create an onboarding survey for new schools joining a Kinship pilot — school name, grade levels, number of students, primary goals, and contact email.",
+      },
+      {
+        label: "Student check-in",
+        prompt:
+          "Make a short daily student check-in survey — how they're feeling today (emoji rating), what subject they worked on, and one thing they found hard.",
+      },
+    ],
+    color: "#06B6D4",
+    bgClass: "bg-[color-mix(in_oklch,#06B6D4_6%,var(--kinship-cream))]",
   },
 ];
 
