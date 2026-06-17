@@ -1,42 +1,29 @@
-# Prototype Brief
+# Prototype: Pomodoro Timer
 
-> This file is written by Hermes before handing off to the coding agent.
-> It defines scope, constraints, and context for this specific prototype.
-
----
-
-## Request
-
-_[Hermes fills this in from the user's original request]_
+## Original Request
+"Create a prototype for me that is a pomodoro timer. I will show this to students on a projector."
 
 ## Prototype Type
-
-- [ ] Slide deck / presentation
-- [ ] Animation / visual concept
-- [ ] Dashboard page (Hearth — teacher view)
-- [ ] Dashboard page (Horizon — student/parent view)
-- [ ] Data visualization
-- [ ] 3D / interactive scene
-- [ ] Other: ___
+Interactive animation / utility
 
 ## Scope
+- Single page: `app/pomodoro-timer/page.tsx`
+- Modes: Pomodoro (25min), Short Break (5min), Long Break (15min)
+- Big, projector-readable display
+- Animated countdown with visual feedback
+- Sound cue or visual bell on completion
 
-_[What pages/routes to build. E.g.: "Single page at `/` — no routing needed"]_
-
-## Content / Research Notes
-
-_[Any research Hermes has done relevant to this prototype's content]_
-
-## Design Constraints
-
-- Follow the Kinship design system (CLAUDE.md §Colors, §Typography, §Cards)
-- Mock data only — no external services
-- Mobile-aware layout (test at 1366×768 Chromebook baseline)
+## Design Inspiration
+- Warm terracotta/reddish-brown background (~#C0504D)
+- Card with slightly lighter background
+- Three tabs at top (Pomodoro / Short Break / Long Break)
+- Large bold white timer digits
+- White START/PAUSE button with dark red label
+- Session counter "#1" + "Time to focus!" below card
 
 ## Success Criteria
-
-_[Specific things the prototype must demonstrate]_
-
-## Branch
-
-`prototype/[slug]-[YYYY-MM-DD]`
+- Large enough text to read from back of classroom on a projector
+- Clear visual when timer completes
+- Smooth countdown animation
+- Works fully in browser with no data dependencies
+- Projector-friendly (high contrast, no tiny elements)
