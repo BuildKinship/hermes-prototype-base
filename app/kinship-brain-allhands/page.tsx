@@ -22,6 +22,9 @@ import {
   CheckCircle2,
   Layers,
   Network,
+  FileText,
+  TrendingUp,
+  Package,
 } from "lucide-react";
 
 // ─── Motion constants ─────────────────────────────────────────────────────────
@@ -38,14 +41,11 @@ function CoverBrainAnimation() {
         @keyframes orbit1 { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         @keyframes orbit2 { from { transform: rotate(0deg); } to { transform: rotate(-360deg); } }
         @keyframes pulse-ring { 0%,100% { opacity:0.15; r:52; } 50% { opacity:0.35; r:58; } }
-        @keyframes dot-fade { 0%,100% { opacity:0.3; } 50% { opacity:1; } }
         .orbit1 { transform-origin:110px 110px; animation: orbit1 8s linear infinite; }
         .orbit2 { transform-origin:110px 110px; animation: orbit2 12s linear infinite; }
         .pulse-ring { transform-origin:110px 110px; animation: pulse-ring 3s ease-in-out infinite; }
       `}</style>
-      {/* Pulse ring */}
       <circle className="pulse-ring" cx="110" cy="110" r="52" stroke="oklch(60% 0.08 293)" strokeWidth="1.5" fill="none" />
-      {/* Orbit 1 — 3 dots */}
       <g className="orbit1">
         <circle cx="110" cy="42" r="5" fill="oklch(75% 0.12 293)" opacity="0.9"/>
         <circle cx="162" cy="141" r="4" fill="oklch(65% 0.10 293)" opacity="0.7">
@@ -53,14 +53,12 @@ function CoverBrainAnimation() {
         </circle>
         <circle cx="58" cy="141" r="3.5" fill="oklch(55% 0.08 293)" opacity="0.5"/>
       </g>
-      {/* Orbit 2 — 2 dots */}
       <g className="orbit2">
         <circle cx="110" cy="30" r="3" fill="oklch(70% 0.08 240)" opacity="0.6"/>
         <circle cx="190" cy="110" r="4" fill="oklch(60% 0.10 220)" opacity="0.5">
           <animate attributeName="opacity" values="0.5;0.9;0.5" dur="3s" repeatCount="indefinite"/>
         </circle>
       </g>
-      {/* Center icon container */}
       <rect x="82" y="82" width="56" height="56" rx="16" fill="oklch(25% 0.08 293)" stroke="oklch(40% 0.08 293)" strokeWidth="1.5"/>
     </svg>
   );
@@ -77,7 +75,6 @@ function ContextLossAnimation() {
         @keyframes scatter4 { 0%,100%{transform:translate(0,0) rotate(0deg);opacity:1} 40%{transform:translate(50px,36px) rotate(-16deg);opacity:0.4} 60%{transform:translate(50px,36px) rotate(-16deg);opacity:0.4} 90%{transform:translate(0,0) rotate(0deg);opacity:1} }
         @keyframes arrow-pulse { 0%,100%{opacity:0.3} 50%{opacity:0.85} }
         @keyframes hub-glow { 0%,100%{fill:oklch(22% 0.08 293)} 50%{fill:oklch(30% 0.12 293)} }
-        @keyframes particle-flow { 0%{offset-distance:0%;opacity:0} 10%{opacity:0.9} 90%{opacity:0.9} 100%{offset-distance:100%;opacity:0} }
         .doc1{transform-origin:110px 80px;animation:scatter1 4s ease-in-out infinite;}
         .doc2{transform-origin:230px 80px;animation:scatter2 4s ease-in-out infinite 0.3s;}
         .doc3{transform-origin:110px 80px;animation:scatter3 4s ease-in-out infinite 0.6s;}
@@ -87,10 +84,8 @@ function ContextLossAnimation() {
         .arrow-r{animation:arrow-pulse 2s ease-in-out infinite 0.5s;}
       `}</style>
 
-      {/* LEFT SIDE: Chaos */}
       <text x="55" y="14" fontSize="9" fill="oklch(55% 0.06 293)" fontFamily="monospace" textAnchor="middle" letterSpacing="1">SCATTERED</text>
 
-      {/* Scattered documents */}
       <g className="doc1">
         <rect x="30" y="30" width="36" height="44" rx="4" fill="white" stroke="oklch(75% 0.05 293)" strokeWidth="1.5"/>
         <line x1="37" y1="42" x2="59" y2="42" stroke="oklch(80% 0.04 293)" strokeWidth="1.5"/>
@@ -116,11 +111,9 @@ function ContextLossAnimation() {
         <line x1="95" y1="106" x2="109" y2="106" stroke="oklch(80% 0.04 293)" strokeWidth="1.5"/>
       </g>
 
-      {/* Label: "inbox", "someone's head" */}
       <text x="48" y="148" fontSize="8" fill="oklch(65% 0.05 293)" fontFamily="monospace" textAnchor="middle">inbox</text>
       <text x="105" y="148" fontSize="8" fill="oklch(65% 0.05 293)" fontFamily="monospace" textAnchor="middle">someone&apos;s head</text>
 
-      {/* ARROWS */}
       <g className="arrow-l">
         <path d="M 148 80 L 164 80" stroke="var(--kinship-mid)" strokeWidth="2" strokeDasharray="4 3"/>
         <path d="M 161 76 L 165 80 L 161 84" stroke="var(--kinship-mid)" strokeWidth="1.5" fill="none"/>
@@ -130,16 +123,12 @@ function ContextLossAnimation() {
         <path d="M 189 76 L 193 80 L 189 84" stroke="var(--kinship-mid)" strokeWidth="1.5" fill="none"/>
       </g>
 
-      {/* CENTER: One place */}
       <text x="170" y="14" fontSize="9" fill="var(--kinship-mid)" fontFamily="monospace" textAnchor="middle" letterSpacing="1">ONE PLACE</text>
       <rect className="hub-rect" x="148" y="52" width="44" height="56" rx="10" fill="oklch(22% 0.08 293)" stroke="oklch(40% 0.10 293)" strokeWidth="1.5"/>
-      {/* Brain icon paths simplified */}
       <text x="170" y="85" fontSize="22" textAnchor="middle" fill="var(--kinship-cream)">⬡</text>
 
-      {/* RIGHT SIDE: Searchable + connected */}
       <text x="265" y="14" fontSize="9" fill="oklch(55% 0.06 293)" fontFamily="monospace" textAnchor="middle" letterSpacing="1">CONNECTED</text>
 
-      {/* Three neat connected nodes */}
       <circle cx="225" cy="55" r="14" fill="white" stroke="oklch(75% 0.05 293)" strokeWidth="1.5"/>
       <text x="225" y="60" fontSize="11" textAnchor="middle" fill="var(--kinship-mid)">📄</text>
 
@@ -152,13 +141,11 @@ function ContextLossAnimation() {
       <circle cx="240" cy="112" r="14" fill="white" stroke="oklch(75% 0.05 293)" strokeWidth="1.5"/>
       <text x="240" y="117" fontSize="11" textAnchor="middle" fill="var(--kinship-mid)">🏫</text>
 
-      {/* Connection lines with animated particles */}
       <line x1="239" y1="55" x2="266" y2="49" stroke="var(--kinship-dim)" strokeWidth="1" strokeDasharray="3 3"/>
       <line x1="280" y1="59" x2="298" y2="77" stroke="var(--kinship-dim)" strokeWidth="1" strokeDasharray="3 3"/>
       <line x1="225" y1="69" x2="232" y2="98" stroke="var(--kinship-dim)" strokeWidth="1" strokeDasharray="3 3"/>
       <line x1="254" y1="112" x2="291" y2="97" stroke="var(--kinship-dim)" strokeWidth="1" strokeDasharray="3 3"/>
 
-      {/* Animated signal dots on connections */}
       <circle r="3" fill="var(--kinship-mid)" opacity="0.8">
         <animateMotion dur="2.4s" repeatCount="indefinite" begin="0s">
           <mpath xlinkHref="#path-a"/>
@@ -190,49 +177,103 @@ function ContextLossAnimation() {
   );
 }
 
-// Slide 3 (ToolsSlide): hub-and-spoke with animated signal pulses
+// ── REVISED: ToolsSlide animation — real brand logos as SVG paths ──────────────
+// Tool positions: Claude center, Notion top, Google right, Slack bottom-right, Zoom bottom-left, Hermes left
 function ToolsNetworkAnimation() {
-  const tools = [
-    { label: "Notion", x: 90, y: 30, emoji: "📋" },
-    { label: "Google", x: 260, y: 30, emoji: "🗂" },
-    { label: "Slack", x: 320, y: 100, emoji: "💬" },
-    { label: "Zoom", x: 260, y: 170, emoji: "🎥" },
-    { label: "Claude", x: 90, y: 170, emoji: "✨" },
-    { label: "Hermes", x: 30, y: 100, emoji: "⚡" },
+  const cx = 200, cy = 130;
+  // Spoke endpoints
+  const spokes = [
+    { x: 200, y: 20,  label: "Notion" },
+    { x: 350, y: 70,  label: "Google" },
+    { x: 370, y: 190, label: "Slack" },
+    { x: 200, y: 240, label: "Zoom" },
+    { x: 30,  y: 190, label: "Hermes" },
+    { x: 50,  y: 70,  label: "GWorkspace" },
   ];
-  const cx = 175, cy = 100;
   return (
-    <svg width="350" height="200" viewBox="0 0 350 200" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <svg width="400" height="264" viewBox="0 0 400 264" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
       <style>{`
-        @keyframes hub-pulse { 0%,100%{r:28;opacity:1} 50%{r:31;opacity:0.85} }
-        .hub-outer{transform-origin:175px 100px;animation:hub-pulse 3s ease-in-out infinite;}
+        @keyframes hub-pulse2 { 0%,100%{r:34;opacity:1} 50%{r:37;opacity:0.85} }
+        .hub-outer2{transform-origin:200px 130px;animation:hub-pulse2 3s ease-in-out infinite;}
       `}</style>
       {/* Spoke lines */}
-      {tools.map((t, i) => (
+      {spokes.map((t, i) => (
         <line key={i} x1={cx} y1={cy} x2={t.x} y2={t.y}
-          stroke="oklch(70% 0.08 293)" strokeWidth="1" strokeDasharray="4 4" opacity="0.5"/>
+          stroke="oklch(70% 0.08 293)" strokeWidth="1.2" strokeDasharray="4 4" opacity="0.45"/>
       ))}
       {/* Animated particles on each spoke */}
-      {tools.map((t, i) => (
+      {spokes.map((t, i) => (
         <g key={`p${i}`}>
           <circle r="3.5" fill="var(--kinship-mid)" opacity="0.9">
-            <animateMotion dur={`${1.8 + i * 0.4}s`} repeatCount="indefinite" begin={`${i * 0.5}s`}>
-              <mpath xlinkHref={`#spoke-${i}`}/>
+            <animateMotion dur={`${1.8 + i * 0.35}s`} repeatCount="indefinite" begin={`${i * 0.45}s`}>
+              <mpath xlinkHref={`#spoke2-${i}`}/>
             </animateMotion>
           </circle>
-          <path id={`spoke-${i}`} d={`M ${cx} ${cy} L ${t.x} ${t.y}`} fill="none"/>
+          <path id={`spoke2-${i}`} d={`M ${cx} ${cy} L ${t.x} ${t.y}`} fill="none"/>
         </g>
       ))}
-      {/* Tool nodes */}
-      {tools.map((t, i) => (
-        <g key={`n${i}`}>
-          <circle cx={t.x} cy={t.y} r="20" fill="white" stroke="oklch(80% 0.05 293)" strokeWidth="1.5"/>
-          <text x={t.x} y={t.y + 5} fontSize="14" textAnchor="middle">{t.emoji}</text>
-        </g>
-      ))}
-      {/* Center hub */}
-      <circle className="hub-outer" cx={cx} cy={cy} r="28" fill="oklch(25% 0.09 293)" stroke="oklch(45% 0.10 293)" strokeWidth="2"/>
-      <text x={cx} y={cy + 6} fontSize="20" textAnchor="middle" fill="var(--kinship-cream)">⬡</text>
+
+      {/* ── Notion logo (top) — N wordmark simplified ── */}
+      <g transform="translate(175,0)">
+        <circle cx="25" cy="20" r="22" fill="white" stroke="oklch(88% 0.03 293)" strokeWidth="1.5"/>
+        {/* Notion N */}
+        <path d="M14 10 L14 30 L17 30 L26 16 L26 30 L29 30 L29 10 L26 10 L17 24 L17 10 Z" fill="#191919" opacity="0.88"/>
+        <text x="25" y="46" fontSize="8" textAnchor="middle" fill="oklch(45% 0.06 293)" fontFamily="system-ui" fontWeight="600">Notion</text>
+      </g>
+
+      {/* ── Google Workspace (top-right) — colourful G ── */}
+      <g transform="translate(326,50)">
+        <circle cx="24" cy="20" r="22" fill="white" stroke="oklch(88% 0.03 293)" strokeWidth="1.5"/>
+        <text x="24" y="26" fontSize="20" textAnchor="middle" fontFamily="system-ui" fontWeight="700">
+          <tspan fill="#4285F4">G</tspan>
+        </text>
+        <path d="M24 17 L33 17 L33 21 L24 21" fill="#4285F4"/>
+        <text x="24" y="46" fontSize="8" textAnchor="middle" fill="oklch(45% 0.06 293)" fontFamily="system-ui" fontWeight="600">Google</text>
+      </g>
+
+      {/* ── Slack logo (right) — colourful hash ── */}
+      <g transform="translate(348,168)">
+        <circle cx="22" cy="22" r="22" fill="white" stroke="oklch(88% 0.03 293)" strokeWidth="1.5"/>
+        {/* Slack # simplified as coloured bars */}
+        <rect x="12" y="14" width="5" height="16" rx="2.5" fill="#E01E5A"/>
+        <rect x="27" y="14" width="5" height="16" rx="2.5" fill="#36C5F0"/>
+        <rect x="10" y="19" width="16" height="5" rx="2.5" fill="#2EB67D"/>
+        <rect x="18" y="24" width="16" height="5" rx="2.5" fill="#ECB22E"/>
+        <text x="22" y="48" fontSize="8" textAnchor="middle" fill="oklch(45% 0.06 293)" fontFamily="system-ui" fontWeight="600">Slack</text>
+      </g>
+
+      {/* ── Zoom logo (bottom) ── */}
+      <g transform="translate(175,218)">
+        <circle cx="25" cy="22" r="22" fill="#2D8CFF" stroke="oklch(88% 0.03 293)" strokeWidth="1.5"/>
+        {/* Zoom camera icon */}
+        <rect x="11" y="14" width="18" height="14" rx="3" fill="white"/>
+        <path d="M29 16 L37 12 L37 30 L29 26 Z" fill="white"/>
+        <text x="25" y="48" fontSize="8" textAnchor="middle" fill="oklch(45% 0.06 293)" fontFamily="system-ui" fontWeight="600">Zoom</text>
+      </g>
+
+      {/* ── Hermes / lightning (left) ── */}
+      <g transform="translate(6,168)">
+        <circle cx="24" cy="22" r="22" fill="oklch(22% 0.08 293)" stroke="oklch(40% 0.08 293)" strokeWidth="1.5"/>
+        <text x="24" y="29" fontSize="18" textAnchor="middle" fill="var(--kinship-cream)">⚡</text>
+        <text x="24" y="48" fontSize="8" textAnchor="middle" fill="oklch(45% 0.06 293)" fontFamily="system-ui" fontWeight="600">Hermes</text>
+      </g>
+
+      {/* ── Google Workspace second spoke (top-left) — Drive icon ── */}
+      <g transform="translate(26,50)">
+        <circle cx="24" cy="20" r="22" fill="white" stroke="oklch(88% 0.03 293)" strokeWidth="1.5"/>
+        {/* Drive triangle */}
+        <path d="M12 30 L24 10 L36 30 Z" fill="none" stroke="#FBBC04" strokeWidth="2.5"/>
+        <path d="M12 30 L20 30" stroke="#34A853" strokeWidth="2.5"/>
+        <path d="M28 30 L36 30" stroke="#4285F4" strokeWidth="2.5"/>
+        <text x="24" y="46" fontSize="7" textAnchor="middle" fill="oklch(45% 0.06 293)" fontFamily="system-ui" fontWeight="600">GWorkspace</text>
+      </g>
+
+      {/* ── Center hub: Claude logo (Anthropic A) ── */}
+      <circle className="hub-outer2" cx={cx} cy={cy} r="34" fill="oklch(16% 0.07 293)" stroke="var(--kinship-mid)" strokeWidth="2"/>
+      {/* Anthropic A simplified */}
+      <path d={`M${cx-10} ${cy+12} L${cx} ${cy-14} L${cx+10} ${cy+12}`} stroke="oklch(88% 0.05 293)" strokeWidth="2.5" fill="none" strokeLinejoin="round"/>
+      <line x1={cx-5} y1={cy+4} x2={cx+5} y2={cy+4} stroke="oklch(88% 0.05 293)" strokeWidth="2.2"/>
+      <text x={cx} y={cy+26} fontSize="8" textAnchor="middle" fill="oklch(60% 0.05 293)" fontFamily="system-ui">Claude</text>
     </svg>
   );
 }
@@ -246,7 +287,6 @@ function ContextFlowAnimation() {
         .box-live{animation:box-live 2.5s ease-in-out infinite;}
       `}</style>
 
-      {/* Box 1: Customer */}
       <rect x="10" y="30" width="110" height="60" rx="10" fill="white" stroke="oklch(60% 0.17 142)" strokeWidth="2"/>
       <text x="65" y="58" fontSize="10" textAnchor="middle" fill="oklch(40% 0.15 142)" fontFamily="monospace" fontWeight="600">CUSTOMER</text>
       <text x="65" y="72" fontSize="9" textAnchor="middle" fill="oklch(55% 0.12 142)" fontFamily="monospace">CONTEXT</text>
@@ -255,7 +295,6 @@ function ContextFlowAnimation() {
         <animate attributeName="r" values="3;5;3" dur="2s" repeatCount="indefinite"/>
       </circle>
 
-      {/* Arrow 1→2 */}
       <path d="M 122 60 L 148 60" stroke="oklch(60% 0.17 142)" strokeWidth="1.5" strokeDasharray="5 3"/>
       <path d="M 145 56 L 149 60 L 145 64" stroke="oklch(60% 0.17 142)" strokeWidth="1.5" fill="none"/>
       <circle r="3" fill="oklch(60% 0.17 142)" opacity="0.8">
@@ -265,13 +304,11 @@ function ContextFlowAnimation() {
       </circle>
       <path id="flow-1" d="M 122 60 L 148 60" fill="none"/>
 
-      {/* Box 2: Operations — LIVE */}
       <rect className="box-live" x="152" y="20" width="116" height="80" rx="10" fill="oklch(25% 0.09 293)" stroke="var(--kinship-mid)" strokeWidth="2.5"/>
       <text x="210" y="52" fontSize="10" textAnchor="middle" fill="var(--kinship-cream)" fontFamily="monospace" fontWeight="700">OPERATIONS</text>
       <text x="210" y="66" fontSize="9" textAnchor="middle" fill="oklch(70% 0.05 293)" fontFamily="monospace">CONTEXT</text>
       <text x="210" y="84" fontSize="8" textAnchor="middle" fill="var(--kinship-mid)" fontFamily="monospace">● LIVE TODAY</text>
 
-      {/* Arrow 2→3 */}
       <path d="M 270 60 L 296 60" stroke="var(--kinship-mid)" strokeWidth="1.5" strokeDasharray="5 3"/>
       <path d="M 293 56 L 297 60 L 293 64" stroke="var(--kinship-mid)" strokeWidth="1.5" fill="none"/>
       <circle r="3" fill="var(--kinship-mid)" opacity="0.9">
@@ -281,7 +318,6 @@ function ContextFlowAnimation() {
       </circle>
       <path id="flow-2" d="M 270 60 L 296 60" fill="none"/>
 
-      {/* Box 3: Product */}
       <rect x="300" y="30" width="110" height="60" rx="10" fill="white" stroke="oklch(62% 0.21 27)" strokeWidth="2"/>
       <text x="355" y="58" fontSize="10" textAnchor="middle" fill="oklch(48% 0.18 27)" fontFamily="monospace" fontWeight="600">PRODUCT</text>
       <text x="355" y="72" fontSize="9" textAnchor="middle" fill="oklch(58% 0.15 27)" fontFamily="monospace">CONTEXT</text>
@@ -293,7 +329,7 @@ function ContextFlowAnimation() {
 // Slide 6 (Capture): transcript lines flowing into a brain hub
 function CaptureFlowAnimation() {
   return (
-    <svg width="380" height="140" viewBox="0 0 380 140" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <svg width="460" height="170" viewBox="0 0 460 170" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
       <style>{`
         @keyframes line-appear { 0%,100%{scaleX:0;opacity:0} 20%{scaleX:1;opacity:1} 75%{scaleX:1;opacity:1} 95%{opacity:0} }
         @keyframes brain-pulse { 0%,100%{fill:oklch(25% 0.08 293)} 50%{fill:oklch(32% 0.12 293)} }
@@ -306,249 +342,296 @@ function CaptureFlowAnimation() {
         .brain-bg{animation:brain-pulse 2.5s ease-in-out infinite;}
       `}</style>
 
-      {/* SOURCE — Zoom call icon */}
-      <rect x="10" y="20" width="90" height="100" rx="8" fill="white" stroke="oklch(80% 0.05 293)" strokeWidth="1.5"/>
-      <text x="55" y="42" fontSize="9" textAnchor="middle" fill="oklch(55% 0.06 293)" fontFamily="monospace" letterSpacing="1">TRANSCRIPT</text>
+      <rect x="10" y="20" width="100" height="125" rx="8" fill="white" stroke="oklch(80% 0.05 293)" strokeWidth="1.5"/>
+      <text x="60" y="42" fontSize="9" textAnchor="middle" fill="oklch(55% 0.06 293)" fontFamily="monospace" letterSpacing="1">TRANSCRIPT</text>
 
-      {/* Animated text lines appearing */}
-      <g className="tline1"><rect x="18" y="48" width="70" height="6" rx="2" fill="oklch(85% 0.04 293)"/></g>
-      <g className="tline2"><rect x="18" y="58" width="55" height="6" rx="2" fill="oklch(85% 0.04 293)"/></g>
-      <g className="tline3"><rect x="18" y="68" width="63" height="6" rx="2" fill="oklch(85% 0.04 293)"/></g>
-      <g className="tline4"><rect x="18" y="98" width="68" height="6" rx="2" fill="oklch(85% 0.04 293)"/></g>
-      <g className="tline5"><rect x="18" y="108" width="50" height="6" rx="2" fill="oklch(85% 0.04 293)"/></g>
-      <g className="tline6"><rect x="18" y="118" width="60" height="6" rx="2" fill="oklch(85% 0.04 293)"/></g>
+      <g className="tline1"><rect x="18" y="50" width="76" height="7" rx="2" fill="oklch(85% 0.04 293)"/></g>
+      <g className="tline2"><rect x="18" y="62" width="60" height="7" rx="2" fill="oklch(85% 0.04 293)"/></g>
+      <g className="tline3"><rect x="18" y="74" width="70" height="7" rx="2" fill="oklch(85% 0.04 293)"/></g>
+      <g className="tline4"><rect x="18" y="100" width="72" height="7" rx="2" fill="oklch(85% 0.04 293)"/></g>
+      <g className="tline5"><rect x="18" y="112" width="54" height="7" rx="2" fill="oklch(85% 0.04 293)"/></g>
+      <g className="tline6"><rect x="18" y="124" width="64" height="7" rx="2" fill="oklch(85% 0.04 293)"/></g>
 
-      {/* FLOW ARROWS with particles */}
-      <path d="M 104 70 Q 160 70 200 70" stroke="var(--kinship-mid)" strokeWidth="2" strokeDasharray="6 4" fill="none"/>
-      <path d="M 197 66 L 201 70 L 197 74" stroke="var(--kinship-mid)" strokeWidth="2" fill="none"/>
+      <path d="M 114 82 Q 175 82 218 82" stroke="var(--kinship-mid)" strokeWidth="2" strokeDasharray="6 4" fill="none"/>
+      <path d="M 215 78 L 219 82 L 215 86" stroke="var(--kinship-mid)" strokeWidth="2" fill="none"/>
 
-      {/* Particles */}
       {[0, 0.8, 1.6].map((delay, i) => (
         <circle key={i} r="4" fill="var(--kinship-mid)" opacity="0.85">
           <animateMotion dur="2.2s" repeatCount="indefinite" begin={`${delay}s`}>
-            <mpath xlinkHref="#capture-path"/>
+            <mpath xlinkHref="#capture-path2"/>
           </animateMotion>
           <animate attributeName="opacity" values="0;0.9;0.9;0" dur="2.2s" repeatCount="indefinite" begin={`${delay}s`}/>
         </circle>
       ))}
-      <path id="capture-path" d="M 104 70 Q 160 70 200 70" fill="none"/>
+      <path id="capture-path2" d="M 114 82 Q 175 82 218 82" fill="none"/>
 
-      {/* BRAIN HUB */}
-      <circle className="brain-bg" cx="240" cy="70" r="38" fill="oklch(25% 0.08 293)" stroke="var(--kinship-mid)" strokeWidth="2"/>
-      <text x="240" y="78" fontSize="28" textAnchor="middle" fill="var(--kinship-cream)">⬡</text>
+      <circle className="brain-bg" cx="264" cy="82" r="46" fill="oklch(25% 0.08 293)" stroke="var(--kinship-mid)" strokeWidth="2"/>
+      <text x="264" y="92" fontSize="32" textAnchor="middle" fill="var(--kinship-cream)">⬡</text>
 
-      {/* OUTPUT arrows to Notion + Wiki */}
-      <path d="M 278 55 Q 310 40 336 40" stroke="oklch(60% 0.10 293)" strokeWidth="1.5" strokeDasharray="5 3" fill="none"/>
-      <path d="M 278 85 Q 310 100 336 100" stroke="oklch(60% 0.10 293)" strokeWidth="1.5" strokeDasharray="5 3" fill="none"/>
+      <path d="M 310 62 Q 348 44 376 44" stroke="oklch(60% 0.10 293)" strokeWidth="1.5" strokeDasharray="5 3" fill="none"/>
+      <path d="M 310 102 Q 348 120 376 120" stroke="oklch(60% 0.10 293)" strokeWidth="1.5" strokeDasharray="5 3" fill="none"/>
 
-      {/* Animated output particles */}
       <circle r="3" fill="oklch(75% 0.08 293)" opacity="0.8">
         <animateMotion dur="2s" repeatCount="indefinite" begin="1s">
-          <mpath xlinkHref="#out-path-1"/>
+          <mpath xlinkHref="#out-path-1b"/>
         </animateMotion>
       </circle>
-      <path id="out-path-1" d="M 278 55 Q 310 40 336 40" fill="none"/>
+      <path id="out-path-1b" d="M 310 62 Q 348 44 376 44" fill="none"/>
 
       <circle r="3" fill="oklch(75% 0.08 293)" opacity="0.8">
         <animateMotion dur="2s" repeatCount="indefinite" begin="1.6s">
-          <mpath xlinkHref="#out-path-2"/>
+          <mpath xlinkHref="#out-path-2b"/>
         </animateMotion>
       </circle>
-      <path id="out-path-2" d="M 278 85 Q 310 100 336 100" fill="none"/>
+      <path id="out-path-2b" d="M 310 102 Q 348 120 376 120" fill="none"/>
 
-      {/* Output labels */}
-      <rect x="335" y="26" width="42" height="28" rx="5" fill="white" stroke="oklch(80% 0.05 293)" strokeWidth="1.2"/>
-      <text x="356" y="44" fontSize="9" textAnchor="middle" fill="oklch(50% 0.06 293)" fontFamily="monospace">Notion</text>
+      <rect x="375" y="28" width="50" height="32" rx="5" fill="white" stroke="oklch(80% 0.05 293)" strokeWidth="1.2"/>
+      <text x="400" y="48" fontSize="9" textAnchor="middle" fill="oklch(50% 0.06 293)" fontFamily="monospace">Notion</text>
 
-      <rect x="335" y="86" width="36" height="28" rx="5" fill="white" stroke="oklch(80% 0.05 293)" strokeWidth="1.2"/>
-      <text x="353" y="104" fontSize="9" textAnchor="middle" fill="oklch(50% 0.06 293)" fontFamily="monospace">Wiki</text>
+      <rect x="375" y="104" width="42" height="32" rx="5" fill="white" stroke="oklch(80% 0.05 293)" strokeWidth="1.2"/>
+      <text x="396" y="124" fontSize="9" textAnchor="middle" fill="oklch(50% 0.06 293)" fontFamily="monospace">Wiki</text>
     </svg>
   );
 }
 
-// Slide 4 (Hermes): animated Slack-style message appearing in chat
+// ── REVISED: HermesChatAnimation — much bigger ──────────────────────────────
 function HermesChatAnimation() {
   return (
-    <svg width="320" height="200" viewBox="0 0 320 200" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <svg width="420" height="300" viewBox="0 0 420 300" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
       <style>{`
-        @keyframes msg-in { 0%,15%{transform:translateY(12px);opacity:0} 30%,80%{transform:translateY(0);opacity:1} 90%,100%{opacity:0.8} }
-        @keyframes msg-in2 { 0%,35%{transform:translateY(12px);opacity:0} 50%,80%{transform:translateY(0);opacity:1} 90%,100%{opacity:0.8} }
-        @keyframes msg-in3 { 0%,55%{transform:translateY(12px);opacity:0} 70%,80%{transform:translateY(0);opacity:1} 90%,100%{opacity:0.8} }
-        @keyframes typing-dot { 0%,80%,100%{opacity:0.3;transform:translateY(0)} 40%{opacity:1;transform:translateY(-3px)} }
-        @keyframes cursor-blink { 0%,100%{opacity:0} 50%{opacity:1} }
-        .msg1{animation:msg-in 5s ease-out infinite;}
-        .msg2{animation:msg-in2 5s ease-out infinite;}
-        .msg3{animation:msg-in3 5s ease-out infinite;}
-        .td1{animation:typing-dot 1.2s ease-in-out infinite 0s;}
-        .td2{animation:typing-dot 1.2s ease-in-out infinite 0.2s;}
-        .td3{animation:typing-dot 1.2s ease-in-out infinite 0.4s;}
+        @keyframes msg-in-a { 0%,10%{transform:translateY(16px);opacity:0} 25%,78%{transform:translateY(0);opacity:1} 92%,100%{opacity:0.7} }
+        @keyframes msg-in-b { 0%,32%{transform:translateY(16px);opacity:0} 47%,78%{transform:translateY(0);opacity:1} 92%,100%{opacity:0.7} }
+        @keyframes msg-in-c { 0%,54%{transform:translateY(16px);opacity:0} 69%,78%{transform:translateY(0);opacity:1} 92%,100%{opacity:0.7} }
+        @keyframes typing-dot { 0%,80%,100%{opacity:0.3;transform:translateY(0)} 40%{opacity:1;transform:translateY(-4px)} }
+        .hmsg1{animation:msg-in-a 6s ease-out infinite;}
+        .hmsg2{animation:msg-in-b 6s ease-out infinite;}
+        .hmsg3{animation:msg-in-c 6s ease-out infinite;}
+        .htd1{animation:typing-dot 1.2s ease-in-out infinite 0s;}
+        .htd2{animation:typing-dot 1.2s ease-in-out infinite 0.22s;}
+        .htd3{animation:typing-dot 1.2s ease-in-out infinite 0.44s;}
       `}</style>
 
       {/* Chat container */}
-      <rect x="10" y="10" width="300" height="180" rx="12" fill="white" stroke="oklch(88% 0.03 293)" strokeWidth="1.5"/>
-      {/* Header */}
-      <rect x="10" y="10" width="300" height="34" rx="12" fill="oklch(97% 0.01 293)"/>
-      <rect x="10" y="34" width="300" height="10" fill="oklch(97% 0.01 293)"/>
-      <circle cx="30" cy="27" r="8" fill="oklch(25% 0.09 293)"/>
-      <text x="30" y="31" fontSize="8" textAnchor="middle" fill="var(--kinship-cream)">⚡</text>
-      <text x="46" y="32" fontSize="10" fontWeight="700" fill="oklch(30% 0.06 293)" fontFamily="system-ui">Hermes</text>
-      <circle cx="240" cy="27" r="4" fill="oklch(60% 0.17 142)"/>
-      <text x="250" y="31" fontSize="8" fill="oklch(50% 0.12 142)" fontFamily="monospace">online</text>
+      <rect x="8" y="8" width="404" height="284" rx="16" fill="white" stroke="oklch(88% 0.03 293)" strokeWidth="1.5"/>
+      {/* Header bar */}
+      <rect x="8" y="8" width="404" height="46" rx="16" fill="oklch(96% 0.01 293)"/>
+      <rect x="8" y="36" width="404" height="18" fill="oklch(96% 0.01 293)"/>
+      <circle cx="34" cy="31" r="12" fill="oklch(22% 0.09 293)"/>
+      <text x="34" y="36" fontSize="12" textAnchor="middle" fill="var(--kinship-cream)">⚡</text>
+      <text x="54" y="36" fontSize="14" fontWeight="700" fill="oklch(25% 0.06 293)" fontFamily="system-ui">Hermes</text>
+      <circle cx="332" cy="31" r="6" fill="oklch(60% 0.17 142)"/>
+      <text x="344" y="36" fontSize="11" fill="oklch(50% 0.12 142)" fontFamily="monospace">online</text>
 
       {/* Messages */}
-      <g className="msg1">
-        <rect x="20" y="56" width="200" height="32" rx="8" fill="oklch(25% 0.09 293)"/>
-        <text x="33" y="73" fontSize="10" fill="var(--kinship-cream)" fontFamily="system-ui">✅ Zoom recap filed to Notion</text>
+      <g className="hmsg1">
+        <rect x="22" y="68" width="280" height="48" rx="12" fill="oklch(22% 0.09 293)"/>
+        <text x="40" y="88" fontSize="13" fill="var(--kinship-cream)" fontFamily="system-ui">✅ Zoom recap filed to Notion</text>
+        <text x="40" y="106" fontSize="11" fill="oklch(65% 0.05 293)" fontFamily="system-ui">Maple Ridge — follow-up logged</text>
       </g>
 
-      <g className="msg2">
-        <rect x="20" y="96" width="170" height="32" rx="8" fill="oklch(25% 0.09 293)"/>
-        <text x="33" y="113" fontSize="10" fill="var(--kinship-cream)" fontFamily="system-ui">📅 Zoom call created</text>
+      <g className="hmsg2">
+        <rect x="22" y="130" width="240" height="48" rx="12" fill="oklch(22% 0.09 293)"/>
+        <text x="40" y="150" fontSize="13" fill="var(--kinship-cream)" fontFamily="system-ui">📅 Zoom call created</text>
+        <text x="40" y="168" fontSize="11" fill="oklch(65% 0.05 293)" fontFamily="system-ui">Thu 2pm · link in calendar</text>
       </g>
 
-      <g className="msg3">
-        <rect x="20" y="136" width="220" height="32" rx="8" fill="oklch(25% 0.09 293)"/>
-        <text x="33" y="153" fontSize="10" fill="var(--kinship-cream)" fontFamily="system-ui">🔬 Research brief ready</text>
+      <g className="hmsg3">
+        <rect x="22" y="192" width="300" height="48" rx="12" fill="oklch(22% 0.09 293)"/>
+        <text x="40" y="212" fontSize="13" fill="var(--kinship-cream)" fontFamily="system-ui">🔬 Research brief ready</text>
+        <text x="40" y="230" fontSize="11" fill="oklch(65% 0.05 293)" fontFamily="system-ui">3 competitors · sent to #team-sales</text>
       </g>
 
       {/* Typing indicator */}
-      <rect x="20" y="168" width="52" height="22" rx="11" fill="oklch(93% 0.02 293)"/>
-      <circle className="td1" cx="32" cy="179" r="3" fill="oklch(60% 0.06 293)"/>
-      <circle className="td2" cx="42" cy="179" r="3" fill="oklch(60% 0.06 293)"/>
-      <circle className="td3" cx="52" cy="179" r="3" fill="oklch(60% 0.06 293)"/>
-
-      {/* Input box suggestion */}
-      <rect x="20" y="192" width="0" height="0" rx="0"/>
+      <rect x="22" y="252" width="68" height="30" rx="15" fill="oklch(92% 0.02 293)"/>
+      <circle className="htd1" cx="38" cy="267" r="4" fill="oklch(58% 0.06 293)"/>
+      <circle className="htd2" cx="52" cy="267" r="4" fill="oklch(58% 0.06 293)"/>
+      <circle className="htd3" cx="66" cy="267" r="4" fill="oklch(58% 0.06 293)"/>
     </svg>
   );
 }
 
-// Slide 7 (Two Representations): animated split-view database ↔ graph
+// ── NEW: AutomationIdeasAnimation — 3 cards with animated flow arrows ─────────
+function AutomationFlowAnimation({ index }: { index: number }) {
+  const configs = [
+    { color: "oklch(60% 0.17 142)", steps: ["📝 Notion Transcript", "→ Shared DB", "⬡ Hermes learns overnight"] },
+    { color: "oklch(62% 0.21 27)",  steps: ["🧾 Pilot Expense", "→ Tracker", "📊 Real-time Dashboard"] },
+    { color: "var(--kinship-mid)",  steps: ["💬 Field Feedback", "→ Product Signal", "📦 Client Artifact"] },
+  ];
+  const cfg = configs[index];
+  return (
+    <svg width="240" height="70" viewBox="0 0 240 70" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <style>{`
+        @keyframes step-appear-${index} { 0%,100%{opacity:0.3} 33%{opacity:1} }
+        @keyframes arrow-flow-${index} { 0%,100%{opacity:0.2;strokeDashoffset:30} 50%{opacity:0.9;strokeDashoffset:0} }
+        .sA${index}{animation:step-appear-${index} 3s ease-in-out infinite 0s;}
+        .sB${index}{animation:step-appear-${index} 3s ease-in-out infinite 1s;}
+        .sC${index}{animation:step-appear-${index} 3s ease-in-out infinite 2s;}
+      `}</style>
+      <g className={`sA${index}`}>
+        <rect x="2" y="20" width="64" height="30" rx="8" fill="white" stroke={cfg.color} strokeWidth="1.5"/>
+        <text x="34" y="39" fontSize="9" textAnchor="middle" fill="oklch(40% 0.06 293)" fontFamily="system-ui">{cfg.steps[0]}</text>
+      </g>
+      <path d="M 68 35 L 88 35" stroke={cfg.color} strokeWidth="1.5" strokeDasharray="5 3"/>
+      <path d="M 85 31 L 89 35 L 85 39" stroke={cfg.color} strokeWidth="1.5" fill="none"/>
+      <circle r="3" fill={cfg.color} opacity="0.9">
+        <animateMotion dur="1.6s" repeatCount="indefinite" begin="0.2s">
+          <mpath xlinkHref={`#auto-arr-${index}`}/>
+        </animateMotion>
+      </circle>
+      <path id={`auto-arr-${index}`} d="M 68 35 L 88 35" fill="none"/>
+      <g className={`sB${index}`}>
+        <rect x="90" y="20" width="60" height="30" rx="8" fill="white" stroke={cfg.color} strokeWidth="1.5"/>
+        <text x="120" y="39" fontSize="9" textAnchor="middle" fill="oklch(40% 0.06 293)" fontFamily="system-ui">{cfg.steps[1]}</text>
+      </g>
+      <path d="M 152 35 L 172 35" stroke={cfg.color} strokeWidth="1.5" strokeDasharray="5 3"/>
+      <path d="M 169 31 L 173 35 L 169 39" stroke={cfg.color} strokeWidth="1.5" fill="none"/>
+      <circle r="3" fill={cfg.color} opacity="0.9">
+        <animateMotion dur="1.6s" repeatCount="indefinite" begin="0.8s">
+          <mpath xlinkHref={`#auto-arr2-${index}`}/>
+        </animateMotion>
+      </circle>
+      <path id={`auto-arr2-${index}`} d="M 152 35 L 172 35" fill="none"/>
+      <g className={`sC${index}`}>
+        <rect x="175" y="12" width="62" height="46" rx="8" fill={cfg.color} opacity="0.92"/>
+        <text x="206" y="36" fontSize="9" textAnchor="middle" fill="white" fontFamily="system-ui" fontWeight="600">{cfg.steps[2]}</text>
+      </g>
+    </svg>
+  );
+}
+
+// ── REVISED: TwoLensAnimation — bigger, wider, more examples ─────────────────
 function TwoLensAnimation() {
   return (
-    <svg width="360" height="130" viewBox="0 0 360 130" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <svg width="560" height="170" viewBox="0 0 560 170" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
       <style>{`
-        @keyframes row-scan { 0%,100%{fill:white} 50%{fill:oklch(94% 0.04 293)} }
-        @keyframes node-pop { 0%,100%{r:8;opacity:0.7} 50%{r:10;opacity:1} }
-        .row1{animation:row-scan 3s ease-in-out infinite 0s;}
-        .row2{animation:row-scan 3s ease-in-out infinite 0.5s;}
-        .row3{animation:row-scan 3s ease-in-out infinite 1s;}
-        .row4{animation:row-scan 3s ease-in-out infinite 1.5s;}
-        .gnode1{animation:node-pop 2.4s ease-in-out infinite 0s;}
-        .gnode2{animation:node-pop 2.4s ease-in-out infinite 0.6s;}
-        .gnode3{animation:node-pop 2.4s ease-in-out infinite 1.2s;}
-        .gnode4{animation:node-pop 2.4s ease-in-out infinite 1.8s;}
+        @keyframes row-scan2 { 0%,100%{fill:white} 50%{fill:oklch(93% 0.04 293)} }
+        @keyframes node-pop2 { 0%,100%{r:9;opacity:0.7} 50%{r:11;opacity:1} }
+        .row2-1{animation:row-scan2 3.2s ease-in-out infinite 0s;}
+        .row2-2{animation:row-scan2 3.2s ease-in-out infinite 0.5s;}
+        .row2-3{animation:row-scan2 3.2s ease-in-out infinite 1s;}
+        .row2-4{animation:row-scan2 3.2s ease-in-out infinite 1.5s;}
+        .row2-5{animation:row-scan2 3.2s ease-in-out infinite 2s;}
+        .gn1{animation:node-pop2 2.4s ease-in-out infinite 0s;}
+        .gn2{animation:node-pop2 2.4s ease-in-out infinite 0.55s;}
+        .gn3{animation:node-pop2 2.4s ease-in-out infinite 1.1s;}
+        .gn4{animation:node-pop2 2.4s ease-in-out infinite 1.65s;}
+        .gn5{animation:node-pop2 2.4s ease-in-out infinite 2.2s;}
       `}</style>
 
-      {/* LEFT: Notion Database table */}
-      <rect x="10" y="10" width="155" height="110" rx="8" fill="white" stroke="oklch(80% 0.05 293)" strokeWidth="1.5"/>
-      {/* Header row */}
-      <rect x="10" y="10" width="155" height="24" rx="8" fill="oklch(93% 0.03 293)"/>
-      <rect x="10" y="26" width="155" height="8" fill="oklch(93% 0.03 293)"/>
-      <text x="24" y="26" fontSize="9" fontWeight="700" fill="oklch(40% 0.06 293)" fontFamily="monospace">NAME</text>
-      <text x="80" y="26" fontSize="9" fontWeight="700" fill="oklch(40% 0.06 293)" fontFamily="monospace">TYPE</text>
-      <text x="120" y="26" fontSize="9" fontWeight="700" fill="oklch(40% 0.06 293)" fontFamily="monospace">STATUS</text>
+      {/* LEFT: Notion Database — wider, more rows */}
+      <rect x="8" y="8" width="250" height="155" rx="10" fill="white" stroke="oklch(80% 0.05 293)" strokeWidth="1.5"/>
+      {/* Header */}
+      <rect x="8" y="8" width="250" height="28" rx="10" fill="oklch(93% 0.03 293)"/>
+      <rect x="8" y="28" width="250" height="8" fill="oklch(93% 0.03 293)"/>
+      <text x="36" y="27" fontSize="9" fontWeight="700" fill="oklch(40% 0.06 293)" fontFamily="monospace">NAME</text>
+      <text x="120" y="27" fontSize="9" fontWeight="700" fill="oklch(40% 0.06 293)" fontFamily="monospace">TYPE</text>
+      <text x="188" y="27" fontSize="9" fontWeight="700" fill="oklch(40% 0.06 293)" fontFamily="monospace">STATUS</text>
 
-      {/* Data rows */}
-      <g className="row1"><rect x="11" y="34" width="153" height="16" rx="0" fill="white"/>
-        <text x="24" y="46" fontSize="8" fill="oklch(45% 0.06 293)" fontFamily="monospace">Maple Ridge</text>
-        <text x="80" y="46" fontSize="8" fill="oklch(55% 0.06 293)" fontFamily="monospace">School</text>
-        <circle cx="130" cy="42" r="4" fill="oklch(60% 0.17 142)"/>
-      </g>
-      <line x1="11" y1="50" x2="163" y2="50" stroke="oklch(88% 0.02 293)" strokeWidth="1"/>
+      {[
+        { name: "Maple Ridge SD", type: "School", color: "oklch(60% 0.17 142)" },
+        { name: "Sarah Chen", type: "Contact", color: "oklch(75% 0.12 293)" },
+        { name: "Q4 Pilot — Brown", type: "Deal", color: "oklch(62% 0.21 27)" },
+        { name: "Mar 12 intro call", type: "Meeting", color: "oklch(60% 0.08 220)" },
+        { name: "Classroom widget bug", type: "Ticket", color: "oklch(62% 0.21 27)" },
+      ].map(({ name, type, color }, i) => {
+        const cls = `row2-${i + 1}`;
+        const y = 36 + i * 24;
+        return (
+          <g key={name}>
+            <g className={cls}><rect x="9" y={y} width="248" height="22" fill="white"/></g>
+            <text x="36" y={y + 15} fontSize="8" fill="oklch(40% 0.06 293)" fontFamily="monospace">{name}</text>
+            <text x="120" y={y + 15} fontSize="8" fill="oklch(55% 0.06 293)" fontFamily="monospace">{type}</text>
+            <circle cx="200" cy={y + 11} r="5" fill={color}/>
+            {i < 4 && <line x1="9" y1={y + 22} x2="257" y2={y + 22} stroke="oklch(90% 0.02 293)" strokeWidth="1"/>}
+          </g>
+        );
+      })}
 
-      <g className="row2"><rect x="11" y="50" width="153" height="16" rx="0" fill="white"/>
-        <text x="24" y="62" fontSize="8" fill="oklch(45% 0.06 293)" fontFamily="monospace">Sarah Chen</text>
-        <text x="80" y="62" fontSize="8" fill="oklch(55% 0.06 293)" fontFamily="monospace">Contact</text>
-        <circle cx="130" cy="58" r="4" fill="oklch(75% 0.12 293)"/>
-      </g>
-      <line x1="11" y1="66" x2="163" y2="66" stroke="oklch(88% 0.02 293)" strokeWidth="1"/>
-
-      <g className="row3"><rect x="11" y="66" width="153" height="16" rx="0" fill="white"/>
-        <text x="24" y="78" fontSize="8" fill="oklch(45% 0.06 293)" fontFamily="monospace">Q4 Pilot</text>
-        <text x="80" y="78" fontSize="8" fill="oklch(55% 0.06 293)" fontFamily="monospace">Deal</text>
-        <circle cx="130" cy="74" r="4" fill="oklch(62% 0.21 27)"/>
-      </g>
-      <line x1="11" y1="82" x2="163" y2="82" stroke="oklch(88% 0.02 293)" strokeWidth="1"/>
-
-      <g className="row4"><rect x="11" y="82" width="153" height="16" rx="0" fill="white"/>
-        <text x="24" y="94" fontSize="8" fill="oklch(45% 0.06 293)" fontFamily="monospace">Mar 2026 call</text>
-        <text x="80" y="94" fontSize="8" fill="oklch(55% 0.06 293)" fontFamily="monospace">Meeting</text>
-        <circle cx="130" cy="90" r="4" fill="oklch(60% 0.08 220)"/>
-      </g>
-
-      {/* For humans label */}
-      <text x="88" y="118" fontSize="8" textAnchor="middle" fill="oklch(55% 0.06 293)" fontFamily="monospace" letterSpacing="1">FOR HUMANS</text>
+      <text x="133" y="162" fontSize="8" textAnchor="middle" fill="oklch(55% 0.06 293)" fontFamily="monospace" letterSpacing="1">FOR HUMANS — you browse, filter, edit</text>
 
       {/* DIVIDER */}
-      <line x1="180" y1="10" x2="180" y2="120" stroke="oklch(85% 0.03 293)" strokeWidth="1" strokeDasharray="4 3"/>
-      <text x="180" y="68" fontSize="18" textAnchor="middle" fill="oklch(75% 0.04 293)">↔</text>
+      <line x1="272" y1="8" x2="272" y2="162" stroke="oklch(85% 0.03 293)" strokeWidth="1" strokeDasharray="4 3"/>
+      <text x="272" y="90" fontSize="22" textAnchor="middle" fill="oklch(72% 0.04 293)">↔</text>
 
-      {/* RIGHT: Knowledge graph */}
-      <circle className="gnode1" cx="245" cy="45" r="8" fill="oklch(25% 0.09 293)" stroke="var(--kinship-mid)" strokeWidth="1.5"/>
-      <text x="245" y="49" fontSize="8" textAnchor="middle" fill="var(--kinship-cream)">S</text>
+      {/* RIGHT: Knowledge graph — more nodes, more labels */}
+      {/* Nodes */}
+      <circle className="gn1" cx="340" cy="50"  r="9" fill="oklch(22% 0.09 293)" stroke="var(--kinship-mid)" strokeWidth="1.5"/>
+      <text x="340" y="54" fontSize="8" textAnchor="middle" fill="var(--kinship-cream)">S</text>
+      <text x="340" y="38" fontSize="7" textAnchor="middle" fill="oklch(50% 0.06 293)" fontFamily="monospace">school</text>
 
-      <circle className="gnode2" cx="310" cy="38" r="8" fill="oklch(25% 0.09 293)" stroke="oklch(60% 0.17 142)" strokeWidth="1.5"/>
-      <text x="310" y="42" fontSize="8" textAnchor="middle" fill="var(--kinship-cream)">P</text>
+      <circle className="gn2" cx="430" cy="36"  r="9" fill="oklch(22% 0.09 293)" stroke="oklch(60% 0.17 142)" strokeWidth="1.5"/>
+      <text x="430" y="40" fontSize="8" textAnchor="middle" fill="var(--kinship-cream)">P</text>
+      <text x="430" y="24" fontSize="7" textAnchor="middle" fill="oklch(50% 0.06 293)" fontFamily="monospace">person</text>
 
-      <circle className="gnode3" cx="340" cy="85" r="8" fill="oklch(25% 0.09 293)" stroke="oklch(62% 0.21 27)" strokeWidth="1.5"/>
-      <text x="340" y="89" fontSize="8" textAnchor="middle" fill="var(--kinship-cream)">D</text>
+      <circle className="gn3" cx="512" cy="80"  r="9" fill="oklch(22% 0.09 293)" stroke="oklch(62% 0.21 27)" strokeWidth="1.5"/>
+      <text x="512" y="84" fontSize="8" textAnchor="middle" fill="var(--kinship-cream)">D</text>
+      <text x="530" y="82" fontSize="7" fill="oklch(50% 0.06 293)" fontFamily="monospace">deal</text>
 
-      <circle className="gnode4" cx="250" cy="95" r="8" fill="oklch(25% 0.09 293)" stroke="oklch(60% 0.10 220)" strokeWidth="1.5"/>
-      <text x="250" y="99" fontSize="8" textAnchor="middle" fill="var(--kinship-cream)">M</text>
+      <circle className="gn4" cx="390" cy="130" r="9" fill="oklch(22% 0.09 293)" stroke="oklch(60% 0.08 220)" strokeWidth="1.5"/>
+      <text x="390" y="134" fontSize="8" textAnchor="middle" fill="var(--kinship-cream)">M</text>
+      <text x="390" y="148" fontSize="7" textAnchor="middle" fill="oklch(50% 0.06 293)" fontFamily="monospace">meeting</text>
 
-      {/* Graph edges */}
-      <line x1="253" y1="45" x2="302" y2="40" stroke="oklch(70% 0.06 293)" strokeWidth="1" strokeDasharray="3 2"/>
-      <line x1="310" y1="46" x2="337" y2="77" stroke="oklch(70% 0.06 293)" strokeWidth="1" strokeDasharray="3 2"/>
-      <line x1="245" y1="53" x2="249" y2="87" stroke="oklch(70% 0.06 293)" strokeWidth="1" strokeDasharray="3 2"/>
-      <line x1="258" y1="95" x2="332" y2="88" stroke="oklch(70% 0.06 293)" strokeWidth="1" strokeDasharray="3 2"/>
+      <circle className="gn5" cx="500" cy="140" r="9" fill="oklch(22% 0.09 293)" stroke="oklch(70% 0.15 60)" strokeWidth="1.5"/>
+      <text x="500" y="144" fontSize="8" textAnchor="middle" fill="var(--kinship-cream)">T</text>
+      <text x="500" y="158" fontSize="7" textAnchor="middle" fill="oklch(50% 0.06 293)" fontFamily="monospace">ticket</text>
 
-      {/* Animated traversal particle */}
-      <circle r="3.5" fill="var(--kinship-mid)" opacity="0.9">
-        <animateMotion dur="4s" repeatCount="indefinite" begin="0s">
-          <mpath xlinkHref="#graph-path"/>
-        </animateMotion>
-        <animate attributeName="opacity" values="0;1;1;1;0" dur="4s" repeatCount="indefinite"/>
-      </circle>
-      <path id="graph-path" d="M 245 45 L 310 38 L 340 85 L 250 95 L 245 45" fill="none"/>
+      {/* Edges */}
+      <line x1="349" y1="50" x2="421" y2="39" stroke="oklch(70% 0.06 293)" strokeWidth="1" strokeDasharray="3 2"/>
+      <line x1="430" y1="45" x2="509" y2="72" stroke="oklch(70% 0.06 293)" strokeWidth="1" strokeDasharray="3 2"/>
+      <line x1="340" y1="59" x2="384" y2="121" stroke="oklch(70% 0.06 293)" strokeWidth="1" strokeDasharray="3 2"/>
+      <line x1="399" y1="130" x2="491" y2="138" stroke="oklch(70% 0.06 293)" strokeWidth="1" strokeDasharray="3 2"/>
+      <line x1="510" y1="89" x2="506" y2="131" stroke="oklch(70% 0.06 293)" strokeWidth="1" strokeDasharray="3 2"/>
 
       {/* Edge labels */}
-      <text x="278" y="37" fontSize="7" fill="oklch(62% 0.08 293)" fontFamily="monospace">knows</text>
-      <text x="330" y="65" fontSize="7" fill="oklch(62% 0.08 293)" fontFamily="monospace">at</text>
-      <text x="225" y="74" fontSize="7" fill="oklch(62% 0.08 293)" fontFamily="monospace">has</text>
+      <text x="382" y="37" fontSize="7" fill="oklch(60% 0.08 293)" fontFamily="monospace">knows</text>
+      <text x="476" y="60" fontSize="7" fill="oklch(60% 0.08 293)" fontFamily="monospace">has deal</text>
+      <text x="344" y="93" fontSize="7" fill="oklch(60% 0.08 293)" fontFamily="monospace">hosted</text>
+      <text x="438" y="130" fontSize="7" fill="oklch(60% 0.08 293)" fontFamily="monospace">led to</text>
 
-      <text x="286" y="118" fontSize="8" textAnchor="middle" fill="oklch(55% 0.06 293)" fontFamily="monospace" letterSpacing="1">FOR AI</text>
+      {/* Traversal particle */}
+      <circle r="4" fill="var(--kinship-mid)" opacity="0.9">
+        <animateMotion dur="5s" repeatCount="indefinite" begin="0s">
+          <mpath xlinkHref="#graph-path2"/>
+        </animateMotion>
+        <animate attributeName="opacity" values="0;1;1;1;1;0" dur="5s" repeatCount="indefinite"/>
+      </circle>
+      <path id="graph-path2" d="M 340 50 L 430 36 L 512 80 L 500 140 L 390 130 L 340 50" fill="none"/>
+
+      <text x="420" y="162" fontSize="8" textAnchor="middle" fill="oklch(55% 0.06 293)" fontFamily="monospace" letterSpacing="1">FOR AI — Hermes navigates relationships</text>
     </svg>
   );
 }
 
-// Slide 8 (How You Help): animated signal bubble rising
+// Slide 8 (How You Help): animated signal bubble rising — bigger
 function SignalAnimation() {
   return (
-    <svg width="200" height="100" viewBox="0 0 200 100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <svg width="480" height="130" viewBox="0 0 480 130" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
       <style>{`
-        @keyframes bubble-rise { 0%{transform:translateY(30px);opacity:0} 20%,75%{transform:translateY(0);opacity:1} 95%,100%{transform:translateY(-20px);opacity:0} }
-        @keyframes bubble-rise2 { 0%,30%{transform:translateY(30px);opacity:0} 50%,75%{transform:translateY(0);opacity:1} 95%,100%{transform:translateY(-20px);opacity:0} }
-        @keyframes bubble-rise3 { 0%,55%{transform:translateY(30px);opacity:0} 75%,85%{transform:translateY(0);opacity:1} 95%,100%{transform:translateY(-20px);opacity:0} }
-        .b1{animation:bubble-rise 4s ease-in-out infinite;}
-        .b2{animation:bubble-rise2 4s ease-in-out infinite;}
-        .b3{animation:bubble-rise3 4s ease-in-out infinite;}
+        @keyframes bubble-rise-big { 0%{transform:translateY(36px);opacity:0} 18%,72%{transform:translateY(0);opacity:1} 92%,100%{transform:translateY(-24px);opacity:0} }
+        @keyframes bubble-rise-big2 { 0%,28%{transform:translateY(36px);opacity:0} 46%,72%{transform:translateY(0);opacity:1} 92%,100%{transform:translateY(-24px);opacity:0} }
+        @keyframes bubble-rise-big3 { 0%,52%{transform:translateY(36px);opacity:0} 70%,80%{transform:translateY(0);opacity:1} 92%,100%{transform:translateY(-24px);opacity:0} }
+        .bb1{animation:bubble-rise-big 5s ease-in-out infinite;}
+        .bb2{animation:bubble-rise-big2 5s ease-in-out infinite;}
+        .bb3{animation:bubble-rise-big3 5s ease-in-out infinite;}
       `}</style>
-      <text x="100" y="94" fontSize="9" textAnchor="middle" fill="oklch(60% 0.06 293)" fontFamily="monospace" letterSpacing="1">IDEAS SURFACE</text>
-      <g className="b1">
-        <rect x="12" y="40" width="68" height="30" rx="8" fill="oklch(25% 0.09 293)"/>
-        <path d="M 20 70 L 14 80 L 28 70" fill="oklch(25% 0.09 293)"/>
-        <text x="46" y="60" fontSize="9" textAnchor="middle" fill="var(--kinship-cream)" fontFamily="system-ui">I wish this…</text>
+      <text x="240" y="120" fontSize="9" textAnchor="middle" fill="oklch(60% 0.06 293)" fontFamily="monospace" letterSpacing="2">IDEAS SURFACE → AUTOMATIONS GET BUILT</text>
+      <g className="bb1">
+        <rect x="10" y="44" width="136" height="52" rx="12" fill="oklch(22% 0.09 293)"/>
+        <path d="M 22 96 L 14 114 L 40 96" fill="oklch(22% 0.09 293)"/>
+        <text x="78" y="66" fontSize="11" textAnchor="middle" fill="var(--kinship-cream)" fontFamily="system-ui">💡 I wish this just</text>
+        <text x="78" y="84" fontSize="11" textAnchor="middle" fill="var(--kinship-cream)" fontFamily="system-ui">captured itself…</text>
       </g>
-      <g className="b2">
-        <rect x="65" y="28" width="72" height="30" rx="8" fill="var(--kinship-mid)"/>
-        <path d="M 72 58 L 68 68 L 82 58" fill="var(--kinship-mid)"/>
-        <text x="101" y="48" fontSize="9" textAnchor="middle" fill="white" fontFamily="system-ui">auto-captured!</text>
+      <g className="bb2">
+        <rect x="170" y="28" width="140" height="52" rx="12" fill="var(--kinship-mid)"/>
+        <path d="M 182 80 L 174 98 L 200 80" fill="var(--kinship-mid)"/>
+        <text x="240" y="50" fontSize="11" textAnchor="middle" fill="white" fontFamily="system-ui">✅ Auto-captured!</text>
+        <text x="240" y="68" fontSize="11" textAnchor="middle" fill="white" fontFamily="system-ui">→ brain updated</text>
       </g>
-      <g className="b3">
-        <rect x="115" y="40" width="74" height="30" rx="8" fill="oklch(25% 0.09 293)"/>
-        <path d="M 122 70 L 118 80 L 132 70" fill="oklch(25% 0.09 293)"/>
-        <text x="152" y="60" fontSize="9" textAnchor="middle" fill="var(--kinship-cream)" fontFamily="system-ui">#brain-context</text>
+      <g className="bb3">
+        <rect x="330" y="44" width="142" height="52" rx="12" fill="oklch(22% 0.09 293)"/>
+        <path d="M 342 96 L 334 114 L 360 96" fill="oklch(22% 0.09 293)"/>
+        <text x="401" y="66" fontSize="11" textAnchor="middle" fill="var(--kinship-cream)" fontFamily="system-ui">📣 Post in</text>
+        <text x="401" y="84" fontSize="11" textAnchor="middle" fill="var(--kinship-cream)" fontFamily="system-ui">#brain-context</text>
       </g>
     </svg>
   );
@@ -559,29 +642,24 @@ function PipeFlowAnimation() {
   return (
     <svg width="280" height="60" viewBox="0 0 280 60" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
       <style>{`
-        @keyframes pipe-fill { 0%{stroke-dashoffset:260} 60%{stroke-dashoffset:0} 100%{stroke-dashoffset:0} }
-        @keyframes pipe-glow { 0%,100%{opacity:0.4} 70%{opacity:0.9} }
-        .pipe-line{stroke-dasharray:260;animation:pipe-fill 4s ease-out infinite;animation:pipe-fill 4s ease-out infinite;}
-        .pipe-glow{animation:pipe-glow 4s ease-in-out infinite;}
+        @keyframes pipe-glow2 { 0%,100%{opacity:0.4} 70%{opacity:0.9} }
+        .pipe-glow2{animation:pipe-glow2 4s ease-in-out infinite;}
       `}</style>
-      {/* Pipe */}
       <path d="M 10 30 C 60 30 80 10 140 10 C 200 10 220 50 280 50"
         stroke="oklch(40% 0.07 293)" strokeWidth="8" fill="none" strokeLinecap="round"/>
-      {/* Flowing fill */}
-      <path className="pipe-line pipe-glow" d="M 10 30 C 60 30 80 10 140 10 C 200 10 220 50 280 50"
+      <path className="pipe-glow2" d="M 10 30 C 60 30 80 10 140 10 C 200 10 220 50 280 50"
         stroke="var(--kinship-mid)" strokeWidth="6" fill="none" strokeLinecap="round" strokeDasharray="260" strokeDashoffset="260">
         <animate attributeName="stroke-dashoffset" values="260;0;0;260" dur="4s" repeatCount="indefinite"/>
       </path>
-      {/* Particles along the pipe */}
       {[0, 1.2, 2.4].map((delay, i) => (
         <circle key={i} r="4" fill="var(--kinship-cream)" opacity="0.9">
           <animateMotion dur="4s" repeatCount="indefinite" begin={`${delay}s`}>
-            <mpath xlinkHref="#pipe-path"/>
+            <mpath xlinkHref="#pipe-path2"/>
           </animateMotion>
           <animate attributeName="opacity" values="0;0.9;0.9;0" dur="4s" repeatCount="indefinite" begin={`${delay}s`}/>
         </circle>
       ))}
-      <path id="pipe-path" d="M 10 30 C 60 30 80 10 140 10 C 200 10 220 50 280 50" fill="none"/>
+      <path id="pipe-path2" d="M 10 30 C 60 30 80 10 140 10 C 200 10 220 50 280 50" fill="none"/>
     </svg>
   );
 }
@@ -687,7 +765,6 @@ function CoverSlide() {
     <div className="flex flex-col items-center justify-center h-full gap-6" style={{ background: "var(--kinship-ink)" }}>
       <div className="relative flex items-center justify-center">
         <CoverBrainAnimation />
-        {/* Brain icon overlaid on center of SVG */}
         <div className="absolute flex items-center justify-center w-14 h-14 rounded-2xl"
           style={{ background: "oklch(25% 0.08 293)" }}>
           <Brain className="w-8 h-8" style={{ color: "var(--kinship-cream)" }} />
@@ -715,7 +792,6 @@ function WhySlide() {
         title="Every company loses context."
         subtitle="It lives in someone's inbox, someone's head, a doc nobody can find. At our size — survivable. As we grow — fatal."
       />
-      {/* Animated SVG — the core message visualized */}
       <ContextLossAnimation />
       <div className="grid grid-cols-3 gap-5 w-full max-w-4xl">
         {[
@@ -736,20 +812,7 @@ function WhySlide() {
   );
 }
 
-// Slide 2 — Ask the room #1
-function AskRoom1() {
-  return (
-    <div className="flex flex-col items-center justify-center h-full gap-8" style={{ background: "var(--kinship-ink)" }}>
-      <SectionLabel dark>Quick show of hands</SectionLabel>
-      <AskBubble>
-        &ldquo;Who has lost time this month because information was somewhere you couldn&apos;t get to it?&rdquo;
-      </AskBubble>
-      <p className="text-sm" style={{ color: "oklch(45% 0.06 293)" }}>This is the pain the brain solves.</p>
-    </div>
-  );
-}
-
-// Slide 3 — Tools (animated hub-and-spoke network)
+// Slide 2 — Tools (REVISED: animated hub with real brand logos)
 function ToolsSlide() {
   const tools = [
     { name: "Notion", role: "Company filing system — schools, contacts, deals, meetings, tasks, devices. Smart and connected." },
@@ -759,7 +822,7 @@ function ToolsSlide() {
     { name: "Hermes", role: "Our Slack agent. The operational brain that lives where we already talk." },
   ];
   return (
-    <div className="flex flex-col items-center justify-center h-full gap-6 px-16 max-w-6xl mx-auto w-full">
+    <div className="flex flex-col items-center justify-center h-full gap-4 px-16 max-w-6xl mx-auto w-full">
       <SectionLabel>2 · Tools already in your hands</SectionLabel>
       <SlideTitle title="No new app to learn." subtitle="The brain connects the tools you already use." />
       <ToolsNetworkAnimation />
@@ -775,7 +838,7 @@ function ToolsSlide() {
   );
 }
 
-// Slide 4 — Skills
+// Slide 3 — Skills
 function SkillsSlide() {
   const skills = [
     "kinship-design",
@@ -806,7 +869,7 @@ function SkillsSlide() {
   );
 }
 
-// Slide 5 — Ask room #2
+// Slide 4 — Ask room #2
 function AskRoom2() {
   return (
     <div className="flex flex-col items-center justify-center h-full gap-8" style={{ background: "var(--kinship-ink)" }}>
@@ -819,7 +882,7 @@ function AskRoom2() {
   );
 }
 
-// Slide 6 — Connectors + Scheduled tasks
+// Slide 5 — Connectors + Scheduled tasks
 function ConnectorsSlide() {
   return (
     <div className="flex flex-col items-center justify-center h-full gap-8 px-16 max-w-6xl mx-auto w-full">
@@ -867,21 +930,21 @@ function ConnectorsSlide() {
   );
 }
 
-// Slide 7 — Hermes agent (animated chat)
+// Slide 6 — Hermes agent (REVISED: bigger chat animation)
 function HermesSlide() {
   const capabilities = ["Book appointments", "Create Zoom calls", "Financial updates", "Rapid prototyping", "Coding tasks", "Research synthesis"];
   return (
-    <div className="flex flex-col items-center justify-center h-full gap-8 px-16 max-w-6xl mx-auto w-full">
+    <div className="flex flex-col items-center justify-center h-full gap-6 px-16 max-w-6xl mx-auto w-full">
       <SectionLabel>4 · Hermes</SectionLabel>
-      <div className="grid grid-cols-2 gap-12 w-full max-w-5xl items-center">
-        <div className="flex flex-col gap-6">
+      <div className="grid grid-cols-2 gap-10 w-full max-w-5xl items-center">
+        <div className="flex flex-col gap-5">
           <h2 style={{ fontFamily: "'Georgia', serif", fontSize: "2.5rem", color: "var(--kinship-ink)", lineHeight: 1.1 }}>
             The shared operator in Slack.
           </h2>
           <p style={{ color: "oklch(50% 0.06 293)", lineHeight: 1.6 }}>
             Claude is <em>your</em> personal operator. Hermes is the <em>shared</em> operator — it lives where we already talk.
           </p>
-          <div className="flex flex-col gap-3 mt-2">
+          <div className="flex flex-col gap-3">
             <p className="text-xs font-mono tracking-widest uppercase mb-1" style={{ color: "var(--kinship-dim)" }}>Already can do</p>
             <div className="grid grid-cols-2 gap-2">
               {capabilities.map(c => (
@@ -901,7 +964,7 @@ function HermesSlide() {
   );
 }
 
-// Slide 8 — Ask room #3 (the big one)
+// Slide 7 — Ask room #3 (the big one)
 function AskRoom3() {
   return (
     <div className="flex flex-col items-center justify-center h-full gap-8 px-16" style={{ background: "var(--kinship-ink)" }}>
@@ -917,6 +980,57 @@ function AskRoom3() {
         ))}
       </div>
       <p className="text-sm" style={{ color: "oklch(45% 0.06 293)" }}>Dream big — start complex, we can always scale it down. This list is your agent roadmap.</p>
+    </div>
+  );
+}
+
+// ── NEW SLIDE: Automation ideas (between Hermes ask + Context Engineering) ──
+function AutomationIdeasSlide() {
+  const ideas = [
+    {
+      index: 0,
+      icon: FileText,
+      title: "Notion transcripts → overnight learning",
+      desc: "Record any call in Notion — even in-person. Move the transcript to the shared meeting database. Hermes reads it overnight, enriches the brain's understanding, but never quietly rewrites your Notion records. You stay in control.",
+      tag: "Low friction capture",
+      tagColor: "oklch(60% 0.17 142)",
+    },
+    {
+      index: 1,
+      icon: TrendingUp,
+      title: "Pilot expense tracking",
+      desc: "Log pilot-related costs as they happen — no end-of-month scramble. Hermes keeps a running tally per school, flags anomalies, and surfaces a clean summary on demand. Real numbers, zero spreadsheet maintenance.",
+      tag: "Real-time visibility",
+      tagColor: "oklch(62% 0.21 27)",
+    },
+    {
+      index: 2,
+      icon: Package,
+      title: "Field feedback → client artifacts",
+      desc: "When your team spots something in the field — a feature gap, a win, a pain point — log it once. Hermes routes it as a product signal and, when ready, drafts a polished artifact you can share directly with that school.",
+      tag: "Feedback to output",
+      tagColor: "var(--kinship-mid)",
+    },
+  ];
+  return (
+    <div className="flex flex-col items-center justify-center h-full gap-6 px-16 max-w-6xl mx-auto w-full">
+      <SectionLabel>4b · Automation ideas — from the team</SectionLabel>
+      <SlideTitle title="Three ideas already on the table." subtitle="These came from you. Here's how they'd work." />
+      <div className="grid grid-cols-3 gap-6 w-full max-w-5xl">
+        {ideas.map(({ index, icon: Icon, title, desc, tag, tagColor }) => (
+          <Card key={title} className="flex flex-col gap-4" style={{ padding: "1.25rem" }}>
+            <AutomationFlowAnimation index={index} />
+            <div className="flex items-center gap-2 mt-1">
+              <Icon className="w-5 h-5 flex-shrink-0" style={{ color: tagColor }} />
+              <p className="font-semibold text-sm leading-snug" style={{ color: "var(--kinship-ink)" }}>{title}</p>
+            </div>
+            <p className="text-xs leading-relaxed" style={{ color: "oklch(50% 0.06 293)" }}>{desc}</p>
+            <span className="self-start text-xs font-mono px-2 py-0.5 rounded-full" style={{ background: "oklch(95% 0.02 293)", color: tagColor, border: `1px solid ${tagColor}` }}>
+              {tag}
+            </span>
+          </Card>
+        ))}
+      </div>
     </div>
   );
 }
@@ -973,13 +1087,15 @@ function AskRoom4() {
   );
 }
 
-// Slide 11 — How context is captured (animated flow)
-function CaptureSilde() {
+// Slide 11 — How context is captured (REVISED: bigger SVG, better spacing)
+function CaptureSlide() {
   return (
-    <div className="flex flex-col items-center justify-center h-full gap-8 px-16 max-w-6xl mx-auto w-full">
+    <div className="flex flex-col items-center justify-center h-full gap-6 px-16 max-w-6xl mx-auto w-full">
       <SectionLabel>6 · How context gets captured</SectionLabel>
       <SlideTitle title="You shouldn't be doing manual data entry." subtitle="The brain is assembled from tools you already use — and we're selective about what we capture." />
-      <CaptureFlowAnimation />
+      <div className="flex justify-center w-full">
+        <CaptureFlowAnimation />
+      </div>
       <div className="grid grid-cols-3 gap-6 w-full max-w-5xl">
         <Card className="col-span-2 flex flex-col gap-4">
           <div className="flex items-center gap-3 mb-2">
@@ -1010,53 +1126,59 @@ function CaptureSilde() {
   );
 }
 
-// Slide 12 — Two representations (animated split)
+// Slide 12 — Two representations (REVISED: bigger/wider SVG, more examples)
 function TwoRepresentationsSlide() {
   return (
-    <div className="flex flex-col items-center justify-center h-full gap-6 px-16 max-w-6xl mx-auto w-full">
+    <div className="flex flex-col items-center justify-center h-full gap-5 px-16 max-w-6xl mx-auto w-full">
       <SectionLabel>7 · How the brain is presented</SectionLabel>
       <SlideTitle title="Same knowledge. Two lenses." />
-      <TwoLensAnimation />
+      <div className="flex justify-center w-full">
+        <TwoLensAnimation />
+      </div>
       <div className="grid grid-cols-2 gap-8 w-full max-w-4xl">
-        <Card className="flex flex-col gap-4">
+        <Card className="flex flex-col gap-3">
           <div className="flex items-center gap-3 mb-1">
             <Database className="w-6 h-6" style={{ color: "var(--kinship-mid)" }} />
             <p className="font-semibold text-lg" style={{ color: "var(--kinship-ink)" }}>Notion databases</p>
           </div>
           <p className="text-xs font-mono tracking-widest uppercase" style={{ color: "var(--kinship-dim)" }}>For humans</p>
           <p className="text-sm leading-relaxed" style={{ color: "oklch(50% 0.06 293)" }}>
-            A friendlier, navigable spreadsheet. Human-driven, agent-assisted. This is where you go to <em>see</em> and <em>work with</em> information.
+            A friendlier, navigable spreadsheet. You filter, you edit, you decide what to act on. Agents help keep it organised — you stay in the driver&apos;s seat.
           </p>
+          <p className="text-xs italic" style={{ color: "oklch(60% 0.06 293)" }}>e.g. View all active pilots, filter by school district, update status in one click.</p>
         </Card>
-        <Card className="flex flex-col gap-4">
+        <Card className="flex flex-col gap-3">
           <div className="flex items-center gap-3 mb-1">
             <GitBranch className="w-6 h-6" style={{ color: "var(--kinship-mid)" }} />
             <p className="font-semibold text-lg" style={{ color: "var(--kinship-ink)" }}>The wiki / knowledge graph</p>
           </div>
           <p className="text-xs font-mono tracking-widest uppercase" style={{ color: "var(--kinship-dim)" }}>For AI</p>
           <p className="text-sm leading-relaxed" style={{ color: "oklch(50% 0.06 293)" }}>
-            Freeform. Hermes manages it automatically — &ldquo;this is a person,&rdquo; &ldquo;this is a company.&rdquo; Less human opinion required on how to organize.
+            Freeform. Hermes builds it automatically — &ldquo;this is a person,&rdquo; &ldquo;this is a school,&rdquo; &ldquo;they had this meeting.&rdquo; No human opinion on taxonomy required.
           </p>
+          <p className="text-xs italic" style={{ color: "oklch(60% 0.06 293)" }}>e.g. Hermes can answer: &ldquo;Which schools have been quiet for 2+ weeks?&rdquo; without a manual query.</p>
         </Card>
       </div>
-      <div className="flex items-center gap-3 rounded-2xl px-8 py-5" style={{ background: "oklch(25% 0.07 293)" }}>
+      <div className="flex items-center gap-3 rounded-2xl px-8 py-4 w-full max-w-4xl" style={{ background: "oklch(25% 0.07 293)" }}>
         <BookOpen className="w-5 h-5 flex-shrink-0" style={{ color: "var(--kinship-dim)" }} />
         <p className="text-base" style={{ color: "var(--kinship-cream)", fontFamily: "'Georgia', serif", fontStyle: "italic" }}>
-          &ldquo;Databases are how <em>we</em> read the brain. The knowledge graph is how <em>AI</em> reads it.&rdquo;
+          &ldquo;You do what only humans can do. Let AI take the busy work.&rdquo;
         </p>
       </div>
     </div>
   );
 }
 
-// Slide 13 — How you help (animated rising idea bubbles)
+// Slide 13 — How you help (REVISED: bigger animated signal bubbles)
 function HowYouHelpSlide() {
   return (
-    <div className="flex flex-col items-center justify-center h-full gap-8 px-16 max-w-6xl mx-auto w-full">
+    <div className="flex flex-col items-center justify-center h-full gap-6 px-16 max-w-6xl mx-auto w-full">
       <SectionLabel>8 · This is a team sport</SectionLabel>
       <SlideTitle title="Your job isn't data entry." subtitle="It's spotting where automation would help and raising it." />
-      <SignalAnimation />
-      <div className="grid grid-cols-2 gap-8 w-full max-w-5xl mt-2">
+      <div className="flex justify-center w-full">
+        <SignalAnimation />
+      </div>
+      <div className="grid grid-cols-2 gap-8 w-full max-w-5xl">
         <Card className="flex flex-col gap-4">
           <Zap className="w-6 h-6 mb-1" style={{ color: "var(--kinship-mid)" }} />
           <p className="font-semibold" style={{ color: "var(--kinship-ink)" }}>Where to bring ideas</p>
@@ -1133,22 +1255,40 @@ function SlackSlide() {
   );
 }
 
-// Slide 16 — Close + CTAs
+// Slide 16 — REVISED Close: new 3-step CTAs
 function CloseSlide() {
   const actions = [
-    { num: "01", action: "Turn on your daily debrief", detail: "In Claude Cowork. We'll help anyone after the meeting." },
-    { num: "02", action: "Move work talk into public channels", detail: "proj- and team- channels. That's where the brain listens." },
-    { num: "03", action: "Bring one automation idea", detail: "To #topic-brain-context. That's the roadmap." },
+    {
+      num: "01",
+      action: "Set up your tools",
+      detail: "Connect Claude, Slack, Zoom, and Google Workspace so we can start collecting business intelligence from day one.",
+      icon: Zap,
+    },
+    {
+      num: "02",
+      action: "Set up your daily debrief on Claude",
+      detail: "Turn on the morning-briefing scheduled task. See what intel you get, notice what's missing, and tell us.",
+      icon: Calendar,
+    },
+    {
+      num: "03",
+      action: "Book a meeting with Azim",
+      detail: "30 minutes. Walk through your tooling, your role, and what the brain can do for you specifically.",
+      icon: MessageSquare,
+    },
   ];
   return (
     <div className="flex flex-col items-center justify-center h-full gap-10 px-16 max-w-6xl mx-auto w-full" style={{ background: "var(--kinship-ink)" }}>
       <SectionLabel dark>10 · Three things to do this week</SectionLabel>
       <div className="flex flex-col gap-5 w-full max-w-3xl">
-        {actions.map(({ num, action, detail }) => (
+        {actions.map(({ num, action, detail, icon: Icon }) => (
           <DarkCard key={num} className="flex items-start gap-5">
             <span className="text-4xl font-mono flex-shrink-0" style={{ color: "oklch(35% 0.07 293)" }}>{num}</span>
-            <div>
-              <p className="text-lg font-semibold mb-1" style={{ color: "var(--kinship-cream)" }}>{action}</p>
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-1">
+                <Icon className="w-4 h-4 flex-shrink-0" style={{ color: "var(--kinship-mid)" }} />
+                <p className="text-lg font-semibold" style={{ color: "var(--kinship-cream)" }}>{action}</p>
+              </div>
               <p className="text-sm" style={{ color: "oklch(60% 0.05 293)" }}>{detail}</p>
             </div>
           </DarkCard>
@@ -1158,7 +1298,7 @@ function CloseSlide() {
   );
 }
 
-// Slide 17 — Final framing (animated pipe filling with data)
+// Slide 17 — REVISED Final: "We build the pipes"
 function FinalSlide() {
   return (
     <div className="flex flex-col items-center justify-center h-full gap-8" style={{ background: "var(--kinship-ink)" }}>
@@ -1167,7 +1307,7 @@ function FinalSlide() {
       </div>
       <SlideTitle
         dark
-        title="I built the pipes."
+        title="We build the pipes."
         subtitle="You're the ones who know what should flow through them. Let's build it together."
       />
       <PipeFlowAnimation />
@@ -1209,16 +1349,17 @@ function FAQSlide() {
 const SLIDES = [
   { id: "cover", component: <CoverSlide />, label: "Cover", dark: true },
   { id: "why", component: <WhySlide />, label: "Why we're here", dark: false },
-  { id: "ask-1", component: <AskRoom1 />, label: "Ask the room", dark: true },
+  // NOTE: old AskRoom1 ("who lost time") REMOVED per Azim's feedback
   { id: "tools", component: <ToolsSlide />, label: "Your tools", dark: false },
   { id: "skills", component: <SkillsSlide />, label: "Skills", dark: false },
   { id: "ask-2", component: <AskRoom2 />, label: "Ask the room", dark: true },
   { id: "connectors", component: <ConnectorsSlide />, label: "Connectors + tasks", dark: false },
   { id: "hermes", component: <HermesSlide />, label: "Hermes", dark: false },
   { id: "ask-3", component: <AskRoom3 />, label: "Ask the room", dark: true },
+  { id: "automation-ideas", component: <AutomationIdeasSlide />, label: "Automation ideas", dark: false },
   { id: "context", component: <ContextSlide />, label: "Context engineering", dark: false },
   { id: "ask-4", component: <AskRoom4 />, label: "Ask the room", dark: true },
-  { id: "capture", component: <CaptureSilde />, label: "How context is captured", dark: false },
+  { id: "capture", component: <CaptureSlide />, label: "How context is captured", dark: false },
   { id: "representations", component: <TwoRepresentationsSlide />, label: "Two lenses", dark: false },
   { id: "help", component: <HowYouHelpSlide />, label: "How you help", dark: false },
   { id: "ask-5", component: <AskRoom5 />, label: "Ask the room", dark: true },
@@ -1239,7 +1380,6 @@ export default function AllHandsPresentation() {
 
   const [isTouchDevice, setIsTouchDevice] = useState(false);
 
-  // Detect touch device on mount; also restore saved slide position
   useEffect(() => {
     if (window.matchMedia("(pointer: coarse)").matches) {
       setIsTouchDevice(true);
@@ -1312,7 +1452,6 @@ export default function AllHandsPresentation() {
       onTouchEnd={handleTouchEnd}
       style={{ background: current.dark ? "var(--kinship-ink)" : "var(--kinship-cream)" }}
     >
-      {/* Slides */}
       <AnimatePresence custom={dir} mode="wait">
         <motion.div
           key={current.id}
@@ -1344,7 +1483,7 @@ export default function AllHandsPresentation() {
         {current.label}
       </div>
 
-      {/* Nav arrows — always visible on mobile, fade in/out on desktop hover */}
+      {/* Nav arrows */}
       <div
         className="absolute bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-6 transition-opacity duration-200"
         style={{ opacity: isTouchDevice || showNav ? 1 : 0 }}
@@ -1363,7 +1502,6 @@ export default function AllHandsPresentation() {
           <ChevronLeft className="w-5 h-5" />
         </button>
 
-        {/* Dot indicator */}
         <div className="flex items-center gap-1.5">
           {SLIDES.map((_, i) => (
             <button
