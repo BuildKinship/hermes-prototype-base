@@ -174,6 +174,43 @@ function PrototypeCard({ m, onOpenDrawer }: { m: PrototypeManifest; onOpenDrawer
           </div>
         )}
 
+        {/* Admin PIN — shown on survey-type prototypes */}
+        {m.admin_code && (
+          <div
+            className="flex items-center gap-2 px-3 py-2 rounded-lg border"
+            style={{
+              borderColor: "color-mix(in oklch, var(--kinship-dim) 30%, transparent)",
+              background: "color-mix(in oklch, var(--kinship-cream) 80%, transparent)",
+            }}
+          >
+            <svg className="w-3.5 h-3.5 flex-shrink-0" viewBox="0 0 16 16" fill="none" style={{ color: "var(--kinship-dim)" }}>
+              <rect x="3" y="7" width="10" height="8" rx="1.5" stroke="currentColor" strokeWidth="1.5"/>
+              <path d="M5 7V5a3 3 0 016 0v2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+            </svg>
+            <span className="text-[11px]" style={{ color: "var(--kinship-dim)" }}>
+              Admin PIN:
+            </span>
+            <span
+              className="text-[11px] font-mono font-bold tracking-widest"
+              style={{ color: "var(--kinship-ink)" }}
+            >
+              {m.admin_code}
+            </span>
+            {m.admin_url && (
+              <a
+                href={m.admin_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="ml-auto text-[10px] hover:underline flex-shrink-0"
+                style={{ color: "var(--kinship-mid)" }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                Open →
+              </a>
+            )}
+          </div>
+        )}
+
         {/* Footer */}
         <div className="flex items-center justify-between mt-auto pt-2 border-t" style={{ borderColor: "color-mix(in oklch, var(--kinship-dim) 30%, transparent)" }}>
           <div className="flex items-center gap-2">
