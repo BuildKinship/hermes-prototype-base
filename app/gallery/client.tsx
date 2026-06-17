@@ -90,16 +90,23 @@ function PrototypeCard({ m }: { m: PrototypeManifest }) {
           rel="noopener noreferrer"
           className="absolute inset-0 flex items-center justify-center group"
         >
-          {/* iframe preview — sandboxed, no scripts */}
-          <iframe
-            src={m.url}
-            title={m.name}
-            sandbox="allow-same-origin"
-            className="w-full h-full scale-[0.55] origin-top pointer-events-none"
-            style={{ height: "180%", transform: "scale(0.55) translateY(-40%)" }}
-          />
+          {m.thumbnail ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={`/prototypes/${m.slug}/thumbnail.png`}
+              alt={m.name}
+              className="w-full h-full object-cover object-top"
+            />
+          ) : (
+            <div
+              className="w-full h-full flex items-center justify-center"
+              style={{ background: "color-mix(in oklch, var(--kinship-mid) 8%, var(--kinship-cream))" }}
+            >
+              <span className="text-4xl opacity-20">⬡</span>
+            </div>
+          )}
           {/* hover overlay */}
-          <div className="absolute inset-0 bg-[var(--kinship-ink)] opacity-0 group-hover:opacity-10 transition-opacity duration-200" />
+          <div className="absolute inset-0 bg-[var(--kinship-ink)] opacity-0 group-hover:opacity-20 transition-opacity duration-200" />
           <div className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
             <span
               className="flex items-center gap-1 text-xs px-2 py-1 rounded-full font-medium"
