@@ -6,6 +6,7 @@ import { motion, AnimatePresence, type Transition } from "framer-motion";
 import {
   Brain,
   Zap,
+  Users,
   Calendar,
   MessageSquare,
   Database,
@@ -677,6 +678,8 @@ export default function AllHandsPresentation() {
   const [[page, dir], setPage] = useState([0, 0]);
   const [showNav, setShowNav] = useState(false);
   const navTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const touchStartX = useRef<number | null>(null);
+  const touchStartY = useRef<number | null>(null);
 
   // Save progress
   useEffect(() => {
@@ -711,6 +714,28 @@ export default function AllHandsPresentation() {
     navTimeoutRef.current = setTimeout(() => setShowNav(false), 2000);
   }, []);
 
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
+    // Show nav on touch
+    setShowNav(true);
+    if (navTimeoutRef.current) clearTimeout(navTimeoutRef.current);
+    navTimeoutRef.current = setTimeout(() => setShowNav(false), 2500);
+  }, []);
+
+  const handleTouchEnd = useCallback((e: React.TouchEvent) => {
+    if (touchStartX.current === null || touchStartY.current === null) return;
+    const dx = e.changedTouches[0].clientX - touchStartX.current;
+    const dy = e.changedTouches[0].clientY - touchStartY.current;
+    // Only count as horizontal swipe if horizontal motion dominates
+    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 40) {
+      if (dx < 0) go(page + 1); // swipe left → next
+      else go(page - 1);        // swipe right → prev
+    }
+    touchStartX.current = null;
+    touchStartY.current = null;
+  }, [go, page]);
+
   const current = SLIDES[page];
 
   const slideVariants = {
@@ -723,6 +748,8 @@ export default function AllHandsPresentation() {
     <div
       className="w-full h-screen overflow-hidden relative"
       onMouseMove={handleMouseMove}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
       style={{ background: current.dark ? "var(--kinship-ink)" : "var(--kinship-cream)" }}
     >
       {/* Slides */}
