@@ -1,19 +1,84 @@
 "use client";
 // Survey engine client component — manages state, animations, and question flow
+// Uses react-hook-form + zod for validation to avoid stale-closure bugs
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { motion, AnimatePresence } from "framer-motion";
 import type { Transition } from "framer-motion";
-import { ArrowRight, Check, ChevronRight } from "lucide-react";
+import { ArrowRight, Check, ChevronRight, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { SurveyConfig, Question, ChoiceOption } from "@/mock/surveys";
 
 const EASE_OUT = [0.22, 1, 0.36, 1] as unknown as Transition["ease"];
-const EASE_IN = [0.55, 0, 1, 0.45] as unknown as Transition["ease"];
 
 /* ─── Types ─────────────────────────────────────────────────── */
 
-type Answers = Record<string, string | string[] | number>;
+type AnswerValue = string | string[] | number | undefined;
+type Answers = Record<string, AnswerValue>;
+
+/* ─── Zod schema builder ─────────────────────────────────────── */
+
+function buildAnswerSchema(question: Question): z.ZodTypeAny {
+  switch (question.type) {
+    case "single-choice": {
+      const base = z.string();
+      return question.required ? base.min(1, "Please select an option") : base.optional();
+    }
+    case "multiple-choice": {
+      const base = z.array(z.string());
+      return question.required
+        ? base.min(1, "Please select at least one option")
+        : base.optional();
+    }
+    case "rating": {
+      // value is a number passed directly — just check it's a valid number
+      const base = z.number({ error: "Please select a rating" });
+      return question.required
+        ? base.min(1, "Please select a rating")
+        : base.optional();
+    }
+    case "email": {
+      if (question.required) {
+        return z.string().min(1, "This question is required").email("Please enter a valid email address");
+      }
+      return z.string().email("Please enter a valid email address").optional().or(z.literal(""));
+    }
+    case "number": {
+      // value comes in as string from input, parse to number
+      let schema = z.string().transform((s) => {
+        if (s === "" || s === undefined) return undefined;
+        const n = parseFloat(s);
+        if (isNaN(n)) throw new z.ZodError([{ code: "custom", message: "Please enter a valid number", path: [] }]);
+        return n;
+      });
+      // Can't refine mid-transform in v4 cleanly — handle min/max in validateAnswer post-parse
+      if (question.required) {
+        return schema.refine((v) => v !== undefined, "This question is required");
+      }
+      return schema.optional();
+    }
+    default: {
+      // short-text, long-text
+      let base = z.string();
+      if (question.minLength) {
+        base = base.min(
+          question.minLength,
+          `Please enter at least ${question.minLength} characters`
+        );
+      }
+      if (question.maxLength) {
+        base = base.max(
+          question.maxLength,
+          `Maximum ${question.maxLength} characters`
+        );
+      }
+      return question.required ? base.min(1, "This question is required") : base.optional();
+    }
+  }
+}
 
 /* ─── Progress Bar ──────────────────────────────────────────── */
 
@@ -35,11 +100,13 @@ function WelcomeScreen({
   title,
   description,
   questionCount,
+  adminUrl,
   onStart,
 }: {
   title: string;
   description: string;
   questionCount: number;
+  adminUrl: string;
   onStart: () => void;
 }) {
   return (
@@ -64,14 +131,23 @@ function WelcomeScreen({
       <p className="text-sm text-[var(--kinship-dim)] mb-10">
         {questionCount} questions · about 3 minutes
       </p>
-      <button
-        onClick={onStart}
-        className="flex items-center gap-3 px-8 py-4 rounded-full text-[var(--kinship-cream)] font-medium text-lg transition-all hover:opacity-90 active:scale-95"
-        style={{ background: "var(--kinship-ink)" }}
-      >
-        Start
-        <ArrowRight className="w-5 h-5" />
-      </button>
+      <div className="flex items-center gap-4">
+        <button
+          onClick={onStart}
+          className="flex items-center gap-3 px-8 py-4 rounded-full text-[var(--kinship-cream)] font-medium text-lg transition-all hover:opacity-90 active:scale-95"
+          style={{ background: "var(--kinship-ink)" }}
+        >
+          Start
+          <ArrowRight className="w-5 h-5" />
+        </button>
+        <a
+          href={adminUrl}
+          className="flex items-center gap-1.5 px-4 py-4 text-sm text-[var(--kinship-dim)] hover:text-[var(--kinship-mid)] transition-colors"
+        >
+          <Settings className="w-4 h-4" />
+          Admin
+        </a>
+      </div>
     </motion.div>
   );
 }
@@ -126,17 +202,12 @@ function TextQuestion({
   error?: string;
 }) {
   const isLong = question.type === "long-text";
-  const ref = useRef<HTMLTextAreaElement & HTMLInputElement>(null);
-
-  useEffect(() => {
-    ref.current?.focus();
-  }, [question.id]);
 
   return (
     <div className="flex flex-col gap-4">
       {isLong ? (
         <textarea
-          ref={ref as React.RefObject<HTMLTextAreaElement>}
+          autoFocus
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={question.placeholder}
@@ -149,20 +220,22 @@ function TextQuestion({
             }
           }}
           className={cn(
-            "w-full resize-none rounded-xl border-2 px-5 py-4 text-lg text-[var(--kinship-ink)]",
-            "bg-white placeholder:text-[var(--kinship-dim)] outline-none transition-colors",
-            "focus:border-[var(--kinship-mid)]",
-            error ? "border-red-400" : "border-[color-mix(in_oklch,var(--kinship-dim)_40%,transparent)]"
+            "w-full px-4 py-3 rounded-xl border-2 resize-none text-base bg-white text-[var(--kinship-ink)] placeholder-[var(--kinship-dim)] outline-none transition-colors focus:border-[var(--kinship-mid)]",
+            error
+              ? "border-red-400"
+              : "border-[color-mix(in_oklch,var(--kinship-dim)_40%,transparent)]"
           )}
         />
       ) : (
         <input
-          ref={ref as React.RefObject<HTMLInputElement>}
-          type={question.type === "email" ? "email" : "text"}
+          autoFocus
+          type={question.type === "email" ? "email" : question.type === "number" ? "number" : "text"}
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={question.placeholder}
           maxLength={question.maxLength}
+          min={question.min}
+          max={question.max}
           onKeyDown={(e) => {
             if (e.key === "Enter") {
               e.preventDefault();
@@ -170,10 +243,10 @@ function TextQuestion({
             }
           }}
           className={cn(
-            "w-full rounded-xl border-2 px-5 py-4 text-lg text-[var(--kinship-ink)]",
-            "bg-white placeholder:text-[var(--kinship-dim)] outline-none transition-colors",
-            "focus:border-[var(--kinship-mid)]",
-            error ? "border-red-400" : "border-[color-mix(in_oklch,var(--kinship-dim)_40%,transparent)]"
+            "w-full px-4 py-3 rounded-xl border-2 text-base bg-white text-[var(--kinship-ink)] placeholder-[var(--kinship-dim)] outline-none transition-colors focus:border-[var(--kinship-mid)]",
+            error
+              ? "border-red-400"
+              : "border-[color-mix(in_oklch,var(--kinship-dim)_40%,transparent)]"
           )}
         />
       )}
@@ -186,96 +259,19 @@ function TextQuestion({
           {error}
         </motion.p>
       )}
-      <div className="flex items-center gap-4 mt-2">
+      <div className="flex items-center gap-4">
         <button
           onClick={onAdvance}
           className="flex items-center gap-2 px-6 py-3 rounded-full text-[var(--kinship-cream)] font-medium transition-all hover:opacity-90 active:scale-95"
           style={{ background: "var(--kinship-ink)" }}
         >
-          {question.required ? "Next" : "Next"}
+          OK
           <ChevronRight className="w-4 h-4" />
         </button>
-        {isLong && (
-          <span className="text-xs text-[var(--kinship-dim)]">
-            or press Ctrl+Enter
-          </span>
-        )}
-        {!isLong && question.type !== "email" && (
-          <span className="text-xs text-[var(--kinship-dim)]">
-            or press Enter
-          </span>
-        )}
+        <span className="text-xs text-[var(--kinship-dim)]">
+          {isLong ? "or press Ctrl+Enter" : "or press Enter"}
+        </span>
       </div>
-    </div>
-  );
-}
-
-/* ─── Question: Number ──────────────────────────────────────── */
-
-function NumberQuestion({
-  question,
-  value,
-  onChange,
-  onAdvance,
-  error,
-}: {
-  question: Question;
-  value: string;
-  onChange: (v: string) => void;
-  onAdvance: () => void;
-  error?: string;
-}) {
-  const ref = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    ref.current?.focus();
-  }, [question.id]);
-
-  return (
-    <div className="flex flex-col gap-4">
-      <input
-        ref={ref}
-        type="number"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={question.placeholder ?? "Enter a number"}
-        min={question.min}
-        max={question.max}
-        onKeyDown={(e) => {
-          if (e.key === "Enter") {
-            e.preventDefault();
-            onAdvance();
-          }
-        }}
-        className={cn(
-          "w-48 rounded-xl border-2 px-5 py-4 text-xl text-[var(--kinship-ink)]",
-          "bg-white placeholder:text-[var(--kinship-dim)] outline-none transition-colors",
-          "focus:border-[var(--kinship-mid)]",
-          error ? "border-red-400" : "border-[color-mix(in_oklch,var(--kinship-dim)_40%,transparent)]"
-        )}
-      />
-      {question.min !== undefined && question.max !== undefined && (
-        <p className="text-xs text-[var(--kinship-dim)]">
-          Between {question.min} and {question.max}
-        </p>
-      )}
-      {error && (
-        <motion.p
-          initial={{ opacity: 0, y: -4 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-red-500 text-sm font-medium"
-        >
-          {error}
-        </motion.p>
-      )}
-      <button
-        onClick={onAdvance}
-        className="self-start flex items-center gap-2 px-6 py-3 rounded-full text-[var(--kinship-cream)] font-medium transition-all hover:opacity-90 active:scale-95"
-        style={{ background: "var(--kinship-ink)" }}
-      >
-        Next
-        <ChevronRight className="w-4 h-4" />
-      </button>
     </div>
   );
 }
@@ -292,7 +288,7 @@ function SingleChoiceQuestion({
   question: Question;
   value: string;
   onChange: (v: string) => void;
-  onAdvance: () => void;
+  onAdvance: (val: string) => void;
   error?: string;
 }) {
   const [showKeys, setShowKeys] = useState(false);
@@ -317,7 +313,7 @@ function SingleChoiceQuestion({
         onChange(opt.id);
         setTimeout(() => {
           setJustSelected(null);
-          onAdvance();
+          onAdvance(opt.id); // pass value directly — bypasses stale closure
         }, 250);
       }
     };
@@ -330,7 +326,7 @@ function SingleChoiceQuestion({
     onChange(optId);
     setTimeout(() => {
       setJustSelected(null);
-      onAdvance();
+      onAdvance(optId); // pass value directly — bypasses stale closure
     }, 250);
   };
 
@@ -403,6 +399,9 @@ function SingleChoiceQuestion({
           {error}
         </motion.p>
       )}
+      <p className="text-xs text-[var(--kinship-dim)] mt-1">
+        Press A, B, C… to select · auto-advances on selection
+      </p>
     </div>
   );
 }
@@ -549,7 +548,7 @@ function RatingQuestion({
   question: Question;
   value: number | null;
   onChange: (v: number) => void;
-  onAdvance: () => void;
+  onAdvance: (val: number) => void;
   error?: string;
 }) {
   const max = question.ratingMax ?? 5;
@@ -561,7 +560,7 @@ function RatingQuestion({
       const num = e.key === "0" ? 10 : parseInt(e.key);
       if (!isNaN(num) && num >= 1 && num <= max) {
         onChange(num);
-        setTimeout(() => onAdvance(), 300);
+        setTimeout(() => onAdvance(num), 300); // pass value directly
       }
     };
     window.addEventListener("keydown", handler);
@@ -570,7 +569,7 @@ function RatingQuestion({
 
   const select = (n: number) => {
     onChange(n);
-    setTimeout(() => onAdvance(), 300);
+    setTimeout(() => onAdvance(n), 300); // pass value directly
   };
 
   return (
@@ -601,9 +600,13 @@ function RatingQuestion({
         ))}
       </div>
       {question.ratingLabels && (
-        <div className="flex justify-between text-xs text-[var(--kinship-dim)] max-w-[calc(3.5rem*${max}+0.5rem*(${max}-1))]">
-          <span>{question.ratingLabels.low}</span>
-          <span>{question.ratingLabels.high}</span>
+        <div className="flex items-center justify-between max-w-sm">
+          <span className="text-xs text-[var(--kinship-dim)]">
+            {question.ratingLabels.low}
+          </span>
+          <span className="text-xs text-[var(--kinship-dim)]">
+            {question.ratingLabels.high}
+          </span>
         </div>
       )}
       {error && (
@@ -622,42 +625,160 @@ function RatingQuestion({
   );
 }
 
-/* ─── Question Wrapper ──────────────────────────────────────── */
+/* ─── Combined Email/Number question (uses TextQuestion) ───── */
 
-function QuestionField({
+function EmailQuestion({
   question,
-  answers,
-  setAnswer,
+  value,
+  onChange,
   onAdvance,
   error,
 }: {
   question: Question;
-  answers: Answers;
-  setAnswer: (id: string, value: string | string[] | number) => void;
+  value: string;
+  onChange: (v: string) => void;
   onAdvance: () => void;
   error?: string;
 }) {
-  const rawValue = answers[question.id];
+  return (
+    <div className="flex flex-col gap-4">
+      <input
+        autoFocus
+        type="email"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={question.placeholder ?? "name@example.com"}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            onAdvance();
+          }
+        }}
+        className={cn(
+          "w-full px-4 py-3 rounded-xl border-2 text-base bg-white text-[var(--kinship-ink)] placeholder-[var(--kinship-dim)] outline-none transition-colors focus:border-[var(--kinship-mid)]",
+          error
+            ? "border-red-400"
+            : "border-[color-mix(in_oklch,var(--kinship-dim)_40%,transparent)]"
+        )}
+      />
+      {error && (
+        <motion.p
+          initial={{ opacity: 0, y: -4 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-red-500 text-sm font-medium"
+        >
+          {error}
+        </motion.p>
+      )}
+      <div className="flex items-center gap-4">
+        <button
+          onClick={onAdvance}
+          className="flex items-center gap-2 px-6 py-3 rounded-full text-[var(--kinship-cream)] font-medium transition-all hover:opacity-90 active:scale-95"
+          style={{ background: "var(--kinship-ink)" }}
+        >
+          OK
+          <ChevronRight className="w-4 h-4" />
+        </button>
+        <span className="text-xs text-[var(--kinship-dim)]">or press Enter</span>
+      </div>
+    </div>
+  );
+}
 
+function NumberQuestion({
+  question,
+  value,
+  onChange,
+  onAdvance,
+  error,
+}: {
+  question: Question;
+  value: string;
+  onChange: (v: string) => void;
+  onAdvance: () => void;
+  error?: string;
+}) {
+  return (
+    <div className="flex flex-col gap-4">
+      <input
+        autoFocus
+        type="number"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={question.placeholder}
+        min={question.min}
+        max={question.max}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            onAdvance();
+          }
+        }}
+        className={cn(
+          "w-full px-4 py-3 rounded-xl border-2 text-base bg-white text-[var(--kinship-ink)] placeholder-[var(--kinship-dim)] outline-none transition-colors focus:border-[var(--kinship-mid)]",
+          error
+            ? "border-red-400"
+            : "border-[color-mix(in_oklch,var(--kinship-dim)_40%,transparent)]"
+        )}
+      />
+      {error && (
+        <motion.p
+          initial={{ opacity: 0, y: -4 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-red-500 text-sm font-medium"
+        >
+          {error}
+        </motion.p>
+      )}
+      <div className="flex items-center gap-4">
+        <button
+          onClick={onAdvance}
+          className="flex items-center gap-2 px-6 py-3 rounded-full text-[var(--kinship-cream)] font-medium transition-all hover:opacity-90 active:scale-95"
+          style={{ background: "var(--kinship-ink)" }}
+        >
+          OK
+          <ChevronRight className="w-4 h-4" />
+        </button>
+        <span className="text-xs text-[var(--kinship-dim)]">or press Enter</span>
+      </div>
+    </div>
+  );
+}
+
+/* ─── Question Field Router ──────────────────────────────────── */
+
+function QuestionField({
+  question,
+  value,
+  onChange,
+  onAdvance,
+  error,
+}: {
+  question: Question;
+  value: AnswerValue;
+  onChange: (v: AnswerValue) => void;
+  onAdvance: (val?: AnswerValue) => void;
+  error?: string;
+}) {
   switch (question.type) {
     case "short-text":
-    case "email":
-      return (
-        <TextQuestion
-          question={question}
-          value={(rawValue as string) ?? ""}
-          onChange={(v) => setAnswer(question.id, v)}
-          onAdvance={onAdvance}
-          error={error}
-        />
-      );
     case "long-text":
       return (
         <TextQuestion
           question={question}
-          value={(rawValue as string) ?? ""}
-          onChange={(v) => setAnswer(question.id, v)}
-          onAdvance={onAdvance}
+          value={(value as string) ?? ""}
+          onChange={(v) => onChange(v)}
+          onAdvance={() => onAdvance()}
+          error={error}
+        />
+      );
+    case "email":
+      return (
+        <EmailQuestion
+          question={question}
+          value={(value as string) ?? ""}
+          onChange={(v) => onChange(v)}
+          onAdvance={() => onAdvance()}
           error={error}
         />
       );
@@ -665,9 +786,9 @@ function QuestionField({
       return (
         <NumberQuestion
           question={question}
-          value={(rawValue as string) ?? ""}
-          onChange={(v) => setAnswer(question.id, v)}
-          onAdvance={onAdvance}
+          value={(value as string) ?? ""}
+          onChange={(v) => onChange(v)}
+          onAdvance={() => onAdvance()}
           error={error}
         />
       );
@@ -675,9 +796,9 @@ function QuestionField({
       return (
         <SingleChoiceQuestion
           question={question}
-          value={(rawValue as string) ?? ""}
-          onChange={(v) => setAnswer(question.id, v)}
-          onAdvance={onAdvance}
+          value={(value as string) ?? ""}
+          onChange={(v) => onChange(v)}
+          onAdvance={(val) => onAdvance(val)}
           error={error}
         />
       );
@@ -685,9 +806,9 @@ function QuestionField({
       return (
         <MultipleChoiceQuestion
           question={question}
-          value={(rawValue as string[]) ?? []}
-          onChange={(v) => setAnswer(question.id, v)}
-          onAdvance={onAdvance}
+          value={(value as string[]) ?? []}
+          onChange={(v) => onChange(v)}
+          onAdvance={() => onAdvance()}
           error={error}
         />
       );
@@ -695,9 +816,9 @@ function QuestionField({
       return (
         <RatingQuestion
           question={question}
-          value={(rawValue as number) ?? null}
-          onChange={(v) => setAnswer(question.id, v)}
-          onAdvance={onAdvance}
+          value={(value as number) ?? null}
+          onChange={(v) => onChange(v)}
+          onAdvance={(val) => onAdvance(val)}
           error={error}
         />
       );
@@ -713,13 +834,13 @@ type Stage = "welcome" | "questions" | "submitting" | "done" | "error";
 export function SurveyEngine({ survey }: { survey: SurveyConfig }) {
   const [stage, setStage] = useState<Stage>("welcome");
   const [questionIndex, setQuestionIndex] = useState(0);
-  const [answers, setAnswers] = useState<Answers>({});
-  const [fieldError, setFieldError] = useState<string | undefined>();
   const [direction, setDirection] = useState<1 | -1>(1); // 1=forward, -1=back
   const [submitError, setSubmitError] = useState<string | undefined>();
 
   const questions = survey.questions;
   const currentQuestion = questions[questionIndex];
+  const adminUrl = `/survey/${survey.slug}/admin`;
+
   const progress =
     stage === "welcome"
       ? 0
@@ -727,96 +848,105 @@ export function SurveyEngine({ survey }: { survey: SurveyConfig }) {
       ? 100
       : ((questionIndex + 1) / questions.length) * 100;
 
+  // react-hook-form manages all answer state — no stale closures possible
+  // because setValue/getValues always operate on the live form store
+  const {
+    setValue,
+    getValues,
+    clearErrors,
+  } = useForm<Record<string, AnswerValue>>({
+    defaultValues: {},
+    mode: "onChange",
+  });
+
+  // Local display state for current field (mirrors RHF under the hood)
+  const [displayAnswers, setDisplayAnswers] = useState<Answers>({});
+  const [fieldError, setFieldError] = useState<string | undefined>();
+
   const setAnswer = useCallback(
-    (id: string, value: string | string[] | number) => {
-      setAnswers((prev) => ({ ...prev, [id]: value }));
+    (id: string, value: AnswerValue) => {
+      setValue(id, value);
+      setDisplayAnswers((prev) => ({ ...prev, [id]: value }));
       setFieldError(undefined);
+      clearErrors(id);
+    },
+    [setValue, clearErrors]
+  );
+
+  // Validate a single question against a value (pure — no captured state)
+  const validateAnswer = useCallback(
+    (question: Question, value: AnswerValue): string | undefined => {
+      try {
+        buildAnswerSchema(question).parse(value);
+        return undefined;
+      } catch (err) {
+        if (err instanceof z.ZodError) {
+          return err.issues[0]?.message ?? "Invalid answer";
+        }
+        return "Invalid answer";
+      }
     },
     []
   );
 
-  const validateCurrent = useCallback((): string | undefined => {
-    if (!currentQuestion) return undefined;
-    const value = answers[currentQuestion.id];
+  // advance(overrideValue?) — overrideValue is passed by auto-advance components
+  // (single-choice, rating) so we validate against the just-selected value
+  // rather than whatever's in state (which may not have updated yet)
+  const advance = useCallback(
+    (overrideValue?: AnswerValue) => {
+      if (!currentQuestion) return;
 
-    if (currentQuestion.required) {
-      if (value === undefined || value === null || value === "") {
-        return "This question is required";
+      const value =
+        overrideValue !== undefined
+          ? overrideValue
+          : getValues(currentQuestion.id);
+
+      const err = validateAnswer(currentQuestion, value);
+      if (err) {
+        setFieldError(err);
+        return;
       }
-      if (Array.isArray(value) && value.length === 0) {
-        return "Please select at least one option";
-      }
-    }
 
-    if (currentQuestion.type === "email" && value) {
-      const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRe.test(String(value))) {
-        return "Please enter a valid email address";
-      }
-    }
+      setFieldError(undefined);
+      setDirection(1);
 
-    if (currentQuestion.type === "number" && value !== undefined && value !== "") {
-      const n = Number(value);
-      if (isNaN(n)) return "Please enter a valid number";
-      if (currentQuestion.min !== undefined && n < currentQuestion.min)
-        return `Minimum value is ${currentQuestion.min}`;
-      if (currentQuestion.max !== undefined && n > currentQuestion.max)
-        return `Maximum value is ${currentQuestion.max}`;
-    }
+      if (questionIndex < questions.length - 1) {
+        setQuestionIndex((i) => i + 1);
+      } else {
+        // Submit
+        setStage("submitting");
+        const allValues = getValues();
+        const payload: Answers = {};
 
-    if (currentQuestion.type === "short-text" || currentQuestion.type === "long-text") {
-      const str = String(value ?? "");
-      if (currentQuestion.minLength && str.length < currentQuestion.minLength)
-        return `Please enter at least ${currentQuestion.minLength} characters`;
-      if (currentQuestion.maxLength && str.length > currentQuestion.maxLength)
-        return `Maximum ${currentQuestion.maxLength} characters`;
-    }
-
-    return undefined;
-  }, [currentQuestion, answers]);
-
-  const advance = useCallback(() => {
-    const err = validateCurrent();
-    if (err) {
-      setFieldError(err);
-      return;
-    }
-    setFieldError(undefined);
-    setDirection(1);
-
-    if (questionIndex < questions.length - 1) {
-      setQuestionIndex((i) => i + 1);
-    } else {
-      // Submit
-      setStage("submitting");
-      const payload: Answers = { ...answers };
-      // Normalize number fields
-      questions.forEach((q) => {
-        if (q.type === "number" && payload[q.id] !== undefined) {
-          payload[q.id] = Number(payload[q.id]);
-        }
-      });
-
-      fetch(`/api/survey/${survey.slug}/submit`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ answers: payload }),
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.success) {
-            setStage("done");
-          } else {
-            setSubmitError(data.error ?? "Submission failed");
-            setStage("error");
+        questions.forEach((q) => {
+          const v = allValues[q.id];
+          if (v !== undefined) {
+            payload[q.id] = q.type === "number" ? Number(v) : v;
           }
-        })
-        .catch(() => {
-          setSubmitError("Network error — please try again");
-          setStage("error");
         });
-    }
-  }, [validateCurrent, questionIndex, questions, answers, survey.slug]);
+
+        fetch(`/api/survey/${survey.slug}/submit`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ answers: payload }),
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            if (data.success) {
+              setStage("done");
+            } else {
+              setSubmitError(data.error ?? "Submission failed");
+              setStage("error");
+            }
+          })
+          .catch(() => {
+            setSubmitError("Network error — please try again");
+            setStage("error");
+          });
+      }
+    },
+    [currentQuestion, getValues, validateAnswer, questionIndex, questions, survey.slug]
+  );
 
   const goBack = useCallback(() => {
     if (questionIndex === 0) {
@@ -841,9 +971,19 @@ export function SurveyEngine({ survey }: { survey: SurveyConfig }) {
           >
             ← Back
           </button>
-          <span className="text-sm text-[var(--kinship-dim)] font-medium tabular-nums">
-            {questionIndex + 1} / {questions.length}
-          </span>
+          <div className="flex items-center gap-4">
+            <span className="text-sm text-[var(--kinship-dim)] font-medium tabular-nums">
+              {questionIndex + 1} / {questions.length}
+            </span>
+            <a
+              href={adminUrl}
+              className="flex items-center gap-1 text-xs text-[var(--kinship-dim)] hover:text-[var(--kinship-mid)] transition-colors"
+              title="Admin view"
+            >
+              <Settings className="w-3.5 h-3.5" />
+              Admin
+            </a>
+          </div>
         </div>
       )}
 
@@ -857,6 +997,7 @@ export function SurveyEngine({ survey }: { survey: SurveyConfig }) {
                 title={survey.title}
                 description={survey.description}
                 questionCount={questions.length}
+                adminUrl={adminUrl}
                 onStart={() => {
                   setDirection(1);
                   setStage("questions");
@@ -900,8 +1041,8 @@ export function SurveyEngine({ survey }: { survey: SurveyConfig }) {
                 {/* Field */}
                 <QuestionField
                   question={currentQuestion}
-                  answers={answers}
-                  setAnswer={setAnswer}
+                  value={displayAnswers[currentQuestion.id]}
+                  onChange={(v) => setAnswer(currentQuestion.id, v)}
                   onAdvance={advance}
                   error={fieldError}
                 />
