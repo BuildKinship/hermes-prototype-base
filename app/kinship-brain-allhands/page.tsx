@@ -21,6 +21,7 @@ import {
   Star,
   CheckCircle2,
   Layers,
+  Network,
 } from "lucide-react";
 
 // ─── Motion constants ─────────────────────────────────────────────────────────
@@ -681,8 +682,14 @@ export default function AllHandsPresentation() {
   const touchStartX = useRef<number | null>(null);
   const touchStartY = useRef<number | null>(null);
 
-  // Save progress
+  const [isTouchDevice, setIsTouchDevice] = useState(false);
+
+  // Detect touch device on mount; also restore saved slide position
   useEffect(() => {
+    if (window.matchMedia("(pointer: coarse)").matches) {
+      setIsTouchDevice(true);
+      setShowNav(true);
+    }
     const saved = localStorage.getItem("kinship-allhands-slide");
     if (saved) setPage([parseInt(saved, 10), 0]);
   }, []);
@@ -784,11 +791,10 @@ export default function AllHandsPresentation() {
         {current.label}
       </div>
 
-      {/* Nav arrows */}
-      <motion.div
-        animate={{ opacity: showNav ? 1 : 0 }}
-        transition={{ duration: 0.2 }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-6"
+      {/* Nav arrows — always visible on mobile, fade in/out on desktop hover */}
+      <div
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-6 transition-opacity duration-200"
+        style={{ opacity: isTouchDevice || showNav ? 1 : 0 }}
       >
         <button
           onClick={() => go(page - 1)}
@@ -835,7 +841,7 @@ export default function AllHandsPresentation() {
         >
           <ChevronRight className="w-5 h-5" />
         </button>
-      </motion.div>
+      </div>
     </div>
   );
 }
