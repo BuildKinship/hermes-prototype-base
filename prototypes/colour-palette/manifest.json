@@ -3,13 +3,36 @@
   "name": "Kinship Colour Palette",
   "description": "A visual reference of all Kinship design token swatches — brand colors, subject colors, and CSS variable names.",
   "prompt": "Build a small prototype showing the Kinship colour palette as design token swatches.",
-  "created_by_name": "Hermes (test)",
-  "created_by_slack_id": "U0ASCCEV1JT",
-  "created_at": "2026-06-17T10:00:00.000Z",
+  "full_prompt": "Build a small prototype showing the Kinship colour palette as design token swatches.",
+  "created_by_name": "Hermes",
+  "created_by_slack_id": "",
+  "created_at": "2026-06-17T00:00:00.000Z",
   "type": "other",
   "tags": ["design-system", "tokens", "colours", "reference"],
   "branch": "prototype/colour-palette-2026-06-17",
   "url": "https://hermes-prototype-base-ten.vercel.app/colour-palette",
   "short_url": "",
-  "thumbnail": "thumbnail.png"
+  "thumbnail": "thumbnail.png",
+  "slack_channel": "Internal test",
+  "session_id": null,
+  "what_made_it_special": "Internal worktree test prototype — built to validate the parallel worktree strategy. Shows all Kinship design tokens (ink, cream, mid, dim, and the four subject colours) as labelled swatches with CSS variable names and hex values.",
+  "design_decisions": [
+    "Built as a parallel worktree test alongside type-scale to validate the git worktree isolation strategy",
+    "Shows 8 swatches: 4 brand tokens (ink, cream, mid, dim) and 4 subject tokens (reading/blue, math/orange, writing/green, science/purple)",
+    "Each swatch displays the token name, CSS variable, and hex value — reference-first design",
+    "Hover state reveals a copy-to-clipboard button for the CSS variable"
+  ],
+  "tech_notes": [
+    "Fully static client component — no backend, no API routes",
+    "Uses Tailwind + CSS variables defined in globals.css",
+    "Built in /app/colour-palette/page.tsx"
+  ],
+  "slack_thread": [
+    {
+      "role": "hermes",
+      "name": "Hermes",
+      "content": "Self-initiated test prototype — built to validate the parallel git worktree strategy. Created alongside type-scale to confirm two simultaneous worktree builds don't conflict.",
+      "timestamp": "2026-06-17T00:00:00.000Z"
+    }
+  ]
 }

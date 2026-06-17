@@ -1,15 +1,55 @@
 {
   "slug": "survey",
   "name": "Survey Engine",
-  "description": "A Typeform-style one-question-at-a-time survey system with an admin results view and in-memory response store.",
-  "prompt": "Build a survey engine for Kinship with a typeform-style UX and an admin view of results.",
+  "description": "A Typeform-style one-question-at-a-time survey system with keyboard shortcuts, animated transitions, an in-memory backend, and a gated admin results view.",
+  "prompt": "Build a Typeform-style survey engine — one question at a time, keyboard shortcuts, animated transitions, admin results view with CSV export.",
+  "full_prompt": "I just thought of another prototype I want you to create for users. You will be asked to create surveys and collect data from a survey. You should be able to build typeform style surveys. research typeform to understand how they render survey and what the UI/UX looks like. They ask one question at a time, they have keyboard shortcuts to select from multiple choice questions, they auto progress to next question when a selection is made on a single option selection. They handle various data types. You should have pre builts from components in the base prototype repo. Here is what you will need to make amazing surveys:\n• A single page survey that shows one question of the survey at the time.\n• shadcn UI library has prebuilt UI components. Just put those together a build components that have labels + field + help text and so on so the forms would be consistent\n• Make sure we use accessibility friendly components and make them look beautiful and bold like typeform using kinship design of course\n• There should be client validation to make sure we collect the required vs optional information and data is normalized\n• The transition between question to question should be animated elegantly.\n• You will keep the data of each survey in memory on backend makes sense because you will also provide an admin view to see the results of the survey in a datatable view with sorting, filtering, export to csv and so on. Every admin view will have a 4 digit numeric code. that you should hard code and share with the user that requested this prototype\nFigure out a consistently great surveys. You should update the base prototype to have a sample survey. Update the landing page to add survey as another type of prototype we can create using this repo after the base prototype work that you will do. ultrathink and use subagents to help you",
   "created_by_name": "Azim",
   "created_by_slack_id": "U0AQ7SJRQ93",
-  "created_at": "2026-06-17T00:00:00.000Z",
+  "created_at": "2026-06-17T00:03:38.000Z",
   "type": "survey",
-  "tags": ["survey", "admin", "forms", "typeform"],
+  "tags": ["survey", "admin", "forms", "typeform", "data-collection"],
   "branch": "prototype/survey-engine-2025-06-17",
   "url": "https://hermes-prototype-base-ten.vercel.app/survey/demo",
   "short_url": "",
-  "thumbnail": "thumbnail.png"
+  "thumbnail": "thumbnail.png",
+  "slack_channel": "Slack DM",
+  "session_id": "20260617_000338_63ec8f44",
+  "admin_code": "7429",
+  "admin_url": "https://hermes-prototype-base-ten.vercel.app/survey/demo/admin",
+  "what_made_it_special": "First data-collection prototype in the system — goes beyond static display with a full in-memory backend and admin authentication. Typeform UX patterns translated into Kinship design language. Hermes used subagents for parallel workstreams. Admin access code (7429) gates the results view.",
+  "design_decisions": [
+    "One question at a time, full-screen per question — matches Typeform's focus model",
+    "7 question types: single-choice, multiple-choice, short-text, long-text, rating, email, number",
+    "Keyboard shortcuts: A/B/C/D for choices, Enter to advance, Ctrl+Enter for long text submissions",
+    "Auto-advance on single-choice and rating selections (250ms visual confirmation delay before advancing)",
+    "Framer Motion slide transitions: questions enter from below, exit upward — smooth and directional",
+    "Animated progress bar across the top of the survey",
+    "Welcome screen and thank-you screen with full-page Kinship-branded design",
+    "4-digit admin code gate (hardcoded as 7429 for demo) — shareable with whoever commissions the survey",
+    "Admin view: sortable/filterable datatable, search bar, CSV export, response timestamps",
+    "React stale-closure bug in auto-advance fixed with answersRef pattern (important pitfall)"
+  ],
+  "tech_notes": [
+    "Routes: /survey/[slug] (survey) and /survey/[slug]/admin (admin view)",
+    "API routes: POST /api/survey/[slug]/submit and GET /api/survey/[slug]/responses?code=XXXX",
+    "In-memory server-side store (lib/survey-store.ts) — data resets on server restart, appropriate for prototyping",
+    "Survey definitions live in mock/surveys.ts — add new surveys there without touching the engine",
+    "Demo survey: 'Kinship Teacher Feedback' — 8 questions covering all 7 question types",
+    "shadcn UI components used for form fields — accessibility-first"
+  ],
+  "slack_thread": [
+    {
+      "role": "user",
+      "name": "Azim",
+      "content": "I just thought of another prototype I want you to create for users. You will be asked to create surveys and collect data from a survey. You should be able to build typeform style surveys. research typeform to understand how they render survey and what the UI/UX looks like. They ask one question at a time, they have keyboard shortcuts to select from multiple choice questions, they auto progress to next question when a selection is made on a single option selection. They handle various data types.\n\n• A single page survey that shows one question of the survey at the time.\n• shadcn UI library has prebuilt UI components. Just put those together a build components that have labels + field + help text and so on so the forms would be consistent\n• Make sure we use accessibility friendly components and make them look beautiful and bold like typeform using kinship design of course\n• There should be client validation to make sure we collect the required vs optional information and data is normalized\n• The transition between question to question should be animated elegantly.\n• You will keep the data of each survey in memory on backend makes sense because you will also provide an admin view to see the results of the survey in a datatable view with sorting, filtering, export to csv and so on. Every admin view will have a 4 digit numeric code. that you should hard code and share with the user that requested this prototype\nFigure out a consistently great surveys. You should update the base prototype to have a sample survey.",
+      "timestamp": "2026-06-17T00:03:39.000Z"
+    },
+    {
+      "role": "hermes",
+      "name": "Hermes",
+      "content": "Built a full Typeform-style survey engine. The demo survey is 'Kinship Teacher Feedback' — 8 questions covering all 7 supported types. Admin view at /survey/demo/admin (code: 7429) shows a sortable/filterable datatable with CSV export. Keyboard shortcuts: A/B/C for choices, Enter to advance.",
+      "timestamp": "2026-06-17T00:10:15.000Z"
+    }
+  ]
 }

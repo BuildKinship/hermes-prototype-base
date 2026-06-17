@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { PrototypeManifest, PrototypeType } from "@/types/manifest";
+import { PrototypeDrawer } from "./drawer";
 
 /* ─── Constants ─────────────────────────────────────────── */
 
@@ -55,7 +56,7 @@ function TypeBadge({ type }: { type: PrototypeType }) {
   );
 }
 
-function PrototypeCard({ m }: { m: PrototypeManifest }) {
+function PrototypeCard({ m, onOpenDrawer }: { m: PrototypeManifest; onOpenDrawer: () => void }) {
   const date = new Date(m.created_at).toLocaleDateString("en-CA", {
     year: "numeric",
     month: "short",
@@ -118,8 +119,17 @@ function PrototypeCard({ m }: { m: PrototypeManifest }) {
         </a>
       </div>
 
-      {/* Body */}
-      <div className="flex flex-col gap-3 p-4 flex-1" style={{ background: "white" }}>
+      {/* Body — click to open drawer */}
+      <div
+        className="flex flex-col gap-3 p-4 flex-1 cursor-pointer group/body transition-colors"
+        style={{ background: "white" }}
+        onClick={onOpenDrawer}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") onOpenDrawer(); }}
+        aria-label={`View details for ${m.name}`}
+        title="Click for full details"
+      >
         <div className="flex items-start justify-between gap-2">
           <h3
             className="font-semibold text-sm leading-snug"
@@ -177,9 +187,17 @@ function PrototypeCard({ m }: { m: PrototypeManifest }) {
               {m.created_by_name}
             </span>
           </div>
-          <span className="text-[11px]" style={{ color: "var(--kinship-dim)" }}>
-            {date}
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="text-[11px]" style={{ color: "var(--kinship-dim)" }}>
+              {date}
+            </span>
+            <span
+              className="text-[10px] px-1.5 py-0.5 rounded opacity-0 group-hover/body:opacity-100 transition-opacity"
+              style={{ background: "color-mix(in oklch, var(--kinship-ink) 8%, transparent)", color: "var(--kinship-ink)" }}
+            >
+              Details →
+            </span>
+          </div>
         </div>
       </div>
     </motion.div>
@@ -193,6 +211,7 @@ export function GalleryClient({ manifests }: { manifests: PrototypeManifest[] })
   const [activeType, setActiveType] = useState<PrototypeType | "all">("all");
   const [activeTag, setActiveTag] = useState<string | null>(null);
   const [sort, setSort] = useState<SortKey>("newest");
+  const [drawerManifest, setDrawerManifest] = useState<PrototypeManifest | null>(null);
 
   // Collect all unique tags from manifests
   const allTags = useMemo(() => {
@@ -392,13 +411,14 @@ export function GalleryClient({ manifests }: { manifests: PrototypeManifest[] })
             >
               <AnimatePresence mode="popLayout">
                 {filtered.map((m) => (
-                  <PrototypeCard key={m.slug} m={m} />
+                  <PrototypeCard key={m.slug} m={m} onOpenDrawer={() => setDrawerManifest(m)} />
                 ))}
               </AnimatePresence>
             </motion.div>
           </>
         )}
       </div>
+      <PrototypeDrawer manifest={drawerManifest} onClose={() => setDrawerManifest(null)} />
     </main>
   );
 }

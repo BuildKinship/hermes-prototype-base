@@ -6,6 +6,17 @@ export type PrototypeType =
   | "survey"
   | "other";
 
+export interface SlackMessage {
+  /** Role of the sender */
+  role: "user" | "hermes";
+  /** Display name */
+  name: string;
+  /** Message content (verbatim) */
+  content: string;
+  /** ISO timestamp */
+  timestamp?: string;
+}
+
 export interface PrototypeManifest {
   /** URL-safe slug — matches the Next.js route path (e.g. "colour-palette") */
   slug: string;
@@ -13,7 +24,7 @@ export interface PrototypeManifest {
   name: string;
   /** 1–2 sentence description of what this prototype does */
   description: string;
-  /** Verbatim user request that triggered this prototype */
+  /** Short prompt shown on the card (verbatim user request, may be truncated) */
   prompt: string;
   /** Slack display name of the requester */
   created_by_name: string;
@@ -31,6 +42,27 @@ export interface PrototypeManifest {
   url: string;
   /** Kinship short link (may be empty if not yet shortened) */
   short_url: string;
-  /** Relative path from prototypes/<slug>/ to thumbnail image */
+  /** Filename of the thumbnail relative to public/prototypes/<slug>/ */
   thumbnail: string;
+
+  // ─── Rich context for the detail drawer ────────────────────────────────
+
+  /** Full verbatim Slack request (may be longer than prompt) */
+  full_prompt?: string;
+  /** The Slack channel or DM where the request was made */
+  slack_channel?: string;
+  /** Session ID in the Hermes session DB */
+  session_id?: string;
+  /** Key design decisions Hermes made while building */
+  design_decisions?: string[];
+  /** Technical implementation notes */
+  tech_notes?: string[];
+  /** What makes this prototype notable */
+  what_made_it_special?: string;
+  /** Reconstructed Slack thread messages (user + Hermes turns, trimmed for clarity) */
+  slack_thread?: SlackMessage[];
+  /** Admin access code if the prototype has a gated admin view */
+  admin_code?: string;
+  /** Admin URL if different from the main URL */
+  admin_url?: string;
 }

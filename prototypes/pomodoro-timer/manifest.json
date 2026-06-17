@@ -1,15 +1,48 @@
 {
   "slug": "pomodoro-timer",
   "name": "Pomodoro Timer",
-  "description": "A focused study timer built on the Pomodoro technique, with Kinship branding and subject-aware session tracking.",
-  "prompt": "Build a pomodoro timer prototype for Kinship students.",
+  "description": "A focused study timer built on the Pomodoro technique, with Kinship branding — projector-ready for classroom display.",
+  "prompt": "Create a prototype for me that is a pomodoro timer. I will show this to students on a projector.",
+  "full_prompt": "Create a prototype for me that is a pomodoro timer. See the image for inspiration. I will show this students on a projector",
   "created_by_name": "Azim",
   "created_by_slack_id": "U0AQ7SJRQ93",
-  "created_at": "2026-06-16T00:00:00.000Z",
+  "created_at": "2026-06-16T23:50:24.000Z",
   "type": "dashboard",
-  "tags": ["student", "productivity", "timer"],
+  "tags": ["student", "productivity", "timer", "classroom"],
   "branch": "prototype/pomodoro-timer-2026-06-16",
   "url": "https://hermes-prototype-base-ten.vercel.app/pomodoro-timer",
-  "short_url": "",
-  "thumbnail": "thumbnail.png"
+  "short_url": "https://kinshipshort.duckdns.org/pomodoro-timer",
+  "thumbnail": "thumbnail.png",
+  "slack_channel": "Slack DM",
+  "session_id": "20260616_235024_d40fb2d1",
+  "what_made_it_special": "Projector-ready for classroom use — large digits readable from the back of a room. Kinship-branded with deep-ink purple for focus mode, shifting to green for short breaks and blue for long breaks. Bell sound cue on completion.",
+  "design_decisions": [
+    "Kinship ink-purple (#3D1A4E) background for focus mode, cream digits — matching classroom display context",
+    "Large 100px font digits for projector readability from the back of the room",
+    "Three modes: Pomodoro (25 min), Short Break (5 min), Long Break (15 min) — color background transitions per mode",
+    "Kinship logo mark + wordmark in the top-left corner (white on purple)",
+    "SVG circular progress ring that depletes as time counts down",
+    "Web Audio API bell sound (C5-E5-G5-C6 chord arpeggio) on session completion",
+    "Originally inspired by a reference image Azim shared; revised to Kinship brand colors"
+  ],
+  "tech_notes": [
+    "Built as app/pomodoro-timer/page.tsx — fully static client component (no backend)",
+    "Framer Motion AnimatePresence for digit flip animations and mode-switch color transitions",
+    "Web Audio API for completion bell — no external sound files needed",
+    "useInterval pattern for accurate countdown without drift"
+  ],
+  "slack_thread": [
+    {
+      "role": "user",
+      "name": "Azim",
+      "content": "Create a prototype for me that is a pomodoro timer. See the image for inspiration. I will show this students on a projector",
+      "timestamp": "2026-06-16T23:50:37.000Z"
+    },
+    {
+      "role": "hermes",
+      "name": "Hermes",
+      "content": "Built and deployed. The timer uses Kinship ink-purple for focus sessions, shifting to green for short breaks and blue for long breaks. Large digits (100px) are readable from the back of a classroom. A bell chord plays on session completion. Kinship logo mark is in the top-left corner.",
+      "timestamp": "2026-06-17T00:07:17.000Z"
+    }
+  ]
 }
