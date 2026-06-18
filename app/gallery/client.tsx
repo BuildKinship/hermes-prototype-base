@@ -3,6 +3,7 @@
 
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import Link from "next/link";
 import {
   Search,
   ExternalLink,
@@ -15,6 +16,7 @@ import {
   SortAsc,
   SortDesc,
   X,
+  ArrowLeft,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { PrototypeManifest, PrototypeType } from "@/types/manifest";
@@ -317,6 +319,14 @@ export function GalleryClient({ manifests }: { manifests: PrototypeManifest[] })
         style={{ borderColor: "color-mix(in oklch, var(--kinship-dim) 30%, transparent)" }}
       >
         <div className="max-w-6xl mx-auto">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-1.5 text-xs font-medium mb-4 opacity-50 hover:opacity-100 transition-opacity"
+            style={{ color: "var(--kinship-ink)" }}
+          >
+            <ArrowLeft className="w-3.5 h-3.5" />
+            Home
+          </Link>
           <p className="section-label mb-2">kinship prototype engine</p>
           <h1 className="text-serif text-4xl font-bold mb-1">Prototype Gallery</h1>
           <p className="text-sm" style={{ color: "var(--kinship-mid)" }}>
