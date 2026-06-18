@@ -22,7 +22,7 @@ import type { PrototypeManifest, SlackMessage } from "@/types/manifest";
 
 // ─── Type Badge ────────────────────────────────────────────────────────────────
 const TYPE_META: Record<string, { label: string; color: string }> = {
-  slide: { label: "Slide Deck", color: "#6B7280" },
+  slide: { label: "Slide", color: "#6B7280" },
   animation: { label: "Animation", color: "#8B5CF6" },
   "3d": { label: "3D / Interactive", color: "#059669" },
   dashboard: { label: "Dashboard", color: "#1A1A2E" },

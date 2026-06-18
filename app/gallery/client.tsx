@@ -26,7 +26,7 @@ const TYPE_META: Record<
   PrototypeType,
   { label: string; icon: React.ComponentType<{ className?: string }>; color: string }
 > = {
-  slide: { label: "Slide Deck", icon: Layers, color: "var(--subject-reading)" },
+  slide: { label: "Slide", icon: Layers, color: "var(--subject-reading)" },
   animation: { label: "Animation", icon: Sparkles, color: "var(--subject-math)" },
   "3d": { label: "3D / Interactive", icon: Box, color: "var(--subject-science)" },
   dashboard: { label: "Dashboard", icon: LayoutDashboard, color: "var(--kinship-mid)" },
