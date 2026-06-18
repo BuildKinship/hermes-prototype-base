@@ -122,17 +122,37 @@ function ToolsNetworkAnimation() {
         </g>
       ))}
       {/* Notion */}
-      <g transform="translate(175,0)"><circle cx="25" cy="20" r="22" fill="white" stroke="oklch(88% 0.03 293)" strokeWidth="1.5"/><path d="M14 10 L14 30 L17 30 L26 16 L26 30 L29 30 L29 10 L26 10 L17 24 L17 10 Z" fill="#191919" opacity="0.88"/><text x="25" y="46" fontSize="8" textAnchor="middle" fill="oklch(45% 0.06 293)" fontFamily="system-ui" fontWeight="600">Notion</text></g>
+      <g transform="translate(175,0)">
+        <circle cx="25" cy="20" r="22" fill="white" stroke="oklch(88% 0.03 293)" strokeWidth="1.5"/>
+        <image href="/logos/notion.png" x="8" y="3" width="34" height="34" preserveAspectRatio="xMidYMid meet"/>
+        <text x="25" y="46" fontSize="8" textAnchor="middle" fill="oklch(45% 0.06 293)" fontFamily="system-ui" fontWeight="600">Notion</text>
+      </g>
       {/* Google */}
-      <g transform="translate(326,50)"><circle cx="24" cy="20" r="22" fill="white" stroke="oklch(88% 0.03 293)" strokeWidth="1.5"/><text x="24" y="26" fontSize="20" textAnchor="middle" fontFamily="system-ui" fontWeight="700"><tspan fill="#4285F4">G</tspan></text><path d="M24 17 L33 17 L33 21 L24 21" fill="#4285F4"/><text x="24" y="46" fontSize="8" textAnchor="middle" fill="oklch(45% 0.06 293)" fontFamily="system-ui" fontWeight="600">Google</text></g>
+      <g transform="translate(326,50)">
+        <circle cx="24" cy="20" r="22" fill="white" stroke="oklch(88% 0.03 293)" strokeWidth="1.5"/>
+        <image href="/logos/google.webp" x="7" y="3" width="34" height="34" preserveAspectRatio="xMidYMid meet"/>
+        <text x="24" y="46" fontSize="8" textAnchor="middle" fill="oklch(45% 0.06 293)" fontFamily="system-ui" fontWeight="600">Google</text>
+      </g>
       {/* Slack */}
-      <g transform="translate(348,168)"><circle cx="22" cy="22" r="22" fill="white" stroke="oklch(88% 0.03 293)" strokeWidth="1.5"/><rect x="12" y="14" width="5" height="16" rx="2.5" fill="#E01E5A"/><rect x="27" y="14" width="5" height="16" rx="2.5" fill="#36C5F0"/><rect x="10" y="19" width="16" height="5" rx="2.5" fill="#2EB67D"/><rect x="18" y="24" width="16" height="5" rx="2.5" fill="#ECB22E"/><text x="22" y="48" fontSize="8" textAnchor="middle" fill="oklch(45% 0.06 293)" fontFamily="system-ui" fontWeight="600">Slack</text></g>
+      <g transform="translate(348,168)">
+        <circle cx="22" cy="22" r="22" fill="white" stroke="oklch(88% 0.03 293)" strokeWidth="1.5"/>
+        <image href="/logos/slack.png" x="5" y="5" width="34" height="34" preserveAspectRatio="xMidYMid meet"/>
+        <text x="22" y="48" fontSize="8" textAnchor="middle" fill="oklch(45% 0.06 293)" fontFamily="system-ui" fontWeight="600">Slack</text>
+      </g>
       {/* Zoom */}
-      <g transform="translate(175,218)"><circle cx="25" cy="22" r="22" fill="#2D8CFF" stroke="oklch(88% 0.03 293)" strokeWidth="1.5"/><rect x="11" y="14" width="18" height="14" rx="3" fill="white"/><path d="M29 16 L37 12 L37 30 L29 26 Z" fill="white"/><text x="25" y="48" fontSize="8" textAnchor="middle" fill="oklch(45% 0.06 293)" fontFamily="system-ui" fontWeight="600">Zoom</text></g>
+      <g transform="translate(175,218)">
+        <circle cx="25" cy="22" r="22" fill="#2D8CFF" stroke="oklch(88% 0.03 293)" strokeWidth="1.5"/>
+        <image href="/logos/zoom.webp" x="6" y="4" width="38" height="38" preserveAspectRatio="xMidYMid meet"/>
+        <text x="25" y="48" fontSize="8" textAnchor="middle" fill="oklch(45% 0.06 293)" fontFamily="system-ui" fontWeight="600">Zoom</text>
+      </g>
       {/* Hermes */}
       <g transform="translate(6,168)"><circle cx="24" cy="22" r="22" fill="oklch(22% 0.08 293)" stroke="oklch(40% 0.08 293)" strokeWidth="1.5"/><text x="24" y="29" fontSize="18" textAnchor="middle" fill="var(--kinship-cream)">⚡</text><text x="24" y="48" fontSize="8" textAnchor="middle" fill="oklch(45% 0.06 293)" fontFamily="system-ui" fontWeight="600">Hermes</text></g>
       {/* GWorkspace */}
-      <g transform="translate(26,50)"><circle cx="24" cy="20" r="22" fill="white" stroke="oklch(88% 0.03 293)" strokeWidth="1.5"/><path d="M12 30 L24 10 L36 30 Z" fill="none" stroke="#FBBC04" strokeWidth="2.5"/><path d="M12 30 L20 30" stroke="#34A853" strokeWidth="2.5"/><path d="M28 30 L36 30" stroke="#4285F4" strokeWidth="2.5"/><text x="24" y="46" fontSize="7" textAnchor="middle" fill="oklch(45% 0.06 293)" fontFamily="system-ui" fontWeight="600">GWorkspace</text></g>
+      <g transform="translate(26,50)">
+        <circle cx="24" cy="20" r="22" fill="white" stroke="oklch(88% 0.03 293)" strokeWidth="1.5"/>
+        <image href="/logos/google-workspace.webp" x="7" y="3" width="34" height="34" preserveAspectRatio="xMidYMid meet"/>
+        <text x="24" y="46" fontSize="7" textAnchor="middle" fill="oklch(45% 0.06 293)" fontFamily="system-ui" fontWeight="600">GWorkspace</text>
+      </g>
       {/* Center hub: Claude */}
       <circle className="hub-outer2" cx={cx} cy={cy} r="34" fill="oklch(16% 0.07 293)" stroke="var(--kinship-mid)" strokeWidth="2"/>
       <path d={`M${cx-10} ${cy+12} L${cx} ${cy-14} L${cx+10} ${cy+12}`} stroke="oklch(88% 0.05 293)" strokeWidth="2.5" fill="none" strokeLinejoin="round"/>

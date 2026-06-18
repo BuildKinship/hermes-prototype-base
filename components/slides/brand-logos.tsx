@@ -1,8 +1,16 @@
 /**
  * BrandLogos — SVG brand logos for common Kinship tool integrations.
  *
- * These are simplified inline SVGs (no external requests) designed to fit
- * inside a 44–50px circle node in hub-and-spoke network diagrams.
+ * Real logo images live in /public/logos/ and are embedded via <image> in SVG
+ * for pixel-perfect rendering in hub-and-spoke diagrams. Falls back to inline
+ * SVG shapes for tools that don't have an image asset yet.
+ *
+ * Available logo files:
+ *   /logos/notion.png          — Notion cube "N" mark
+ *   /logos/slack.png           — Slack pinwheel
+ *   /logos/zoom.webp           — Zoom blue wordmark
+ *   /logos/google.webp         — Google multicolor G
+ *   /logos/google-workspace.webp — Google Workspace 4-color icon
  *
  * Usage (hub-and-spoke):
  *   <g transform="translate(nodeX - 22, nodeY - 22)">
@@ -41,13 +49,16 @@ export function ClaudeLogo({ r = 24, cx = 24, cy = 24 }: LogoProps) {
 
 // ── Notion N mark ─────────────────────────────────────────────────────────────
 export function NotionLogo({ r = 22, cx = 22, cy = 22 }: LogoProps) {
+  const pad = r * 0.25;
   return (
     <g>
       <circle cx={cx} cy={cy} r={r} fill="white" stroke="oklch(88% 0.03 293)" strokeWidth="1.5"/>
-      {/* Simplified N letterform */}
-      <path
-        d={`M${cx - 10} ${cy - 10} L${cx - 10} ${cy + 10} L${cx - 7} ${cy + 10} L${cx + 4} ${cy - 4} L${cx + 4} ${cy + 10} L${cx + 8} ${cy + 10} L${cx + 8} ${cy - 10} L${cx + 5} ${cy - 10} L${cx - 6} ${cy + 4} L${cx - 6} ${cy - 10} Z`}
-        fill="#191919" opacity="0.88"
+      <image
+        href="/logos/notion.png"
+        x={cx - r + pad} y={cy - r + pad}
+        width={(r - pad) * 2} height={(r - pad) * 2}
+        clipPath={`circle(${r - pad}px at ${r - pad}px ${r - pad}px)`}
+        preserveAspectRatio="xMidYMid meet"
       />
       <text x={cx} y={cy + r + 14} fontSize="8" textAnchor="middle"
         fill="oklch(45% 0.06 293)" fontFamily="system-ui" fontWeight="600">Notion</text>
@@ -57,14 +68,16 @@ export function NotionLogo({ r = 22, cx = 22, cy = 22 }: LogoProps) {
 
 // ── Slack coloured hash ────────────────────────────────────────────────────────
 export function SlackLogo({ r = 22, cx = 22, cy = 22 }: LogoProps) {
+  const pad = r * 0.2;
   return (
     <g>
       <circle cx={cx} cy={cy} r={r} fill="white" stroke="oklch(88% 0.03 293)" strokeWidth="1.5"/>
-      {/* Two vertical bars + two horizontal bars in Slack brand colors */}
-      <rect x={cx - 10} y={cy - 8} width="5" height="16" rx="2.5" fill="#E01E5A"/>
-      <rect x={cx + 5}  y={cy - 8} width="5" height="16" rx="2.5" fill="#36C5F0"/>
-      <rect x={cx - 12} y={cy - 3} width="16" height="5" rx="2.5" fill="#2EB67D"/>
-      <rect x={cx - 4}  y={cy + 2} width="16" height="5" rx="2.5" fill="#ECB22E"/>
+      <image
+        href="/logos/slack.png"
+        x={cx - r + pad} y={cy - r + pad}
+        width={(r - pad) * 2} height={(r - pad) * 2}
+        preserveAspectRatio="xMidYMid meet"
+      />
       <text x={cx} y={cy + r + 14} fontSize="8" textAnchor="middle"
         fill="oklch(45% 0.06 293)" fontFamily="system-ui" fontWeight="600">Slack</text>
     </g>
@@ -73,12 +86,16 @@ export function SlackLogo({ r = 22, cx = 22, cy = 22 }: LogoProps) {
 
 // ── Zoom camera icon ───────────────────────────────────────────────────────────
 export function ZoomLogo({ r = 22, cx = 22, cy = 22 }: LogoProps) {
+  const pad = r * 0.15;
   return (
     <g>
       <circle cx={cx} cy={cy} r={r} fill="#2D8CFF" stroke="oklch(88% 0.03 293)" strokeWidth="1.5"/>
-      {/* Camera body + lens */}
-      <rect x={cx - 11} y={cy - 7} width="16" height="12" rx="3" fill="white"/>
-      <path d={`M${cx + 5} ${cy - 5} L${cx + 13} ${cy - 9} L${cx + 13} ${cy + 9} L${cx + 5} ${cy + 5} Z`} fill="white"/>
+      <image
+        href="/logos/zoom.webp"
+        x={cx - r + pad} y={cy - r + pad}
+        width={(r - pad) * 2} height={(r - pad) * 2}
+        preserveAspectRatio="xMidYMid meet"
+      />
       <text x={cx} y={cy + r + 14} fontSize="8" textAnchor="middle"
         fill="oklch(45% 0.06 293)" fontFamily="system-ui" fontWeight="600">Zoom</text>
     </g>
@@ -87,29 +104,34 @@ export function ZoomLogo({ r = 22, cx = 22, cy = 22 }: LogoProps) {
 
 // ── Google G ──────────────────────────────────────────────────────────────────
 export function GoogleLogo({ r = 22, cx = 22, cy = 22 }: LogoProps) {
+  const pad = r * 0.22;
   return (
     <g>
       <circle cx={cx} cy={cy} r={r} fill="white" stroke="oklch(88% 0.03 293)" strokeWidth="1.5"/>
-      <text x={cx} y={cy + 7} fontSize="20" textAnchor="middle" fontFamily="system-ui" fontWeight="700">
-        <tspan fill="#4285F4">G</tspan>
-      </text>
-      {/* Blue horizontal bar (distinctive Google G notch) */}
-      <path d={`M${cx} ${cy - 3} L${cx + 9} ${cy - 3} L${cx + 9} ${cy + 1} L${cx} ${cy + 1}`} fill="#4285F4"/>
+      <image
+        href="/logos/google.webp"
+        x={cx - r + pad} y={cy - r + pad}
+        width={(r - pad) * 2} height={(r - pad) * 2}
+        preserveAspectRatio="xMidYMid meet"
+      />
       <text x={cx} y={cy + r + 14} fontSize="8" textAnchor="middle"
         fill="oklch(45% 0.06 293)" fontFamily="system-ui" fontWeight="600">Google</text>
     </g>
   );
 }
 
-// ── Google Drive triangle ──────────────────────────────────────────────────────
+// ── Google Drive triangle / Google Workspace ───────────────────────────────────
 export function GoogleDriveLogo({ r = 22, cx = 22, cy = 22 }: LogoProps) {
+  const pad = r * 0.2;
   return (
     <g>
       <circle cx={cx} cy={cy} r={r} fill="white" stroke="oklch(88% 0.03 293)" strokeWidth="1.5"/>
-      <path d={`M${cx - 12} ${cy + 8} L${cx} ${cy - 12} L${cx + 12} ${cy + 8} Z`}
-        fill="none" stroke="#FBBC04" strokeWidth="2.5"/>
-      <path d={`M${cx - 12} ${cy + 8} L${cx - 4} ${cy + 8}`} stroke="#34A853" strokeWidth="2.5"/>
-      <path d={`M${cx + 4} ${cy + 8} L${cx + 12} ${cy + 8}`} stroke="#4285F4" strokeWidth="2.5"/>
+      <image
+        href="/logos/google-workspace.webp"
+        x={cx - r + pad} y={cy - r + pad}
+        width={(r - pad) * 2} height={(r - pad) * 2}
+        preserveAspectRatio="xMidYMid meet"
+      />
       <text x={cx} y={cy + r + 14} fontSize="7" textAnchor="middle"
         fill="oklch(45% 0.06 293)" fontFamily="system-ui" fontWeight="600">GWorkspace</text>
     </g>
