@@ -757,7 +757,7 @@ function SlackSlide() {
     { prefix: "team-…", reads: true,  desc: "How a team works (team-sales, team-eng). The brain reads these." },
     { prefix: "space-…", reads: false, desc: "Social, community. Free zone — the brain doesn't read." },
     { prefix: "open-…",  reads: false, desc: "Open discussions. Free zone." },
-    { prefix: "topic-…", reads: false, desc: "Side topics. Free zone. (Including #topic-brain-context!)" },
+    { prefix: "topic-…", reads: true,  desc: "Side topics. The brain reads these — we're starting to monitor these channels." },
     { prefix: "alerts-…", reads: false, desc: "Notifications and alerts. Free zone." },
   ];
   return (
@@ -821,7 +821,7 @@ function FinalSlide() {
 
 function FAQSlide() {
   const faqs = [
-    { q: "Is the brain reading my DMs or private channels?", a: "No. Private channels and DMs are never read. Only public proj- and team- channels feed the brain." },
+    { q: "Is the brain reading my DMs or private channels?", a: "No. Private channels and DMs are never read. Only public proj-, team-, and topic- channels feed the brain." },
     { q: "Do I have to learn a new app?", a: "No. The brain connects tools you already use. The main new habit is talking in public channels." },
     { q: "What if the AI gets something wrong?", a: "Humans review and approve. Agents propose, they don't silently overwrite. The source transcript/email always wins on raw facts." },
     { q: "Will every meeting get recorded?", a: "No — we're selective. Right now it's external conversations transcribed via Zoom/Meet. We deliberately avoid capturing everything." },
