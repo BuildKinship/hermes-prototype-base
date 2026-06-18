@@ -97,67 +97,98 @@ function ContextLossAnimation() {
 }
 
 function ToolsNetworkAnimation() {
-  const cx = 200, cy = 130;
+  // Dual hub: Claude (left) + Hermes (right), both AI agents at center
+  const claudeX = 168, hermesX = 244, hubY = 136;
+  const hubR = 30; // radius of each hub circle
+
+  // 5 tool spokes — symmetrically arranged, no Hermes in spokes
   const spokes = [
-    { x: 200, y: 20,  label: "Notion" },
-    { x: 350, y: 70,  label: "Google" },
-    { x: 370, y: 190, label: "Slack" },
-    { x: 200, y: 240, label: "Zoom" },
-    { x: 30,  y: 190, label: "Hermes" },
-    { x: 50,  y: 70,  label: "GWorkspace" },
+    { x: 200, y: 18,   label: "Notion",     img: "/logos/notion.png",             bg: "white",    textSize: 8 },
+    { x: 360, y: 66,   label: "Google",     img: "/logos/google.webp",             bg: "white",    textSize: 8 },
+    { x: 370, y: 200,  label: "Slack",      img: "/logos/slack.png",               bg: "white",    textSize: 8 },
+    { x: 30,  y: 200,  label: "GWorkspace", img: "/logos/google-workspace.webp",   bg: "white",    textSize: 7 },
+    { x: 40,  y: 66,   label: "Zoom",       img: "/logos/zoom.webp",               bg: "#2D8CFF",  textSize: 8 },
   ];
+  const nodeR = 22;
+  // Hub midpoint for particle origins
+  const midX = (claudeX + hermesX) / 2;
+
   return (
-    <svg width="400" height="264" viewBox="0 0 400 264" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style={{ width: "min(100%,400px)", height: "auto" }}>
+    <svg width="410" height="280" viewBox="0 0 410 280" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style={{ width: "min(100%,410px)", height: "auto" }}>
       <style>{`
-        @keyframes hub-pulse2{0%,100%{r:34;opacity:1}50%{r:37;opacity:0.85}}
-        .hub-outer2{transform-origin:200px 130px;animation:hub-pulse2 3s ease-in-out infinite;}
+        @keyframes hub-pulse-c{0%,100%{opacity:1;r:${hubR}}50%{opacity:0.85;r:${hubR+3}}}
+        @keyframes hub-pulse-h{0%,100%{opacity:1;r:${hubR}}50%{opacity:0.85;r:${hubR+3}}}
+        .hub-c{transform-origin:${claudeX}px ${hubY}px;animation:hub-pulse-c 3s ease-in-out infinite;}
+        .hub-h{transform-origin:${hermesX}px ${hubY}px;animation:hub-pulse-h 3s ease-in-out infinite 1.5s;}
       `}</style>
-      {spokes.map((t, i) => (<line key={i} x1={cx} y1={cy} x2={t.x} y2={t.y} stroke="oklch(70% 0.08 293)" strokeWidth="1.2" strokeDasharray="4 4" opacity="0.45"/>))}
+
+      {/* Dashed spoke lines from midpoint to each tool */}
       {spokes.map((t, i) => (
-        <g key={`p${i}`}>
+        <line key={`line-${i}`}
+          x1={midX} y1={hubY} x2={t.x} y2={t.y}
+          stroke="oklch(70% 0.08 293)" strokeWidth="1.2" strokeDasharray="4 4" opacity="0.45"
+        />
+      ))}
+
+      {/* Animated particles along each spoke */}
+      {spokes.map((t, i) => (
+        <g key={`particle-${i}`}>
           <circle r="3.5" fill="var(--kinship-mid)" opacity="0.9">
-            <animateMotion dur={`${1.8 + i * 0.35}s`} repeatCount="indefinite" begin={`${i * 0.45}s`}><mpath xlinkHref={`#spoke2-${i}`}/></animateMotion>
+            <animateMotion dur={`${1.8 + i * 0.35}s`} repeatCount="indefinite" begin={`${i * 0.45}s`}>
+              <mpath xlinkHref={`#sp2-${i}`}/>
+            </animateMotion>
           </circle>
-          <path id={`spoke2-${i}`} d={`M ${cx} ${cy} L ${t.x} ${t.y}`} fill="none"/>
+          <path id={`sp2-${i}`} d={`M ${midX} ${hubY} L ${t.x} ${t.y}`} fill="none"/>
         </g>
       ))}
-      {/* Notion */}
-      <g transform="translate(175,0)">
-        <circle cx="25" cy="20" r="22" fill="white" stroke="oklch(88% 0.03 293)" strokeWidth="1.5"/>
-        <image href="/logos/notion.png" x="8" y="3" width="34" height="34" preserveAspectRatio="xMidYMid meet"/>
-        <text x="25" y="46" fontSize="8" textAnchor="middle" fill="oklch(45% 0.06 293)" fontFamily="system-ui" fontWeight="600">Notion</text>
-      </g>
-      {/* Google */}
-      <g transform="translate(326,50)">
-        <circle cx="24" cy="20" r="22" fill="white" stroke="oklch(88% 0.03 293)" strokeWidth="1.5"/>
-        <image href="/logos/google.webp" x="7" y="3" width="34" height="34" preserveAspectRatio="xMidYMid meet"/>
-        <text x="24" y="46" fontSize="8" textAnchor="middle" fill="oklch(45% 0.06 293)" fontFamily="system-ui" fontWeight="600">Google</text>
-      </g>
-      {/* Slack */}
-      <g transform="translate(348,168)">
-        <circle cx="22" cy="22" r="22" fill="white" stroke="oklch(88% 0.03 293)" strokeWidth="1.5"/>
-        <image href="/logos/slack.png" x="5" y="5" width="34" height="34" preserveAspectRatio="xMidYMid meet"/>
-        <text x="22" y="48" fontSize="8" textAnchor="middle" fill="oklch(45% 0.06 293)" fontFamily="system-ui" fontWeight="600">Slack</text>
-      </g>
-      {/* Zoom */}
-      <g transform="translate(175,218)">
-        <circle cx="25" cy="22" r="22" fill="#2D8CFF" stroke="oklch(88% 0.03 293)" strokeWidth="1.5"/>
-        <image href="/logos/zoom.webp" x="6" y="4" width="38" height="38" preserveAspectRatio="xMidYMid meet"/>
-        <text x="25" y="48" fontSize="8" textAnchor="middle" fill="oklch(45% 0.06 293)" fontFamily="system-ui" fontWeight="600">Zoom</text>
-      </g>
-      {/* Hermes */}
-      <g transform="translate(6,168)"><circle cx="24" cy="22" r="22" fill="oklch(22% 0.08 293)" stroke="oklch(40% 0.08 293)" strokeWidth="1.5"/><text x="24" y="29" fontSize="18" textAnchor="middle" fill="var(--kinship-cream)">⚡</text><text x="24" y="48" fontSize="8" textAnchor="middle" fill="oklch(45% 0.06 293)" fontFamily="system-ui" fontWeight="600">Hermes</text></g>
-      {/* GWorkspace */}
-      <g transform="translate(26,50)">
-        <circle cx="24" cy="20" r="22" fill="white" stroke="oklch(88% 0.03 293)" strokeWidth="1.5"/>
-        <image href="/logos/google-workspace.webp" x="7" y="3" width="34" height="34" preserveAspectRatio="xMidYMid meet"/>
-        <text x="24" y="46" fontSize="7" textAnchor="middle" fill="oklch(45% 0.06 293)" fontFamily="system-ui" fontWeight="600">GWorkspace</text>
-      </g>
-      {/* Center hub: Claude */}
-      <circle className="hub-outer2" cx={cx} cy={cy} r="34" fill="oklch(16% 0.07 293)" stroke="var(--kinship-mid)" strokeWidth="2"/>
-      <path d={`M${cx-10} ${cy+12} L${cx} ${cy-14} L${cx+10} ${cy+12}`} stroke="oklch(88% 0.05 293)" strokeWidth="2.5" fill="none" strokeLinejoin="round"/>
-      <line x1={cx-5} y1={cy+4} x2={cx+5} y2={cy+4} stroke="oklch(88% 0.05 293)" strokeWidth="2.2"/>
-      <text x={cx} y={cy+26} fontSize="8" textAnchor="middle" fill="oklch(60% 0.05 293)" fontFamily="system-ui">Claude</text>
+
+      {/* Bridge connector between Claude and Hermes */}
+      <line x1={claudeX + hubR} y1={hubY} x2={hermesX - hubR} y2={hubY}
+        stroke="oklch(55% 0.10 293)" strokeWidth="2" strokeDasharray="3 3" opacity="0.6"/>
+
+      {/* Tool spoke nodes */}
+      {spokes.map((t, i) => (
+        <g key={`node-${i}`} transform={`translate(${t.x - nodeR}, ${t.y - nodeR})`}>
+          <circle cx={nodeR} cy={nodeR} r={nodeR} fill={t.bg} stroke="oklch(88% 0.03 293)" strokeWidth="1.5"/>
+          <image
+            href={t.img}
+            x={nodeR * 0.22} y={nodeR * 0.22}
+            width={nodeR * 1.56} height={nodeR * 1.56}
+            preserveAspectRatio="xMidYMid meet"
+          />
+          {/* Label — 6px gap below circle bottom */}
+          <text x={nodeR} y={nodeR * 2 + 14} fontSize={t.textSize} textAnchor="middle"
+            fill="oklch(45% 0.06 293)" fontFamily="system-ui" fontWeight="600">{t.label}</text>
+        </g>
+      ))}
+
+      {/* ── Claude hub (left) ── */}
+      <circle className="hub-c" cx={claudeX} cy={hubY} r={hubR}
+        fill="oklch(16% 0.07 293)" stroke="oklch(50% 0.10 293)" strokeWidth="2"/>
+      {/* Claude starburst logo */}
+      <image
+        href="/logos/claude.png"
+        x={claudeX - hubR * 0.72} y={hubY - hubR * 0.72}
+        width={hubR * 1.44} height={hubR * 1.44}
+        preserveAspectRatio="xMidYMid meet"
+      />
+      {/* Claude label — 8px gap below circle bottom */}
+      <text x={claudeX} y={hubY + hubR + 14} fontSize="8" textAnchor="middle"
+        fill="oklch(60% 0.05 293)" fontFamily="system-ui" fontWeight="600">Claude</text>
+
+      {/* ── Hermes hub (right) ── */}
+      <circle className="hub-h" cx={hermesX} cy={hubY} r={hubR}
+        fill="oklch(18% 0.09 293)" stroke="oklch(48% 0.12 293)" strokeWidth="2"/>
+      {/* Hermes sprite — transparent background */}
+      <image
+        href="/logos/hermes.png"
+        x={hermesX - hubR * 0.82} y={hubY - hubR * 1.0}
+        width={hubR * 1.64} height={hubR * 1.64}
+        preserveAspectRatio="xMidYMid meet"
+      />
+      {/* Hermes label — 8px gap below circle bottom */}
+      <text x={hermesX} y={hubY + hubR + 14} fontSize="8" textAnchor="middle"
+        fill="oklch(60% 0.05 293)" fontFamily="system-ui" fontWeight="600">Hermes</text>
     </svg>
   );
 }

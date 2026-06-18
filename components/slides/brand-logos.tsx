@@ -30,19 +30,37 @@ interface LogoProps {
   size?: number;
 }
 
-// ── Claude / Anthropic A mark ──────────────────────────────────────────────────
+// ── Claude / Anthropic starburst ──────────────────────────────────────────────
 export function ClaudeLogo({ r = 24, cx = 24, cy = 24 }: LogoProps) {
+  const pad = r * 0.28;
   return (
     <g>
       <circle cx={cx} cy={cy} r={r} fill="oklch(16% 0.07 293)" stroke="oklch(50% 0.08 293)" strokeWidth="1.5"/>
-      {/* Anthropic A: two legs meeting at apex + crossbar */}
-      <path
-        d={`M${cx - 10} ${cy + 12} L${cx} ${cy - 14} L${cx + 10} ${cy + 12}`}
-        stroke="oklch(88% 0.05 293)" strokeWidth="2.5" fill="none" strokeLinejoin="round"
+      <image
+        href="/logos/claude.png"
+        x={cx - r + pad} y={cy - r + pad}
+        width={(r - pad) * 2} height={(r - pad) * 2}
+        preserveAspectRatio="xMidYMid meet"
       />
-      <line x1={cx - 5} y1={cy + 4} x2={cx + 5} y2={cy + 4} stroke="oklch(88% 0.05 293)" strokeWidth="2.2"/>
       <text x={cx} y={cy + r + 14} fontSize="8" textAnchor="middle"
         fill="oklch(45% 0.06 293)" fontFamily="system-ui" fontWeight="600">Claude</text>
+    </g>
+  );
+}
+
+// ── Hermes agent sprite ────────────────────────────────────────────────────────
+export function HermesLogo({ r = 22, cx = 22, cy = 22 }: LogoProps) {
+  return (
+    <g>
+      <circle cx={cx} cy={cy} r={r} fill="oklch(18% 0.09 293)" stroke="oklch(48% 0.12 293)" strokeWidth="1.5"/>
+      <image
+        href="/logos/hermes.png"
+        x={cx - r * 0.82} y={cy - r * 1.0}
+        width={r * 1.64} height={r * 1.64}
+        preserveAspectRatio="xMidYMid meet"
+      />
+      <text x={cx} y={cy + r + 14} fontSize="8" textAnchor="middle"
+        fill="oklch(45% 0.06 293)" fontFamily="system-ui" fontWeight="600">Hermes</text>
     </g>
   );
 }
