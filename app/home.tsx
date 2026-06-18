@@ -2,6 +2,7 @@
 // needed for useState (copy button state) and interactive prompt cards
 
 import { useState } from "react";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import {
   Layers,
@@ -12,6 +13,7 @@ import {
   Check,
   ArrowRight,
   ChevronRight,
+  LayoutGrid,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -311,6 +313,22 @@ export function HomePage() {
             <span>Message Hermes in Slack with a prototype request.</span>
             <ArrowRight className="w-3.5 h-3.5 flex-shrink-0" />
             <span>Get a short link back.</span>
+          </div>
+
+          {/* Gallery CTA */}
+          <div className="mt-8">
+            <Link
+              href="/gallery"
+              className="inline-flex items-center gap-3 px-6 py-3.5 rounded-xl font-semibold text-sm transition-all duration-150 hover:scale-[1.02] active:scale-[0.99]"
+              style={{
+                background: "var(--kinship-ink)",
+                color: "var(--kinship-cream)",
+              }}
+            >
+              <LayoutGrid className="w-4 h-4" />
+              Browse the Prototype Gallery
+              <ArrowRight className="w-4 h-4 opacity-70" />
+            </Link>
           </div>
         </motion.div>
 
