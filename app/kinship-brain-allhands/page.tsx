@@ -177,14 +177,20 @@ function ToolsNetworkAnimation() {
         fill="oklch(60% 0.05 293)" fontFamily="system-ui" fontWeight="600">Claude</text>
 
       {/* ── Hermes hub (right) ── */}
+      <defs>
+        <clipPath id="hermes-clip">
+          <circle cx={hermesX} cy={hubY} r={hubR - 1}/>
+        </clipPath>
+      </defs>
       <circle className="hub-h" cx={hermesX} cy={hubY} r={hubR}
-        fill="oklch(18% 0.09 293)" stroke="oklch(48% 0.12 293)" strokeWidth="2"/>
-      {/* Hermes sprite — transparent background */}
+        fill="white" stroke="oklch(25% 0.08 293)" strokeWidth="2"/>
+      {/* Hermes portrait — clipped to circle, fills it */}
       <image
         href="/logos/hermes.png"
-        x={hermesX - hubR * 0.82} y={hubY - hubR * 1.0}
-        width={hubR * 1.64} height={hubR * 1.64}
+        x={hermesX - hubR * 0.95} y={hubY - hubR * 1.1}
+        width={hubR * 1.9} height={hubR * 1.9}
         preserveAspectRatio="xMidYMid meet"
+        clipPath="url(#hermes-clip)"
       />
       {/* Hermes label — 8px gap below circle bottom */}
       <text x={hermesX} y={hubY + hubR + 14} fontSize="8" textAnchor="middle"

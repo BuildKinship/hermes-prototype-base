@@ -48,16 +48,24 @@ export function ClaudeLogo({ r = 24, cx = 24, cy = 24 }: LogoProps) {
   );
 }
 
-// ── Hermes agent sprite ────────────────────────────────────────────────────────
+// ── Hermes agent portrait ──────────────────────────────────────────────────────
 export function HermesLogo({ r = 22, cx = 22, cy = 22 }: LogoProps) {
+  const clipId = `hermes-clip-${cx}-${cy}`;
   return (
     <g>
-      <circle cx={cx} cy={cy} r={r} fill="oklch(18% 0.09 293)" stroke="oklch(48% 0.12 293)" strokeWidth="1.5"/>
+      <defs>
+        <clipPath id={clipId}>
+          <circle cx={cx} cy={cy} r={r - 1}/>
+        </clipPath>
+      </defs>
+      {/* White circle — logo has white background */}
+      <circle cx={cx} cy={cy} r={r} fill="white" stroke="oklch(25% 0.08 293)" strokeWidth="1.5"/>
       <image
         href="/logos/hermes.png"
-        x={cx - r * 0.82} y={cy - r * 1.0}
-        width={r * 1.64} height={r * 1.64}
+        x={cx - r * 0.95} y={cy - r * 1.1}
+        width={r * 1.9} height={r * 1.9}
         preserveAspectRatio="xMidYMid meet"
+        clipPath={`url(#${clipId})`}
       />
       <text x={cx} y={cy + r + 14} fontSize="8" textAnchor="middle"
         fill="oklch(45% 0.06 293)" fontFamily="system-ui" fontWeight="600">Hermes</text>
@@ -152,18 +160,6 @@ export function GoogleDriveLogo({ r = 22, cx = 22, cy = 22 }: LogoProps) {
       />
       <text x={cx} y={cy + r + 14} fontSize="7" textAnchor="middle"
         fill="oklch(45% 0.06 293)" fontFamily="system-ui" fontWeight="600">GWorkspace</text>
-    </g>
-  );
-}
-
-// ── Hermes (lightning bolt) ────────────────────────────────────────────────────
-export function HermesLogo({ r = 22, cx = 22, cy = 22 }: LogoProps) {
-  return (
-    <g>
-      <circle cx={cx} cy={cy} r={r} fill="oklch(22% 0.08 293)" stroke="oklch(40% 0.08 293)" strokeWidth="1.5"/>
-      <text x={cx} y={cy + 7} fontSize="18" textAnchor="middle">⚡</text>
-      <text x={cx} y={cy + r + 14} fontSize="8" textAnchor="middle"
-        fill="oklch(45% 0.06 293)" fontFamily="system-ui" fontWeight="600">Hermes</text>
     </g>
   );
 }
