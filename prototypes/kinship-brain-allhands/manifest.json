@@ -9,7 +9,7 @@
   "type": "slide",
   "tags": ["all-hands", "brain", "presentation", "slide-deck", "internal", "kinship"],
   "branch": "prototype/kinship-brain-allhands-2026-06-17",
-  "url": "https://hermes-prototype-base-ten.vercel.app/kinship-brain-allhands",
+  "url": "https://quick.buildkinship.dev/kinship-brain-allhands",
   "short_url": "https://short.buildkinship.dev/kinship-brain-allhands",
   "thumbnail": "thumbnail.png",
   "full_prompt": "Build a presentation based on the Kinship Brain All-Hands talking points markdown doc. 19 slides covering all 10 sections, with Ask the Room dark interstitial slides throughout.",

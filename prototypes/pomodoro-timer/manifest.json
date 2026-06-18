@@ -10,7 +10,7 @@
   "type": "dashboard",
   "tags": ["student", "productivity", "timer", "classroom"],
   "branch": "prototype/pomodoro-timer-2026-06-16",
-  "url": "https://hermes-prototype-base-ten.vercel.app/pomodoro-timer",
+  "url": "https://quick.buildkinship.dev/pomodoro-timer",
   "short_url": "https://kinshipshort.duckdns.org/pomodoro-timer",
   "thumbnail": "thumbnail.png",
   "slack_channel": "Slack DM",
