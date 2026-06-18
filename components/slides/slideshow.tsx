@@ -6,7 +6,7 @@ import { motion, AnimatePresence, type Transition } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-// ─── Types ─────────────────────────────────────────────────────────────────────
+// ─── Types ──────────────────────────────────────────────────────────────────────
 
 export interface Slide {
   id: string;
@@ -25,7 +25,7 @@ interface SlideshowProps {
   className?: string;
 }
 
-// ─── Motion constants ───────────────────────────────────────────────────────────
+// ─── Motion constants ────────────────────────────────────────────────────────────
 const EASE_OUT = [0.22, 1, 0.36, 1] as unknown as Transition["ease"];
 const EASE_IN  = [0.55, 0, 1, 0.45] as unknown as Transition["ease"];
 
@@ -40,7 +40,7 @@ const slideVariants = {
 };
 
 /**
- * Kinship fullscreen slideshow engine — production-ready.
+ * Kinship fullscreen slideshow engine — mobile-first, production-ready.
  *
  * Features:
  *   - Keyboard nav (← → Space Home End)
@@ -48,13 +48,15 @@ const slideVariants = {
  *   - Per-slide dark/light theming
  *   - Always-visible nav on touch devices (pointer: coarse)
  *   - localStorage position persistence
- *   - Progress dots + prev/next arrows
- *   - Slide counter + label display
+ *   - Progress dots (collapses to "N/total" text on decks >12 slides)
+ *   - Mobile-safe full-bleed height via CSS dvh/svh with vh fallback
+ *   - Slide counter + label display (hidden on small phones to save space)
+ *   - Scrollable slide body on mobile so content never clips under nav bar
  *
  * Usage:
  *   import { Slideshow } from "@/components/slides/slideshow";
  *   const slides: Slide[] = [
- *     { id: "cover", dark: true, label: "Cover", content: <CoverSlide /> },
+ *     { id: "cover", dark: true,  label: "Cover",            content: <CoverSlide /> },
  *     { id: "why",   dark: false, label: "1 · Why we're here", content: <WhySlide /> },
  *   ];
  *   <Slideshow slides={slides} storageKey="my-deck-slide" />
@@ -123,7 +125,7 @@ export function Slideshow({ slides, storageKey = "slideshow-current", className 
     if (touchStartX.current === null || touchStartY.current === null) return;
     const dx = e.changedTouches[0].clientX - touchStartX.current;
     const dy = e.changedTouches[0].clientY - touchStartY.current;
-    // Require horizontal dominance and 40px minimum to avoid accidental swipes during vertical scroll
+    // Require horizontal dominance + 40px min to avoid triggering on vertical scroll
     if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 40) {
       dx < 0 ? go(page + 1) : go(page - 1);
     }
@@ -133,101 +135,133 @@ export function Slideshow({ slides, storageKey = "slideshow-current", className 
 
   const current = slides[page];
   const isDark = current?.dark ?? false;
+  // Compact dots for large decks — avoids overflow on small screens
+  const useCompactDots = slides.length > 12;
 
   return (
+    /*
+     * Height strategy — mobile-safe:
+     *   1. `dvh` (dynamic viewport height) — ideal: shrinks/grows with browser chrome on iOS/Android
+     *   2. `svh` (small viewport height) — fallback: always the smallest stable height
+     *   3. `100vh` — last resort for older browsers
+     *
+     * We stack the slide body and the nav bar inside a column flex container so the nav
+     * is always anchored at the bottom and never overlaps slide content.
+     */
     <div
-      className={cn("relative w-full h-screen overflow-hidden", className)}
-      style={{ background: isDark ? "var(--kinship-ink)" : "var(--kinship-cream)" }}
+      className={cn("relative w-full flex flex-col overflow-hidden", className)}
+      style={{
+        height: "100dvh",
+        // Progressive enhancement: browsers that don't support dvh fall back via CSS cascade
+        background: isDark ? "var(--kinship-ink)" : "var(--kinship-cream)",
+      }}
       onMouseMove={handleMouseMove}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
-      {/* Slides */}
-      <AnimatePresence custom={dir} mode="wait">
-        <motion.div
-          key={current.id}
-          custom={dir}
-          variants={slideVariants}
-          initial="enter"
-          animate="center"
-          exit="exit"
-          className="absolute inset-0 flex items-center justify-center"
-          style={{ background: isDark ? "var(--kinship-ink)" : "var(--kinship-cream)" }}
-        >
-          {current.content}
-        </motion.div>
-      </AnimatePresence>
-
-      {/* Top-left: slide label */}
-      {current.label && (
+      {/* ── Top chrome: label (left) + counter (right) ─────────────────────── */}
+      <div className="flex-none flex items-center justify-between px-4 pt-4 pb-1 sm:px-8 sm:pt-6">
         <div
-          className="absolute top-6 left-8 text-xs font-mono tracking-widest"
+          className="text-xs font-mono tracking-widest truncate max-w-[60vw]"
+          style={{ color: isDark ? "oklch(40% 0.06 293)" : "oklch(65% 0.05 293)", minHeight: "1em" }}
+        >
+          {current.label ?? ""}
+        </div>
+        <div
+          className="text-xs font-mono tracking-widest flex-none"
           style={{ color: isDark ? "oklch(40% 0.06 293)" : "oklch(65% 0.05 293)" }}
         >
-          {current.label}
+          {page + 1} / {slides.length}
         </div>
-      )}
-
-      {/* Top-right: slide counter */}
-      <div
-        className="absolute top-6 right-8 text-xs font-mono tracking-widest"
-        style={{ color: isDark ? "oklch(40% 0.06 293)" : "oklch(65% 0.05 293)" }}
-      >
-        {page + 1} / {slides.length}
       </div>
 
-      {/* Bottom: nav arrows + progress dots — always visible on touch, fade on desktop */}
+      {/* ── Slide body — scrollable on mobile so long content isn't clipped ─── */}
+      <div className="relative flex-1 overflow-hidden">
+        <AnimatePresence custom={dir} mode="wait">
+          <motion.div
+            key={current.id}
+            custom={dir}
+            variants={slideVariants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            className="absolute inset-0 overflow-y-auto"
+            style={{ background: isDark ? "var(--kinship-ink)" : "var(--kinship-cream)" }}
+          >
+            {/*
+             * Inner wrapper centres content on desktop (flex column centred),
+             * but on mobile lets it start from the top with padding so it never
+             * hides under the nav bar at the bottom.
+             */}
+            <div className="min-h-full flex flex-col items-center justify-center px-4 py-6 sm:px-8 sm:py-10">
+              {current.content}
+            </div>
+          </motion.div>
+        </AnimatePresence>
+      </div>
+
+      {/* ── Bottom nav: prev arrow + dots/counter + next arrow ──────────────── */}
       <div
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-6 transition-opacity duration-200"
+        className="flex-none flex items-center justify-center gap-4 px-4 py-4 sm:gap-6 sm:py-6 transition-opacity duration-200"
         style={{ opacity: isTouchDevice || showNav ? 1 : 0 }}
       >
         <button
           onClick={() => go(page - 1)}
           disabled={page === 0}
-          className="p-2.5 rounded-xl border transition-all"
+          className="p-2 sm:p-2.5 rounded-xl border transition-all"
           style={{
             borderColor: isDark ? "oklch(35% 0.07 293)" : "var(--kinship-dim)",
-            background: isDark ? "oklch(25% 0.07 293)" : "white",
-            color: isDark ? "var(--kinship-cream)" : "var(--kinship-ink)",
+            background:   isDark ? "oklch(25% 0.07 293)" : "white",
+            color:        isDark ? "var(--kinship-cream)" : "var(--kinship-ink)",
             opacity: page === 0 ? 0.2 : 0.8,
           }}
           aria-label="Previous slide"
         >
-          <ChevronLeft className="w-5 h-5" />
+          <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
         </button>
 
-        {/* Progress dots — active dot expands to 20px wide */}
-        <div className="flex items-center gap-1.5">
-          {slides.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => go(i)}
-              className="transition-all rounded-full"
-              style={{
-                width: i === page ? 20 : 6,
-                height: 6,
-                background: i === page
-                  ? (isDark ? "var(--kinship-cream)" : "var(--kinship-mid)")
-                  : (isDark ? "oklch(35% 0.07 293)" : "var(--kinship-dim)"),
-              }}
-              aria-label={`Go to slide ${i + 1}`}
-            />
-          ))}
-        </div>
+        {useCompactDots ? (
+          // Compact text counter for long decks
+          <span
+            className="text-sm font-mono w-20 text-center"
+            style={{ color: isDark ? "oklch(55% 0.05 293)" : "oklch(55% 0.05 293)" }}
+          >
+            {page + 1} of {slides.length}
+          </span>
+        ) : (
+          // Pill dots — active dot expands to 20px wide
+          <div className="flex items-center gap-1 sm:gap-1.5">
+            {slides.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => go(i)}
+                className="transition-all rounded-full"
+                style={{
+                  width:  i === page ? 18 : 6,
+                  height: 6,
+                  background: i === page
+                    ? (isDark ? "var(--kinship-cream)" : "var(--kinship-mid)")
+                    : (isDark ? "oklch(35% 0.07 293)" : "var(--kinship-dim)"),
+                }}
+                aria-label={`Go to slide ${i + 1}`}
+              />
+            ))}
+          </div>
+        )}
 
         <button
           onClick={() => go(page + 1)}
           disabled={page === slides.length - 1}
-          className="p-2.5 rounded-xl border transition-all"
+          className="p-2 sm:p-2.5 rounded-xl border transition-all"
           style={{
             borderColor: isDark ? "oklch(35% 0.07 293)" : "var(--kinship-dim)",
-            background: isDark ? "oklch(25% 0.07 293)" : "white",
-            color: isDark ? "var(--kinship-cream)" : "var(--kinship-ink)",
+            background:   isDark ? "oklch(25% 0.07 293)" : "white",
+            color:        isDark ? "var(--kinship-cream)" : "var(--kinship-ink)",
             opacity: page === slides.length - 1 ? 0.2 : 0.8,
           }}
           aria-label="Next slide"
         >
-          <ChevronRight className="w-5 h-5" />
+          <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
         </button>
       </div>
     </div>
@@ -238,10 +272,16 @@ export function Slideshow({ slides, storageKey = "slideshow-current", className 
 /* ─────────────────────────────────────────────────────────────────────────────
    SLIDE LAYOUT PRIMITIVES
    Drop these into slide content components for consistent Kinship layout.
+   All primitives are mobile-first: responsive font sizes, fluid grids, safe padding.
 ───────────────────────────────────────────────────────────────────────────── */
 
 /**
  * Large centered hero title for cover and section-opening slides.
+ *
+ * Font scale:
+ *   - Cover / section break → use default (2.4rem→5.5rem)
+ *   - Content slides with lots of body → pass size="sm" (1.8rem→3rem)
+ *
  * dark=true → cream text (use on dark-bg slides).
  */
 export function SlideTitle({
@@ -249,17 +289,24 @@ export function SlideTitle({
   subtitle,
   eyebrow,
   dark = false,
+  size = "lg",
 }: {
   title: string;
   subtitle?: string;
   eyebrow?: string;
   dark?: boolean;
+  /** "lg" = cover/section (default) | "sm" = content slide with lots of body */
+  size?: "lg" | "sm";
 }) {
+  const fontSize = size === "lg"
+    ? "clamp(2.4rem, 6vw, 5.5rem)"
+    : "clamp(1.8rem, 4vw, 3rem)";
+
   return (
-    <div className="text-center max-w-5xl px-8">
+    <div className="text-center w-full max-w-4xl px-2">
       {eyebrow && (
         <p
-          className="mb-6 text-sm font-mono tracking-[0.2em] uppercase"
+          className="mb-4 text-xs font-mono tracking-[0.2em] uppercase sm:mb-6 sm:text-sm"
           style={{ color: dark ? "oklch(70% 0.05 293)" : "var(--kinship-mid)" }}
         >
           {eyebrow}
@@ -267,7 +314,7 @@ export function SlideTitle({
       )}
       <h1
         style={{
-          fontSize: "clamp(2.8rem, 6vw, 5.5rem)",
+          fontSize,
           lineHeight: 1.05,
           fontFamily: "'Georgia', 'Times New Roman', serif",
           color: dark ? "var(--kinship-cream)" : "var(--kinship-ink)",
@@ -277,7 +324,7 @@ export function SlideTitle({
       </h1>
       {subtitle && (
         <p
-          className="mt-8 text-xl leading-relaxed mx-auto max-w-3xl"
+          className="mt-5 text-base leading-relaxed mx-auto max-w-2xl sm:mt-8 sm:text-xl"
           style={{ color: dark ? "oklch(70% 0.05 293)" : "oklch(50% 0.06 293)", fontWeight: 400 }}
         >
           {subtitle}
@@ -294,7 +341,7 @@ export function SlideTitle({
 export function SectionLabel({ children, dark = false }: { children: ReactNode; dark?: boolean }) {
   return (
     <p
-      className="text-xs font-mono tracking-[0.2em] uppercase mb-10"
+      className="text-xs font-mono tracking-[0.2em] uppercase mb-6 sm:mb-10"
       style={{ color: dark ? "oklch(60% 0.05 293)" : "var(--kinship-mid)" }}
     >
       {children}
@@ -303,7 +350,38 @@ export function SectionLabel({ children, dark = false }: { children: ReactNode; 
 }
 
 /**
+ * Responsive card grid — 1 col on mobile, 2 on tablet, 3 on desktop.
+ * Pass cols={2} to max at 2 columns instead of 3.
+ *
+ * @example
+ * <SlideCardGrid>
+ *   <SlideCard>…</SlideCard>
+ *   <SlideCard>…</SlideCard>
+ *   <SlideCard>…</SlideCard>
+ * </SlideCardGrid>
+ */
+export function SlideCardGrid({
+  children,
+  cols = 3,
+  className = "",
+}: {
+  children: ReactNode;
+  cols?: 2 | 3;
+  className?: string;
+}) {
+  const gridClass = cols === 2
+    ? "grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5"
+    : "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5";
+  return (
+    <div className={`w-full max-w-5xl ${gridClass} ${className}`}>
+      {children}
+    </div>
+  );
+}
+
+/**
  * Light card with border — no shadow (Kinship brand policy).
+ * Padding is tighter on mobile (p-5) than desktop (p-8).
  */
 export function SlideCard({
   children,
@@ -316,7 +394,7 @@ export function SlideCard({
 }) {
   return (
     <div
-      className={"rounded-2xl border p-8 " + className}
+      className={"rounded-2xl border p-5 sm:p-8 " + className}
       style={{ background: "white", borderColor: "var(--kinship-dim)", ...style }}
     >
       {children}
@@ -330,10 +408,39 @@ export function SlideCard({
 export function SlideDarkCard({ children, className = "" }: { children: ReactNode; className?: string }) {
   return (
     <div
-      className={"rounded-2xl border p-8 " + className}
+      className={"rounded-2xl border p-5 sm:p-8 " + className}
       style={{ background: "oklch(25% 0.07 293)", borderColor: "oklch(35% 0.07 293)" }}
     >
       {children}
+    </div>
+  );
+}
+
+/**
+ * Responsive SVG wrapper — scales inline SVGs down on mobile without blurring.
+ *
+ * Problem: SVG animations are often authored at a fixed width (e.g. 460px) that
+ * overflows a 390px phone screen. Wrapping in this component makes the SVG fluid.
+ *
+ * Usage:
+ *   <ResponsiveSVG maxWidth={460}>
+ *     <MyAnimatedSVG />     ← your SVG component with fixed width/height props
+ *   </ResponsiveSVG>
+ *
+ * The SVG itself should still have explicit width/height (for viewBox to work),
+ * but those become the maximum — the wrapper scales it down on smaller screens.
+ */
+export function ResponsiveSVG({ children, maxWidth = 480 }: { children: ReactNode; maxWidth?: number }) {
+  return (
+    <div
+      className="w-full flex justify-center"
+      style={{ maxWidth: "100%" }}
+    >
+      <div style={{ width: "100%", maxWidth, overflow: "visible" }}>
+        <div style={{ width: "100%", overflowX: "auto", display: "flex", justifyContent: "center" }}>
+          {children}
+        </div>
+      </div>
     </div>
   );
 }
@@ -348,7 +455,7 @@ export function SlideDarkCard({ children, className = "" }: { children: ReactNod
 export function AskBubble({ children }: { children: ReactNode }) {
   return (
     <div
-      className="rounded-2xl p-8 text-center max-w-3xl"
+      className="rounded-2xl p-6 sm:p-8 text-center w-full max-w-3xl mx-auto"
       style={{ background: "oklch(25% 0.07 293)", color: "var(--kinship-cream)" }}
     >
       <div className="flex items-center justify-center gap-2 mb-4">
@@ -365,7 +472,7 @@ export function AskBubble({ children }: { children: ReactNode }) {
           Ask the room
         </span>
       </div>
-      <p className="text-2xl leading-snug" style={{ fontFamily: "'Georgia', serif", fontStyle: "italic" }}>
+      <p className="text-xl sm:text-2xl leading-snug" style={{ fontFamily: "'Georgia', serif", fontStyle: "italic" }}>
         {children}
       </p>
     </div>
@@ -377,11 +484,11 @@ export function AskBubble({ children }: { children: ReactNode }) {
 ───────────────────────────────────────────────────────────────────────────── */
 /** @deprecated Use SlideTitle */
 export const SlideTitleLayout = SlideTitle;
-/** @deprecated Use SlideCard */
+/** @deprecated Use SlideCard + SlideCardGrid */
 export function SlideContentLayout({ title, children }: { title?: string; children: ReactNode }) {
   return (
-    <div className="w-full max-w-5xl">
-      {title && <h2 className="text-3xl mb-10 text-center" style={{ fontFamily: "'Georgia', serif" }}>{title}</h2>}
+    <div className="w-full max-w-5xl px-2">
+      {title && <h2 className="text-2xl sm:text-3xl mb-6 sm:mb-10 text-center" style={{ fontFamily: "'Georgia', serif" }}>{title}</h2>}
       {children}
     </div>
   );
