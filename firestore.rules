@@ -1,0 +1,34 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isGoogleUser() {
+      return isSignedIn()
+        && request.auth.token.firebase.sign_in_provider == 'google.com';
+    }
+
+    function isBuildkinshipUser() {
+      return isGoogleUser()
+        && request.auth.token.email.matches('.*@buildkinship\\.com');
+    }
+
+    // Prototypes collection — gallery data
+    match /prototypes/{protoId} {
+      allow read:           if isSignedIn();          // anon OR google can read
+      allow create, update: if isBuildkinshipUser();  // internal only
+      allow delete:         if isBuildkinshipUser();
+    }
+
+    // Survey responses
+    match /survey_responses/{responseId} {
+      allow create: if isSignedIn();          // anon OR google can submit
+      allow read:   if isBuildkinshipUser();  // internal only
+      allow delete: if isBuildkinshipUser();
+    }
+  }
+}

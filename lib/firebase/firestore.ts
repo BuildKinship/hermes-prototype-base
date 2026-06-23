@@ -5,8 +5,6 @@ import {
   getDoc,
   getDocs,
   updateDoc,
-  query,
-  orderBy,
   serverTimestamp,
   type DocumentReference,
 } from "firebase/firestore";
@@ -37,16 +35,21 @@ export async function getPrototype(
   return snap.data() as FirestorePrototype;
 }
 
-/** Fetch all prototypes, ordered by creation time desc */
+/** Fetch all prototypes, sorted by creation time desc (client-side to avoid index requirement) */
 export async function listPrototypes(): Promise<
   (FirestorePrototype & { id: string })[]
 > {
-  const q = query(collection(db, COL), orderBy("createdAt", "desc"));
-  const snap = await getDocs(q);
-  return snap.docs.map((d) => ({
+  const snap = await getDocs(collection(db, COL));
+  const docs = snap.docs.map((d) => ({
     id: d.id,
     ...(d.data() as FirestorePrototype),
   }));
+  // Sort client-side: newest first
+  return docs.sort((a, b) => {
+    const aTime = (a.createdAt as any)?.seconds ?? 0;
+    const bTime = (b.createdAt as any)?.seconds ?? 0;
+    return bTime - aTime;
+  });
 }
 
 /** Update prototype metadata by UUID */
