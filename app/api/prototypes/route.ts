@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { adminDb } from "@/lib/firebase/admin";
+import { getAdminDb } from "@/lib/firebase/admin";
 import { FieldValue } from "firebase-admin/firestore";
 
 function authorized(req: NextRequest) {
@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
   }
 
   const body = await req.json();
-  const ref = await adminDb.collection("prototypes").add({
+  const ref = await getAdminDb().collection("prototypes").add({
     ...body,
     createdAt: FieldValue.serverTimestamp(),
   });
@@ -31,7 +31,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const snap = await adminDb
+  const snap = await getAdminDb()
     .collection("prototypes")
     .orderBy("createdAt", "desc")
     .get();
