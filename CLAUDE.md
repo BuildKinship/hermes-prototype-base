@@ -1,6 +1,6 @@
 # Hermes Prototype Base — Coding Harness
 
-> This file is your operating manual. Read it fully before touching any code.
+> This file is your operating manual. Read it **fully** before touching any code.
 > Every prototype is a **branch off `main`**. You build on top of this base — you never modify `main`.
 
 ---
@@ -13,41 +13,56 @@ A Next.js 15 (App Router) prototype engine for Kinship. When Hermes receives a p
 3. Delegates work to a coding agent (you) on that branch
 4. Registers the new prototype component in `PrototypeRegistry.tsx`
 5. Pushes → Vercel auto-builds → deploys to production
-6. Hermes shortens the UUID-based URL and returns it to the requester
+6. Hermes shortens the UUID-based artifact URL and returns it to the requester
 
-**This is primarily a frontend prototype system.** Data is mocked in `mock/` — simple TypeScript objects and arrays.
-**Firebase Auth + Firestore are available for auth and persistence** (survey responses, gallery data).
+**This is primarily a frontend prototype system.** Visual/display data is mocked in `mock/` — simple TypeScript objects and arrays. Firebase Auth + Firestore are used for auth gating and persistence (survey responses, gallery data).
 
 ---
 
 ## Authentication Architecture
 
-The app has two access tiers enforced by Next.js route groups:
+The app has **two access tiers** enforced by Next.js route groups. Do not add auth logic outside these components — everything is handled at the layout level.
 
-### Internal routes (Google Auth, @buildkinship.com only)
+### Internal routes — Google Auth, @buildkinship.com only
 ```
 /                          → GoogleAuthGate
 /gallery                   → GoogleAuthGate
 /survey-admin/[slug]       → GoogleAuthGate
 ```
-These live in `app/(internal)/` route group. `app/(internal)/layout.tsx` wraps all of them in `<GoogleAuthGate>`.
-Non-@buildkinship.com accounts see a "sign in with Google" page. Anonymous users are blocked.
+These live in `app/(internal)/`. The layout at `app/(internal)/layout.tsx` wraps all children in `<GoogleAuthGate>`. Non-@buildkinship.com accounts see a sign-in page. Anonymous users are blocked.
 
-### Artifact routes (Anonymous Auth, public)
+### Artifact routes — Anonymous Auth, public
 ```
-/artifact/[uuid]               → AnonAuthGate (silent, invisible)
-/artifact/[uuid]/survey/[slug] → AnonAuthGate (silent, invisible)
+/artifact/[uuid]               → AnonAuthGate (silent, no UI)
+/artifact/[uuid]/survey/[slug] → AnonAuthGate (silent, no UI)
 ```
-These live in `app/artifact/`. `app/artifact/layout.tsx` wraps all of them in `<AnonAuthGate>`.
-Visitors are silently signed in anonymously — they see no auth UI.
+These live in `app/artifact/`. The layout at `app/artifact/layout.tsx` wraps all children in `<AnonAuthGate>`. Visitors are silently signed into Firebase anonymously — they see no auth UI at all.
 
 ### Auth components
 - `components/auth/AuthProvider.tsx` — React context, exports `useAuth()` hook
 - `components/auth/GoogleAuthGate.tsx` — blocks and shows sign-in for internal routes
-- `components/auth/AnonAuthGate.tsx` — silently signs in visitors anonymously
+- `components/auth/AnonAuthGate.tsx` — silently signs in visitors anonymously (3s fallback timeout)
 - `components/auth/FullPageSpinner.tsx` — loading state
 
-**DO NOT** add auth logic outside these components. The gates are applied at the layout level — all child routes inherit them automatically.
+### The auth race — CRITICAL
+**Always wait for Firebase auth to resolve before querying Firestore.** This is the #1 cause of `Missing or insufficient permissions` errors.
+
+```tsx
+// ✅ Correct — gate Firestore reads on auth state
+const { user, loading: authLoading } = useAuth();
+
+useEffect(() => {
+  if (authLoading || !user) return; // wait for Firebase auth to settle
+  fetchMyData();
+}, [user, authLoading]);
+
+// ❌ Wrong — fires before onAuthStateChanged resolves
+useEffect(() => {
+  fetchMyData(); // will fail with permission-denied if auth hasn't resolved yet
+}, []);
+```
+
+This applies to **both** Google users (internal) and anonymous users (artifacts). Even though `AnonAuthGate` wraps the artifact layout, there's a brief window between the gate rendering and the anonymous sign-in completing — always gate on `user && !authLoading`.
 
 ---
 
@@ -58,45 +73,55 @@ app/
   (internal)/           Route group — GoogleAuthGate applied to all routes here
     layout.tsx          Applies GoogleAuthGate
     page.tsx            Homepage
-    gallery/            Gallery — reads from Firestore
+    gallery/            Gallery — reads from Firestore (client component)
     survey-admin/[slug] Survey results (Google auth, no PIN)
+      page.tsx          Renders <SurveyAdminView survey={...} />
 
   artifact/             Artifact routes — AnonAuthGate applied to all routes here
     layout.tsx          Applies AnonAuthGate
-    [uuid]/             Artifact page — fetches Firestore doc, renders by slug
-      page.tsx
-      survey/[slug]/    Survey artifact route
+    [uuid]/             Looks up Firestore doc by UUID → renders component by slug
+      page.tsx          Uses useAuth() to wait for anon auth, then getDocs
+      survey/[slug]/    Survey artifact (public, anon auth)
+        page.tsx        Server component — renders <SurveyEngine survey={...} />
 
   api/
-    prototypes/         Prototype CRUD (protected by PROTOTYPE_ADMIN_SECRET bearer token)
-    survey/[slug]/      Survey submit + results (submit: any auth, results: @buildkinship.com)
+    prototypes/         Prototype CRUD (PROTOTYPE_ADMIN_SECRET bearer token)
+    survey/[slug]/
+      submit/route.ts   POST — public, writes to Firestore via Admin SDK
+      responses/route.ts GET — @buildkinship.com Firebase ID token required
 
 components/
-  auth/                 Auth gates and context (see above)
+  auth/                 Auth gates and context (do not modify)
   artifact/
-    PrototypeRegistry.tsx   ← EVERY new prototype must be registered here
+    PrototypeRegistry.tsx   ← EVERY new prototype MUST be registered here
+  survey/
+    survey-engine.tsx   Full survey UI — question types, transitions, thank-you
+    survey-admin.tsx    Admin table — sort, filter, CSV export
   kinship/              Kinship-branded UI components
     stat-card.tsx       StatCard, StatGrid
     student.tsx         StudentAvatar, StudentStatusIndicator
     accuracy-ring.tsx   AccuracyRing (SVG progress circle)
     badges.tsx          SubjectBadge, PlatformBadge, SubjectDot
-  slides/               Presentation primitives
-    slideshow.tsx       Slideshow engine, SlideTitleLayout, SlideContentLayout
-  animations/           Motion primitives
+  slides/
+    slideshow.tsx       Full slideshow engine (keyboard nav, touch, localStorage)
+    brand-logos.tsx     ClaudeLogo, NotionLogo, SlackLogo, ZoomLogo, etc.
+  animations/
     fade.tsx            FadeUp, Stagger (Framer Motion wrappers)
-  three/                3D scene helpers
 
 lib/
   firebase/
-    client.ts           Firebase client app init, exports auth + db
-    admin.ts            Firebase Admin SDK, exports adminDb + adminAuth
-    firestore.ts        Typed Firestore helpers: createPrototype, getPrototype, listPrototypes, updatePrototype
-    survey-store.ts     addResponseFirestore, getResponsesFirestore
+    client.ts           Firebase client app init — exports auth + db (client-side only)
+    admin.ts            Firebase Admin SDK — exports getAdminDb(), getAdminAuth()
+                        ⚠️  Use in API routes only — NOT in React components
+    firestore.ts        Typed Firestore helpers: createPrototype, getPrototype, etc.
+    survey-store.ts     addResponseFirestore, getResponsesFirestore (client SDK)
   utils.ts              cn(), deterministicColor(), accuracyColor(), slugify()
 
-mock/                   ALL mock data lives here (non-Firebase data)
+mock/                   ALL visual/display mock data lives here
+  surveys.ts            Survey definitions — SurveyConfig objects + getSurvey(slug)
+
 docs/
-  PROTOTYPE.md          Prototype-specific context (set by Hermes before agent runs)
+  PROTOTYPE.md          Written by Hermes before you run — read this first
 ```
 
 ---
@@ -106,195 +131,382 @@ docs/
 Every new prototype component **must** be registered in `components/artifact/PrototypeRegistry.tsx`:
 
 ```typescript
+import dynamic from "next/dynamic";
+import type { ComponentType } from "react";
+
 const registry: Record<string, ComponentType> = {
   "colour-palette": dynamic(() => import("@/app/colour-palette/page")),
   "pomodoro-timer": dynamic(() => import("@/app/pomodoro-timer/page")),
-  // ─── Add new prototypes below this line ────
+  // ─── Add new prototypes below this line ────────────────────────────────
   "my-new-slug": dynamic(() => import("@/app/my-new-slug/page")),
 };
 ```
 
 **Without this entry, `/artifact/[uuid]` shows "No component registered for: {slug}" even if the page file exists.**
 
-This replaces the old `prototypes/*/manifest.json` commit step. Same importance, different mechanism.
+Surveys are **not** registered here — they use a dedicated route. See the Survey section below.
+
+---
+
+## Building a Survey Prototype
+
+Surveys are the most complex prototype type. Follow this exactly.
+
+### How survey routing works
+
+```
+/artifact/[uuid]
+  → AnonAuthGate (silent anon sign-in)
+  → Fetches Firestore doc by UUID
+  → If proto.type === "survey" AND proto.survey_slug is set:
+      → Redirects to /artifact/[uuid]/survey/[slug]
+  → SurveyEngine renders the form
+
+/survey-admin/[slug]
+  → GoogleAuthGate (@buildkinship.com only)
+  → SurveyAdminView fetches responses via /api/survey/[slug]/responses
+  → Bearer token = user.getIdToken(true) from useAuth()
+```
+
+**The redirect only works if `survey_slug` is set in the Firestore prototype doc.**
+Hermes sets this via the MCP tool (`update_prototype(uuid, { survey_slug: "your-slug" })`).
+You do not need to do this — but if the artifact page shows "Component not registered", check this field.
+
+### Adding a new survey
+
+**Step 1 — Add the survey config to `mock/surveys.ts`:**
+
+```typescript
+export const SURVEYS: Record<string, SurveyConfig> = {
+  "my-survey": {
+    slug: "my-survey",
+    title: "Survey Title",
+    description: "1–2 sentences shown on the welcome screen.",
+    adminCode: "", // legacy field — no longer used, leave empty string
+    thankYouTitle: "Thank you!",
+    thankYouMessage: "Your responses help us improve Kinship.",
+    questions: [
+      // see question types below
+    ],
+  },
+};
+```
+
+**Step 2 — That's it.** No new routes, no new components. The survey engine, API routes, and admin view are all generic — they work with any slug defined in `SURVEYS`.
+
+Hermes handles creating the Firestore doc with `survey_slug: "my-survey"` set.
+
+### Question types
+
+```typescript
+// Single choice — auto-advances 250ms after selection
+{
+  id: "role",
+  type: "single-choice",
+  title: "What best describes your role?",
+  required: true,
+  options: [
+    { id: "teacher", label: "Classroom teacher" },
+    { id: "admin", label: "School administrator" },
+    { id: "other", label: "Other" },
+  ],
+}
+
+// Multiple choice — requires explicit Next button
+{
+  id: "subjects",
+  type: "multiple-choice",
+  title: "Which subjects do you teach?",
+  required: true,
+  options: [
+    { id: "math", label: "Math" },
+    { id: "reading", label: "Reading" },
+    { id: "science", label: "Science" },
+  ],
+}
+
+// Rating — auto-advances after selection
+{
+  id: "satisfaction",
+  type: "rating",
+  title: "How satisfied are you with Kinship?",
+  required: true,
+  ratingMax: 5,            // 5 or 10
+  ratingLabels: { low: "Not at all", high: "Extremely" },
+}
+
+// Short text — Enter key or Next button advances
+{
+  id: "name",
+  type: "short-text",
+  title: "What's your name?",
+  description: "First name is fine.",
+  required: true,
+  maxLength: 100,
+}
+
+// Long text — Ctrl+Enter or Next button
+{
+  id: "feedback",
+  type: "long-text",
+  title: "Any additional feedback?",
+  required: false,
+  minLength: 10,
+  maxLength: 500,
+}
+
+// Email
+{
+  id: "email",
+  type: "email",
+  title: "What's your email address?",
+  required: false,
+}
+
+// Number
+{
+  id: "class-size",
+  type: "number",
+  title: "How many students are in your class?",
+  required: true,
+  min: 1,
+  max: 60,
+}
+```
+
+### Survey UX rules (already implemented — do not override)
+
+- One question fills the full screen — nothing else visible
+- `single-choice` and `rating` auto-advance after selection (250ms / 300ms delay)
+- Keyboard shortcuts: A/B/C for choices, 1–5 for ratings, Enter for text
+- Progress bar fixed at the top
+- ⚙️ Admin link visible on welcome screen, question nav bar, and thank-you screen
+- Thank-you screen shows after successful submit — do not add a separate "done" page
+
+### Survey data flow
+
+```
+Guest fills form
+  → SurveyEngine collects answers
+  → POST /api/survey/[slug]/submit
+      { answers: {...}, sessionId: user.uid }   ← anon Firebase uid
+  → API route (Admin SDK) writes to Firestore:
+      collection: "survey_responses"
+      { surveySlug, answers, submittedAt, sessionId, createdAt }
+
+@buildkinship.com user views results
+  → /survey-admin/[slug]  (Google auth gate)
+  → SurveyAdminView calls GET /api/survey/[slug]/responses
+      Authorization: Bearer <firebase-id-token>
+  → API route verifies token with Admin SDK
+  → Returns responses sorted by submittedAt desc
+```
+
+### API routes for surveys — Admin SDK only
+
+Both survey API routes use `firebase-admin`, not the client SDK:
+
+```typescript
+// app/api/survey/[slug]/submit/route.ts
+export const runtime = 'nodejs'; // REQUIRED — first line of file
+import { getAdminDb } from "@/lib/firebase/admin";
+// ...
+const db = await getAdminDb();
+await db.collection("survey_responses").add({ ... });
+
+// app/api/survey/[slug]/responses/route.ts
+export const runtime = 'nodejs'; // REQUIRED — first line of file
+import { getAdminAuth, getAdminDb } from "@/lib/firebase/admin";
+// ...
+const decoded = await adminAuth.verifyIdToken(token);
+// check decoded.firebase?.sign_in_provider !== "anonymous"
+// check decoded.email?.endsWith("@buildkinship.com")
+```
+
+**Never import from `lib/firebase/client.ts` inside API routes.** The client SDK has no auth context on the server.
+
+---
+
+## Building a Slide Deck
+
+```tsx
+// app/my-deck/page.tsx
+import {
+  Slideshow, SlideTitle, SectionLabel,
+  SlideCard, SlideCardGrid, SlideDarkCard,
+  ResponsiveSVG, AskBubble,
+} from "@/components/slides/slideshow";
+import type { Slide } from "@/components/slides/slideshow";
+
+const slides: Slide[] = [
+  {
+    id: "cover",
+    dark: true,            // dark bg, cream text
+    label: "Cover",
+    content: (
+      <div className="flex flex-col items-center gap-8 w-full">
+        <SlideTitle title="The Title" subtitle="The subtitle" dark />
+      </div>
+    ),
+  },
+  {
+    id: "point-1",
+    dark: false,
+    label: "1 · Key point",
+    content: (
+      <div className="flex flex-col items-center gap-6 w-full">
+        <SectionLabel>1 · Key point</SectionLabel>
+        <SlideTitle title="One clear idea per slide." size="sm" />
+        <SlideCardGrid>
+          <SlideCard>Point A</SlideCard>
+          <SlideCard>Point B</SlideCard>
+          <SlideCard>Point C</SlideCard>
+        </SlideCardGrid>
+      </div>
+    ),
+  },
+];
+
+export default function Page() {
+  return <Slideshow slides={slides} storageKey="my-deck-slide" />;
+}
+```
+
+### Already handled by the Slideshow component — do NOT re-implement
+
+- ← → Space / Home / End keyboard navigation
+- Touch swipe (40px threshold)
+- `localStorage` position persistence
+- Progress dots (collapses to text on >12 slides)
+- Per-slide dark/light theming via `slide.dark`
+- `100dvh` height — safe on iOS Safari (no chrome clipping)
+- Always-visible nav on touch devices
+
+### Slide deck rules
+
+- Dark and light slides should alternate for visual rhythm
+- Keep SVG animations in `<ResponsiveSVG maxWidth={N}>` — prevents mobile overflow
+- Use `SlideCardGrid` instead of `grid-cols-N` — handles 1→2→3 breakpoints automatically
+- Framer Motion `ease` arrays must be cast: `[0.22, 1, 0.36, 1] as unknown as Transition["ease"]`
+- Brand logos: import from `@/components/slides/brand-logos.tsx` (Claude, Notion, Slack, Zoom, Google, Hermes)
+
+---
+
+## Building a Dashboard Page
+
+```
+Layout pattern:
+  Ink sidebar (240px fixed) + Cream content area (flex-1)
+  Content: FadeUp sections, StatGrid at top, data tables or card grids below
+  Data: All from mock/ — realistic names, numbers, subjects, platforms
+```
+
+- **Never show peer comparison between students**
+- **Never show leaderboards**
+- **Never show XP, streaks, or achievement badges**
+- Use `StatCard` / `StatGrid` from `@/components/kinship/stat-card` for metrics
+- Use `AccuracyRing` from `@/components/kinship/accuracy-ring` for circular progress
+- Use `SubjectBadge` from `@/components/kinship/badges` for subject labels
 
 ---
 
 ## The Golden Rules
 
-### 1. Mock data for visual content; Firestore for persistence
+### 1. Mock data for visuals; Firestore only for persistence
 ```ts
-// ✅ Correct — visual/display data in mock/
+// ✅ Visual data in mock/
 import { students } from "@/mock/students";
 
-// ✅ Correct — survey responses go to Firestore (handled by API routes)
-// API routes at app/api/survey/[slug]/submit/route.ts write to Firestore
+// ✅ Survey responses go to Firestore via API routes (already wired)
+// You don't write Firestore logic for surveys — it's handled
 
-// ❌ Wrong — never fetch from real Kinship APIs
+// ❌ Never fetch from real APIs
 fetch("https://api.kinship.io/...")
-// ❌ Wrong — never connect to Kinship's main DB
-import { db } from "@/packages/db"
+
+// ❌ Never write Firestore in React components directly
+// (unless you're building a new persistence feature — ask Hermes first)
 ```
 
-### 2. Follow the Kinship design system
+### 2. Kinship design system
 
-**Colors:**
-```ts
-// Use CSS vars — never hardcoded hex unless it's from the palette
-style={{ color: "var(--kinship-ink)" }}           // ✅
-style={{ color: "#3D1A4E" }}                       // ✅ (same thing, palette color)
-style={{ color: "#123456" }}                       // ❌ not a brand color
-className="text-gray-900"                          // ❌ cold unbranded gray
+**Colors — always use CSS vars:**
+```tsx
+style={{ color: "var(--kinship-ink)" }}    // ✅ deep purple — text
+style={{ color: "var(--kinship-cream)" }}  // ✅ warm cream — backgrounds
+style={{ color: "var(--kinship-mid)" }}    // ✅ mid purple — secondary
+style={{ color: "var(--kinship-dim)" }}    // ✅ light purple — muted/disabled
+style={{ color: "#123456" }}               // ❌ not a brand color
+className="text-gray-900"                  // ❌ cold unbranded gray
 ```
-
-**The four brand colors:**
-- `--kinship-ink`   `#3D1A4E` — deep purple — primary text, Hearth sidebar
-- `--kinship-cream` `#F5F0E8` — warm cream — page background, cards
-- `--kinship-mid`   `#7A5590` — mid purple — secondary text, Horizon sidebar
-- `--kinship-dim`   `#B8A2C8` — light purple — muted text, disabled
 
 **Typography:**
 ```tsx
-// Page titles — use text-serif class
-<h1 className="text-serif text-4xl">My heading</h1>
-
-// Section labels — always uppercase, small, tracked
-<p className="section-label">students</p>
-
-// Body — Inter (auto from font-sans)
-<p className="text-sm text-[var(--kinship-ink)]">Body text</p>
+<h1 className="text-serif text-4xl">Headings use text-serif</h1>
+<p className="section-label">SECTION LABELS — uppercase, tracked</p>
+<p className="text-sm text-[var(--kinship-ink)]">Body — Inter, sentence case</p>
 ```
 
-**Cards:** Always `rounded-lg border` — no shadows, no gradients
+**Cards — border only, no shadows, no gradients:**
 ```tsx
-// ✅ Correct card
+// ✅
 <div className="rounded-lg border border-[color-mix(in_oklch,var(--kinship-dim)_30%,transparent)] bg-white p-5">
 
-// ❌ Wrong — no box shadows
+// ❌
 <div className="shadow-lg rounded-lg">
-
-// ❌ Wrong — no gradients
 <div className="bg-gradient-to-br from-purple-500 to-blue-500">
 ```
 
-**Text case:**
-- Sidebar nav items → `lowercase`
-- Section dividers → `UPPERCASE` (use `section-label` class)
-- Everything else → Sentence case
-- No Title Case in UI copy
-
-### 3. Animations — use the provided primitives
+### 3. Server vs Client components
 ```tsx
-import { FadeUp, Stagger } from "@/components/animations/fade";
-
-// Page sections entrance
-<FadeUp><MySection /></FadeUp>
-
-// Card grid entrance
-<Stagger className="grid grid-cols-3 gap-4">
-  {items.map(item => <MyCard key={item.id} {...item} />)}
-</Stagger>
-```
-
-For 3D/physics animations, use `@react-three/fiber` + `@react-three/drei` (Three.js).
-For complex motion paths, use `framer-motion` directly.
-For spring physics, use `react-spring`.
-GSAP is available for timeline-heavy sequences.
-
-**NO bounce easing.** Use `[0.22, 1, 0.36, 1]` (ease-out-expo) for most animations.
-
-### 4. Server vs Client components
-```tsx
-// Default: Server Component (no directive)
+// Default: Server Component (no directive needed)
 export default function MyPage() { ... }
 
-// Client: add directive + IMMEDIATELY comment why
+// Client component: directive + comment explaining WHY
 "use client";
-// needed for useState to manage active slide
+// needed for useState to track active question index
 ```
 
-### 5. Import paths
+### 4. Import paths — always use @/ aliases
 ```tsx
 import { cn } from "@/lib/utils";                           // ✅
 import { FadeUp } from "@/components/animations/fade";      // ✅
-import { StatCard } from "@/components/kinship/stat-card";  // ✅
-import { cn } from "../../lib/utils";                       // ❌ no relative cross-dir
+import { cn } from "../../lib/utils";                       // ❌
 ```
+
+### 5. API routes — Admin SDK rules
+Any API route that touches `firebase-admin` **must** have these two things:
+```typescript
+export const runtime = 'nodejs'; // ← FIRST line, before any imports
+// ...
+import { getAdminDb } from "@/lib/firebase/admin"; // ← dynamic getter, not direct import
+```
+Both are required. Missing `runtime = 'nodejs'` causes Edge Runtime crashes. Static imports of `firebase-admin/*` cause build-time crashes.
 
 ---
 
-## Available Libraries (pre-installed)
+## Available Libraries (pre-installed — do NOT install new packages)
 
 | Library | Use for |
 |---|---|
-| `framer-motion` | Page transitions, entrance animations, gestures |
-| `@react-three/fiber` + `@react-three/drei` | 3D objects, scenes, shaders |
-| `three` | Low-level Three.js when needed |
-| `recharts` | Charts — bars, lines, areas, pie |
-| `d3` | Complex data viz, custom SVG charts |
-| `lucide-react` | Icons (consistent icon set — use this exclusively) |
+| `framer-motion` | Page transitions, entrance animations, layout |
+| `@react-three/fiber` + `@react-three/drei` | 3D scenes, WebGL |
+| `three` | Low-level Three.js |
+| `recharts` | Bar, line, area, pie charts |
+| `d3` | Custom SVG data viz |
+| `lucide-react` | Icons — use this exclusively, no other icon lib |
 | `gsap` | Timeline animations, scroll triggers |
-| `react-spring` | Spring physics animations |
+| `react-spring` | Spring physics |
 | `@use-gesture/react` | Drag, pinch, hover gestures |
 | `lottie-react` | Lottie JSON animations |
 | `embla-carousel-react` | Carousels |
-| `reveal.js` | Full-featured presentation (alternative to Slideshow component) |
+| `react-hook-form` | Form state (used in SurveyEngine — use for any form) |
+| `zod` + `@hookform/resolvers/zod` | Schema validation (Zod v4 is installed — see note) |
 | `class-variance-authority` | Variant-based component styles |
-| `clsx` + `tailwind-merge` | Class utilities (use `cn()` from `@/lib/utils`) |
-| `@radix-ui/*` | Accessible headless components (dialog, tooltip, tabs, progress) |
-| `firebase` | Client SDK — auth (anon + Google), Firestore reads |
+| `clsx` + `tailwind-merge` | Class utilities — use `cn()` from `@/lib/utils` |
+| `@radix-ui/*` | Accessible headless: dialog, tooltip, tabs, progress |
+| `firebase` | Client SDK — anon auth, Firestore reads in components |
 
-**Do NOT install additional packages.** Use what's here. If something genuinely isn't possible without a new package, note it in a code comment.
-
----
-
-## Prototype Types & Patterns
-
-### Slide Deck
-```tsx
-// app/artifact/page.tsx (or app/slides/page.tsx on the branch)
-import { Slideshow, SlideTitleLayout, SlideContentLayout } from "@/components/slides/slideshow";
-
-const slides = [
-  { id: "title", content: <SlideTitleLayout title="My Deck" subtitle="Kinship 2026" /> },
-  { id: "content", content: <SlideContentLayout title="Key Points">...</SlideContentLayout> },
-];
-
-export default function Page() {
-  return <Slideshow slides={slides} theme="kinship" />;
-}
-```
-- Arrow keys + click navigation built-in
-- Three themes: `"kinship"` (cream bg), `"dark"` (ink bg), `"light"` (white bg)
-- Add custom slide layouts inline — no need to abstract unless reused
-
-### Dashboard Page (Hearth/Horizon)
-```
-Layout: Ink sidebar (240px) + Cream content area
-Content: FadeUp sections, StatGrid at top, data tables or card grids below
-Data: All from mock/ folder — realistic names, numbers, subjects, platforms
-```
-Follow the Hearth/Horizon patterns from DESIGN.md exactly.
-Never show peer comparison. Never show leaderboards. Never use XP/streaks.
-
-### Animation / Visual
-```tsx
-// For 3D — use React Three Fiber
-import { Canvas } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
-
-// For 2D motion — use Framer Motion
-import { motion } from "framer-motion";
-
-// For data-driven visuals — use D3 or Recharts
-import { BarChart, Bar, XAxis, YAxis, Tooltip } from "recharts";
-```
-
-### Survey
-- Survey form: `app/artifact/[uuid]/survey/[slug]/page.tsx` — anon auth, uses survey engine
-- Survey admin: `app/(internal)/survey-admin/[slug]/page.tsx` — Google auth
-- Responses persist to Firestore `survey_responses` collection via `/api/survey/[slug]/submit`
-- No PIN gate — survey admin is protected by `GoogleAuthGate` route group
+**Zod v4 note:** The API changed from v3. Use `z.number({ error: '...' })` not `invalid_type_error`. Use `err.issues[0].message` not `err.errors[0].message`.
 
 ---
 
@@ -307,7 +519,7 @@ export interface Student {
   name: string;
   grade: number;
   accuracy: number | null;
-  status: "active" | "struggling" | "needs-attention" | "inactive" | "offline";
+  status: "active" | "struggling" | "needs-attention";
   subjects: string[];
 }
 
@@ -318,97 +530,86 @@ export const students: Student[] = [
 ];
 ```
 
-Rules for mock data:
-- Realistic names (diverse, no placeholder "John Doe")
-- Realistic numbers (accuracy between 45–98%, not round numbers)
-- Sufficient data to tell a story (minimum 8–10 students for a classroom view)
+Rules:
+- Realistic names (diverse, no "John Doe")
+- Realistic numbers (accuracy 45–98%, not round numbers like 80%)
+- Enough data to tell a story (min 8–10 items for a classroom view)
 - No real school, student, or teacher names from actual Kinship customers
 
 ---
 
 ## Anti-Patterns (Will Get Your PR Rejected)
 
-| ❌ Pattern | ✅ Instead |
+| ❌ Don't | ✅ Do instead |
 |---|---|
 | `shadow-lg` on cards | `border` only |
 | `bg-gradient-to-br` | Flat `bg-[var(--kinship-cream)]` |
 | `text-gray-900` | `text-[var(--kinship-ink)]` |
 | `bg-white` for page bg | `bg-[var(--kinship-cream)]` |
 | Peer comparison / leaderboard | Class-aggregate trends only |
-| XP / streaks / badges | Concept milestones only |
+| XP / streaks / achievement badges | Concept milestones only |
 | `bounce` easing | `[0.22, 1, 0.36, 1]` |
-| Nested cards | Flat sections or list rows |
-| Modals as first response | Inline panels, sheets |
-| `console.log(...)` left in | Remove before committing |
-| Importing from `app/` in components | Keep component deps clean |
-| Any `fetch()` to real Kinship APIs | Mock data only |
-| Auth logic outside auth components | Use `useAuth()` hook or rely on layout gates |
-| Writing to `prototypes/*/manifest.json` | Use `update_prototype` MCP tool |
+| `fetch()` to real Kinship APIs | Mock data in `mock/` |
+| `import ... from 'firebase-admin'` in component | Client SDK only in components |
+| Static `import ... from 'firebase-admin'` in API route | `await import(...)` or `getAdminDb()` getter |
+| API route without `export const runtime = 'nodejs'` | Always first line for admin routes |
+| Firestore query without waiting for `user` | Gate on `user && !authLoading` |
+| `orderBy(...)` on Firestore query without a deployed index | Sort client-side instead |
+| `prototypes/*/manifest.json` files | Use Firestore + MCP tool |
+| Auth logic outside auth components | Use `useAuth()` hook or layout gates |
+| Survey PIN gate | GoogleAuthGate at route level |
+| `adminCode` field in surveys (old PIN) | Leave empty string `""` |
 
 ---
 
 ## Checklist Before Committing
 
-- [ ] Prototype component registered in `components/artifact/PrototypeRegistry.tsx`
+- [ ] Prototype component registered in `components/artifact/PrototypeRegistry.tsx` (not needed for surveys)
 - [ ] Visual data comes from `mock/` — no external API calls
-- [ ] Colors match the Kinship palette — no arbitrary hex values
+- [ ] Colors match the Kinship palette — no arbitrary hex
 - [ ] No `shadow-*` on cards — borders only
-- [ ] No peer comparison or leaderboard data shown
-- [ ] `'use client'` has a comment on the immediately following line explaining why
-- [ ] TypeScript compiles without errors (`npx tsc --noEmit`)
+- [ ] No peer comparison, leaderboards, or XP shown
+- [ ] `'use client'` has an explanatory comment on the next line
+- [ ] API routes that use firebase-admin have `export const runtime = 'nodejs'` as first line
+- [ ] Firestore reads in components are gated on `user && !authLoading` from `useAuth()`
+- [ ] TypeScript compiles: `npx tsc --noEmit`
 - [ ] Page loads without console errors
-- [ ] Animations respect `prefers-reduced-motion` (FadeUp/Stagger handle this automatically)
-- [ ] Mobile layout tested (Chromebook baseline: 1366×768, also check ~768px)
-- [ ] No `prototypes/*/manifest.json` files created — use Firestore instead
+- [ ] Mobile layout tested at ~768px width
+- [ ] No `prototypes/*/manifest.json` files created
 
 ---
 
 ## What's in `docs/PROTOTYPE.md`
 
-Hermes writes a `docs/PROTOTYPE.md` on each branch with:
-- The original user request
-- Specific scope and constraints
-- Which prototype type this is (slide deck / animation / dashboard page / other)
-- Research notes relevant to the content
+Hermes writes this on every branch before delegating to you. It contains:
+- The original user request (verbatim)
+- Prototype type (survey / slide deck / dashboard / animation / other)
+- Scope and constraints
 - The Firestore UUID and artifact URL (`https://quick.buildkinship.dev/artifact/{uuid}`)
+- For surveys: the survey slug to use in `mock/surveys.ts`
 
-Read it before starting.
+**Read it first. It is the single source of truth for what to build.**
 
 ---
 
 ## The Gallery System — Rules for Coding Agents
 
-Every prototype is listed in the **Prototype Gallery** at `/gallery`. The gallery reads
-from **Firestore** (`prototypes` collection) at runtime — there are no manifest files.
+The **Prototype Gallery** at `/gallery` reads from Firestore at runtime. There are no manifest files.
 
 ### What you must NOT do
 
-- Do **not** modify `app/(internal)/gallery/page.tsx` or related gallery files
-- Do **not** modify `app/(internal)/page.tsx` or `app/home.tsx`
-- Do **not** create or edit any file in `prototypes/` — that folder is legacy, ignore it
-- Do **not** write `manifest.json` files — Hermes uses the `update_prototype` MCP tool instead
+- Do **not** modify `app/(internal)/gallery/` or `app/(internal)/page.tsx`
+- Do **not** create or edit files in `prototypes/` — that folder is legacy
+- Do **not** write `manifest.json` files — Hermes uses the `update_prototype` MCP tool
 
 ### What you MUST do
 
-When you build a new prototype, register its component in `components/artifact/PrototypeRegistry.tsx`:
-
-```typescript
-// Add your slug → component mapping:
-"my-new-slug": dynamic(() => import("@/app/my-new-slug/page")),
-```
-
-Hermes handles everything else (Firestore doc creation, gallery metadata, URL shortening).
+Register your prototype in `components/artifact/PrototypeRegistry.tsx`. Hermes handles Firestore doc creation, gallery metadata, and URL shortening.
 
 ### Artifact URL pattern
 
-Prototypes are served at: `https://quick.buildkinship.dev/artifact/{FIRESTORE_UUID}`
+```
+https://quick.buildkinship.dev/artifact/{FIRESTORE_UUID}
+```
 
-The UUID comes from the Firestore document created by Hermes before your branch was created.
-It's in `docs/PROTOTYPE.md` on your branch. **Do not use slug-based URLs** — those are old
-and only exist as short-link aliases.
-
-### The `prototypes/` folder
-
-The `prototypes/` directory contains legacy `manifest.json` files from before Firebase.
-They have been migrated to Firestore and are no longer read by the gallery. Leave them alone —
-do not add new ones.
+The UUID is in `docs/PROTOTYPE.md`. Do not use slug-based URLs — those are short-link aliases only.
