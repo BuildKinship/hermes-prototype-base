@@ -1,42 +1,42 @@
-import { readFileSync, readdirSync, existsSync } from "fs";
-import { join } from "path";
+"use client";
+// Gallery page — reads prototype list from Firestore at runtime
+// Replaces the old readFileSync approach (build-time manifest files)
+// Protected by GoogleAuthGate in app/(internal)/layout.tsx
+
+import { useEffect, useState } from "react";
 import type { Metadata } from "next";
 import type { PrototypeManifest } from "@/types/manifest";
+import { listPrototypes } from "@/lib/firebase/firestore";
 import { GalleryClient } from "./client";
 
-export const metadata: Metadata = {
-  title: "Prototype Gallery — Kinship",
-  description: "Every prototype built by the Kinship team, in one place.",
-};
+export default function GalleryPage() {
+  const [manifests, setManifests] = useState<PrototypeManifest[]>([]);
+  const [loading, setLoading] = useState(true);
 
-function loadManifests(): PrototypeManifest[] {
-  const prototypesDir = join(process.cwd(), "prototypes");
-  if (!existsSync(prototypesDir)) return [];
+  useEffect(() => {
+    listPrototypes().then((prototypes) => {
+      // Remap: artifact URL is always /artifact/[firestoreId]
+      const remapped = prototypes.map((p) => ({
+        ...p,
+        url: `/artifact/${p.id}`,
+        // Admin URL points to /survey-admin/[slug] for survey prototypes
+        admin_url:
+          p.type === "survey" && (p as PrototypeManifest & { survey_slug?: string }).survey_slug
+            ? `/survey-admin/${(p as PrototypeManifest & { survey_slug?: string }).survey_slug}`
+            : p.admin_url,
+      })) as PrototypeManifest[];
+      setManifests(remapped);
+      setLoading(false);
+    });
+  }, []);
 
-  const slugs = readdirSync(prototypesDir, { withFileTypes: true })
-    .filter((d) => d.isDirectory())
-    .map((d) => d.name);
-
-  const manifests: PrototypeManifest[] = [];
-
-  for (const slug of slugs) {
-    const manifestPath = join(prototypesDir, slug, "manifest.json");
-    if (!existsSync(manifestPath)) continue;
-    try {
-      const raw = readFileSync(manifestPath, "utf-8");
-      manifests.push(JSON.parse(raw) as PrototypeManifest);
-    } catch {
-      // skip malformed manifests silently
-    }
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[var(--kinship-cream)]">
+        <p className="text-[var(--kinship-mid)] text-sm">Loading gallery…</p>
+      </div>
+    );
   }
 
-  // newest first by default
-  return manifests.sort(
-    (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-  );
-}
-
-export default function GalleryPage() {
-  const manifests = loadManifests();
   return <GalleryClient manifests={manifests} />;
 }
