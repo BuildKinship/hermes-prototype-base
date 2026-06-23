@@ -841,7 +841,7 @@ export function SurveyEngine({ survey }: { survey: SurveyConfig }) {
 
   const questions = survey.questions;
   const currentQuestion = questions[questionIndex];
-  const adminUrl = `/survey/${survey.slug}/admin`;
+  const adminUrl = `/survey-admin/${survey.slug}`;
 
   const progress =
     stage === "welcome"
