@@ -1,37 +1,48 @@
-import { initializeApp, getApps, cert } from "firebase-admin/app";
-import { getFirestore, type Firestore } from "firebase-admin/firestore";
-import { getAuth, type Auth } from "firebase-admin/auth";
+// Firebase Admin SDK — async lazy init via dynamic imports
+// Static imports of firebase-admin crash in some Vercel serverless environments.
+// All firebase-admin modules are loaded dynamically on first use.
 
-// Module-level initialization deferred to first use.
-// Next.js "collecting page data" imports this module but does NOT call any
-// Firestore/Auth methods — so this is safe to import without env vars.
+import type { Firestore } from "firebase-admin/firestore";
+import type { Auth } from "firebase-admin/auth";
 
 let _db: Firestore | null = null;
 let _auth: Auth | null = null;
+let _initialized = false;
 
-function getApp() {
-  if (getApps().length > 0) return getApps()[0];
+async function initAdmin() {
+  if (_initialized) return;
 
-  const raw = process.env.FIREBASE_SERVICE_ACCOUNT_JSON;
-  if (!raw) throw new Error("FIREBASE_SERVICE_ACCOUNT_JSON env var is not set");
+  const { initializeApp, getApps, cert } = await import("firebase-admin/app");
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return initializeApp({ credential: cert(JSON.parse(raw) as any) });
+  if (getApps().length === 0) {
+    const raw = process.env.FIREBASE_SERVICE_ACCOUNT_JSON;
+    if (!raw) throw new Error("FIREBASE_SERVICE_ACCOUNT_JSON env var is not set");
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    initializeApp({ credential: cert(JSON.parse(raw) as any) });
+  }
+
+  _initialized = true;
 }
 
-export function getAdminDb(): Firestore {
-  if (!_db) _db = getFirestore(getApp());
+export async function getAdminDb(): Promise<Firestore> {
+  if (_db) return _db;
+  await initAdmin();
+  const { getFirestore } = await import("firebase-admin/firestore");
+  const { getApps } = await import("firebase-admin/app");
+  _db = getFirestore(getApps()[0]);
   return _db;
 }
 
-export function getAdminAuth(): Auth {
-  if (!_auth) _auth = getAuth(getApp());
+export async function getAdminAuth(): Promise<Auth> {
+  if (_auth) return _auth;
+  await initAdmin();
+  const { getAuth } = await import("firebase-admin/auth");
+  const { getApps } = await import("firebase-admin/app");
+  _auth = getAuth(getApps()[0]);
   return _auth;
 }
 
-// Convenience aliases — these look like the old module-level exports
-// but are actually function calls. Callers must be updated to use
-// getAdminDb().collection(...) or adminDb().collection(...).
-// We export both names for compatibility.
-export const adminDb   = getAdminDb;
+// Legacy sync aliases kept for type compatibility — they throw at runtime
+// if called before async init. Use getAdminDb()/getAdminAuth() instead.
+export const adminDb = getAdminDb;
 export const adminAuth = getAdminAuth;

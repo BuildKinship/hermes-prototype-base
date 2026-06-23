@@ -20,14 +20,18 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { uuid } = await params;
-  const d = await getAdminDb().collection("prototypes").doc(uuid).get();
-
-  if (!d.exists) {
-    return NextResponse.json({ error: "Not found" }, { status: 404 });
+  try {
+    const { uuid } = await params;
+    const db = await getAdminDb();
+    const d = await db.collection("prototypes").doc(uuid).get();
+    if (!d.exists) {
+      return NextResponse.json({ error: "Not found" }, { status: 404 });
+    }
+    return NextResponse.json({ id: d.id, ...d.data() });
+  } catch (e) {
+    const err = e as Error;
+    return NextResponse.json({ error: err.message }, { status: 500 });
   }
-
-  return NextResponse.json({ id: d.id, ...d.data() });
 }
 
 // PATCH /api/prototypes/[uuid] — partial update
@@ -36,11 +40,16 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { uuid } = await params;
-  const body = await req.json();
-  await getAdminDb().collection("prototypes").doc(uuid).update(body);
-
-  return NextResponse.json({ success: true });
+  try {
+    const { uuid } = await params;
+    const body = await req.json();
+    const db = await getAdminDb();
+    await db.collection("prototypes").doc(uuid).update(body);
+    return NextResponse.json({ success: true });
+  } catch (e) {
+    const err = e as Error;
+    return NextResponse.json({ error: err.message }, { status: 500 });
+  }
 }
 
 // DELETE /api/prototypes/[uuid]
@@ -49,8 +58,13 @@ export async function DELETE(req: NextRequest, { params }: RouteParams) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { uuid } = await params;
-  await getAdminDb().collection("prototypes").doc(uuid).delete();
-
-  return NextResponse.json({ success: true });
+  try {
+    const { uuid } = await params;
+    const db = await getAdminDb();
+    await db.collection("prototypes").doc(uuid).delete();
+    return NextResponse.json({ success: true });
+  } catch (e) {
+    const err = e as Error;
+    return NextResponse.json({ error: err.message }, { status: 500 });
+  }
 }

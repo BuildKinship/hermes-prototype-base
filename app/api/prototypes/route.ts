@@ -2,7 +2,6 @@ export const runtime = 'nodejs'
 
 import { NextRequest, NextResponse } from "next/server";
 import { getAdminDb } from "@/lib/firebase/admin";
-import { FieldValue } from "firebase-admin/firestore";
 
 function authorized(req: NextRequest) {
   return (
@@ -20,7 +19,8 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const db = getAdminDb();
+    const { FieldValue } = await import("firebase-admin/firestore");
+    const db = await getAdminDb();
     const ref = await db.collection("prototypes").add({
       ...body,
       createdAt: FieldValue.serverTimestamp(),
@@ -42,7 +42,7 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const db = getAdminDb();
+    const db = await getAdminDb();
     const snap = await db
       .collection("prototypes")
       .orderBy("createdAt", "desc")

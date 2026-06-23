@@ -1,8 +1,8 @@
 export const runtime = 'nodejs'
 
 import { NextRequest, NextResponse } from "next/server";
-import { getSurvey } from "@/mock/surveys";
 import { getAdminAuth } from "@/lib/firebase/admin";
+import { getSurvey } from "@/mock/surveys";
 import { getResponsesFirestore } from "@/lib/firebase/survey-store";
 
 export async function GET(
@@ -20,7 +20,8 @@ export async function GET(
   }
 
   try {
-    const decoded = await getAdminAuth().verifyIdToken(token);
+    const auth = await getAdminAuth();
+    const decoded = await auth.verifyIdToken(token);
     const email = decoded.email ?? "";
     if (!email.endsWith("@buildkinship.com")) {
       return NextResponse.json(
