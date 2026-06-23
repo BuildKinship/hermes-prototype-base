@@ -158,9 +158,11 @@ function WelcomeScreen({
 function ThankYouScreen({
   title,
   message,
+  adminUrl,
 }: {
   title: string;
   message: string;
+  adminUrl: string;
 }) {
   return (
     <motion.div
@@ -183,6 +185,14 @@ function ThankYouScreen({
       <p className="text-[var(--kinship-mid)] text-lg leading-relaxed max-w-lg">
         {message}
       </p>
+      <a
+        href={adminUrl}
+        className="mt-8 flex items-center gap-1.5 text-sm text-[var(--kinship-dim)] hover:text-[var(--kinship-mid)] transition-colors"
+        title="Admin view"
+      >
+        <Settings className="w-3.5 h-3.5" />
+        Admin
+      </a>
     </motion.div>
   );
 }
@@ -1074,6 +1084,7 @@ export function SurveyEngine({ survey }: { survey: SurveyConfig }) {
                 key="done"
                 title={survey.thankYouTitle}
                 message={survey.thankYouMessage}
+                adminUrl={adminUrl}
               />
             )}
 
