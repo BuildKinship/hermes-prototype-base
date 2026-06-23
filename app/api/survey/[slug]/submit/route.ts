@@ -1,6 +1,12 @@
+export const runtime = 'nodejs';
+// POST /api/survey/[slug]/submit
+// Public — no auth required (anonymous users submit surveys)
+// Writes directly to Firestore via Admin SDK (server-side, no client SDK on server)
+
 import { NextRequest, NextResponse } from "next/server";
 import { getSurvey } from "@/mock/surveys";
-import { addResponseFirestore } from "@/lib/firebase/survey-store";
+import { getAdminDb } from "@/lib/firebase/admin";
+import { FieldValue } from "firebase-admin/firestore";
 
 export async function POST(
   request: NextRequest,
@@ -15,7 +21,7 @@ export async function POST(
 
   let body: {
     answers: Record<string, string | string[] | number>;
-    sessionId?: string;
+    sessionId?: string | null;
   };
   try {
     body = await request.json();
@@ -48,11 +54,23 @@ export async function POST(
     }
   }
 
-  // Write to Firestore — persists across cold starts
-  const response = await addResponseFirestore(
-    slug,
-    body.answers,
-    body.sessionId // anon uid from the client, optional
-  );
-  return NextResponse.json({ success: true, id: response.id }, { status: 201 });
+  try {
+    const db = await getAdminDb();
+    const submittedAt = new Date().toISOString();
+    const ref = await db.collection("survey_responses").add({
+      surveySlug: slug,
+      answers: body.answers,
+      submittedAt,
+      sessionId: body.sessionId ?? null,
+      createdAt: FieldValue.serverTimestamp(),
+    });
+
+    return NextResponse.json({ success: true, id: ref.id }, { status: 201 });
+  } catch (err) {
+    console.error("Survey submit error:", err);
+    return NextResponse.json(
+      { error: "Failed to save response" },
+      { status: 500 }
+    );
+  }
 }

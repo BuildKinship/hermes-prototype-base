@@ -1,9 +1,11 @@
-export const runtime = 'nodejs'
+export const runtime = 'nodejs';
+// GET /api/survey/[slug]/responses
+// Protected — requires Firebase ID token from a @buildkinship.com Google user
+// Uses Admin SDK to read from Firestore (server-side)
 
 import { NextRequest, NextResponse } from "next/server";
-import { getAdminAuth } from "@/lib/firebase/admin";
+import { getAdminAuth, getAdminDb } from "@/lib/firebase/admin";
 import { getSurvey } from "@/mock/surveys";
-import { getResponsesFirestore } from "@/lib/firebase/survey-store";
 
 export async function GET(
   request: NextRequest,
@@ -20,8 +22,8 @@ export async function GET(
   }
 
   try {
-    const auth = await getAdminAuth();
-    const decoded = await auth.verifyIdToken(token);
+    const adminAuth = await getAdminAuth();
+    const decoded = await adminAuth.verifyIdToken(token);
     const email = decoded.email ?? "";
     if (!email.endsWith("@buildkinship.com")) {
       return NextResponse.json(
@@ -38,6 +40,30 @@ export async function GET(
     return NextResponse.json({ error: "Survey not found" }, { status: 404 });
   }
 
-  const responses = await getResponsesFirestore(slug);
-  return NextResponse.json({ responses, total: responses.length });
+  try {
+    const db = await getAdminDb();
+    const snap = await db
+      .collection("survey_responses")
+      .where("surveySlug", "==", slug)
+      .get();
+
+    const responses = snap.docs
+      .map((d) => ({
+        id: d.id,
+        surveySlug: d.data().surveySlug as string,
+        submittedAt: d.data().submittedAt as string,
+        answers: d.data().answers as Record<string, string | string[] | number>,
+        sessionId: d.data().sessionId as string | null,
+      }))
+      // Sort newest first — no composite index needed with admin SDK
+      .sort((a, b) => b.submittedAt.localeCompare(a.submittedAt));
+
+    return NextResponse.json({ responses, total: responses.length });
+  } catch (err) {
+    console.error("Responses fetch error:", err);
+    return NextResponse.json(
+      { error: "Failed to fetch responses" },
+      { status: 500 }
+    );
+  }
 }

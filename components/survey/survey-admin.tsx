@@ -1,9 +1,11 @@
 "use client";
 // Admin view — guarded by Google auth (@buildkinship.com) via (internal) route group layout
 // PIN gate removed — replaced by GoogleAuthGate at the route level
+// Fetches responses from /api/survey/[slug]/responses using the signed-in user's ID token
 
+import React from "react";
 import { useState, useEffect, useMemo, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import type { Transition } from "framer-motion";
 import {
   Search,
@@ -16,96 +18,9 @@ import {
 import { cn } from "@/lib/utils";
 import type { SurveyConfig } from "@/mock/surveys";
 import type { SurveyResponse } from "@/lib/survey-store";
-import { auth } from "@/lib/firebase/client";
+import { useAuth } from "@/components/auth/AuthProvider";
 
 const EASE_OUT = [0.22, 1, 0.36, 1] as unknown as Transition["ease"];
-
-/* ─── Code Gate ─────────────────────────────────────────────── */
-
-function CodeGate({ onSubmit }: { onSubmit: (code: string) => void }) {
-  const [code, setCode] = useState("");
-  const [shake, setShake] = useState(false);
-  const [error, setError] = useState(false);
-
-  const submit = () => {
-    if (code.length !== 4) {
-      setShake(true);
-      setError(true);
-      setTimeout(() => setShake(false), 400);
-      return;
-    }
-    onSubmit(code);
-  };
-
-  return (
-    <div className="min-h-screen bg-[var(--kinship-cream)] flex items-center justify-center px-6">
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, ease: EASE_OUT }}
-        className="flex flex-col items-center gap-6 max-w-sm w-full"
-      >
-        <div
-          className="w-14 h-14 rounded-full flex items-center justify-center"
-          style={{ background: "var(--kinship-ink)" }}
-        >
-          <Lock className="w-6 h-6 text-[var(--kinship-cream)]" />
-        </div>
-        <div className="text-center">
-          <h1 className="text-serif text-2xl text-[var(--kinship-ink)] mb-2">
-            Admin Access
-          </h1>
-          <p className="text-sm text-[var(--kinship-mid)]">
-            Enter the 4-digit code to view survey results
-          </p>
-        </div>
-
-        <motion.div
-          animate={shake ? { x: [-8, 8, -6, 6, -4, 4, 0] } : { x: 0 }}
-          transition={{ duration: 0.4 }}
-          className="w-full"
-        >
-          <input
-            type="text"
-            inputMode="numeric"
-            pattern="[0-9]*"
-            maxLength={4}
-            value={code}
-            onChange={(e) => {
-              const val = e.target.value.replace(/\D/g, "").slice(0, 4);
-              setCode(val);
-              setError(false);
-            }}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") submit();
-            }}
-            placeholder="0000"
-            className={cn(
-              "w-full text-center text-3xl font-bold tracking-[0.5em] rounded-xl border-2 px-6 py-5 outline-none transition-colors bg-white",
-              error
-                ? "border-red-400 text-red-500"
-                : "border-[color-mix(in_oklch,var(--kinship-dim)_40%,transparent)] focus:border-[var(--kinship-mid)] text-[var(--kinship-ink)]"
-            )}
-            autoFocus
-          />
-          {error && (
-            <p className="text-red-500 text-sm text-center mt-2">
-              Invalid code. Try again.
-            </p>
-          )}
-        </motion.div>
-
-        <button
-          onClick={submit}
-          className="w-full py-3 rounded-full text-[var(--kinship-cream)] font-medium transition-all hover:opacity-90 active:scale-95"
-          style={{ background: "var(--kinship-ink)" }}
-        >
-          Unlock
-        </button>
-      </motion.div>
-    </div>
-  );
-}
 
 /* ─── Empty State ───────────────────────────────────────────── */
 
@@ -172,7 +87,6 @@ function AdminTable({
     ...survey.questions.map((q) => ({ key: q.id, label: q.title })),
   ];
 
-  // Filtered + sorted data
   const filtered = useMemo(() => {
     let rows = responses;
     if (filter.trim()) {
@@ -188,11 +102,11 @@ function AdminTable({
     }
     if (sortCol && sortDir) {
       rows = [...rows].sort((a, b) => {
-        let aVal =
+        const aVal =
           sortCol === "submittedAt"
             ? a.submittedAt
             : formatAnswer(a.answers[sortCol]);
-        let bVal =
+        const bVal =
           sortCol === "submittedAt"
             ? b.submittedAt
             : formatAnswer(b.answers[sortCol]);
@@ -293,10 +207,7 @@ function AdminTable({
                     className="text-left px-4 py-3 font-medium text-[var(--kinship-ink)] whitespace-nowrap cursor-pointer select-none hover:bg-[color-mix(in_oklch,var(--kinship-mid)_5%,transparent)] transition-colors border-b border-[color-mix(in_oklch,var(--kinship-dim)_20%,transparent)]"
                   >
                     <div className="flex items-center gap-1.5">
-                      <span
-                        className="max-w-[140px] truncate"
-                        title={col.label}
-                      >
+                      <span className="max-w-[140px] truncate" title={col.label}>
                         {col.label}
                       </span>
                       <SortIcon col={col.key} />
@@ -360,21 +271,19 @@ function AdminTable({
 /* ─── Main Admin View ───────────────────────────────────────── */
 
 export function SurveyAdminView({ survey }: { survey: SurveyConfig }) {
+  const { user, loading: authLoading } = useAuth();
   const [responses, setResponses] = useState<SurveyResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const fetchResponses = useCallback(async () => {
+    // Wait until Firebase auth has resolved and we have a Google user
+    if (authLoading || !user) return;
+
     setLoading(true);
     setError(null);
     try {
-      // Get the current user's ID token to authenticate the API call
-      const currentUser = auth.currentUser;
-      if (!currentUser) {
-        setError("Not signed in.");
-        return;
-      }
-      const token = await currentUser.getIdToken();
+      const token = await user.getIdToken();
       const res = await fetch(`/api/survey/${survey.slug}/responses`, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -389,16 +298,14 @@ export function SurveyAdminView({ survey }: { survey: SurveyConfig }) {
     } finally {
       setLoading(false);
     }
-  }, [survey.slug]);
+  }, [survey.slug, user, authLoading]);
 
-  // Fetch on mount
+  // Fetch once auth is ready
   useEffect(() => {
-    fetchResponses();
-  }, [fetchResponses]);
-
-  const handleRefresh = () => {
-    fetchResponses();
-  };
+    if (!authLoading && user) {
+      fetchResponses();
+    }
+  }, [fetchResponses, authLoading, user]);
 
   return (
     <div className="min-h-screen bg-[var(--kinship-cream)]">
@@ -436,7 +343,7 @@ export function SurveyAdminView({ survey }: { survey: SurveyConfig }) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, ease: EASE_OUT, delay: 0.1 }}
         >
-          {loading ? (
+          {loading || authLoading ? (
             <div className="flex justify-center py-24">
               <div
                 className="w-8 h-8 rounded-full border-2 border-t-transparent animate-spin"
@@ -450,7 +357,7 @@ export function SurveyAdminView({ survey }: { survey: SurveyConfig }) {
             <AdminTable
               survey={survey}
               responses={responses}
-              onRefresh={handleRefresh}
+              onRefresh={fetchResponses}
             />
           )}
         </motion.div>

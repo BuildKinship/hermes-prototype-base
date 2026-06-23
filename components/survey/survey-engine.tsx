@@ -11,6 +11,7 @@ import type { Transition } from "framer-motion";
 import { ArrowRight, Check, ChevronRight, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { SurveyConfig, Question, ChoiceOption } from "@/mock/surveys";
+import { useAuth } from "@/components/auth/AuthProvider";
 
 const EASE_OUT = [0.22, 1, 0.36, 1] as unknown as Transition["ease"];
 
@@ -832,6 +833,7 @@ function QuestionField({
 type Stage = "welcome" | "questions" | "submitting" | "done" | "error";
 
 export function SurveyEngine({ survey }: { survey: SurveyConfig }) {
+  const { user } = useAuth(); // anon user from AnonAuthGate — uid used as sessionId
   const [stage, setStage] = useState<Stage>("welcome");
   const [questionIndex, setQuestionIndex] = useState(0);
   const [direction, setDirection] = useState<1 | -1>(1); // 1=forward, -1=back
@@ -928,7 +930,10 @@ export function SurveyEngine({ survey }: { survey: SurveyConfig }) {
         fetch(`/api/survey/${survey.slug}/submit`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ answers: payload }),
+          body: JSON.stringify({
+            answers: payload,
+            sessionId: user?.uid ?? null, // anon Firebase uid for response linkage
+          }),
         })
           .then((res) => res.json())
           .then((data) => {
@@ -945,7 +950,7 @@ export function SurveyEngine({ survey }: { survey: SurveyConfig }) {
           });
       }
     },
-    [currentQuestion, getValues, validateAnswer, questionIndex, questions, survey.slug]
+    [currentQuestion, getValues, validateAnswer, questionIndex, questions, survey.slug, user]
   );
 
   const goBack = useCallback(() => {
