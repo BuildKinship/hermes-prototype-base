@@ -46,6 +46,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const provider = new GoogleAuthProvider();
     // Hint the account chooser to show @buildkinship.com accounts
     provider.setCustomParameters({ hd: "buildkinship.com" });
+    // If currently signed in anonymously, sign out first so the Google
+    // credential fully replaces the session (not a link attempt)
+    if (user && user.isAnonymous) {
+      await signOut(auth);
+    }
     await signInWithPopup(auth, provider);
   };
 

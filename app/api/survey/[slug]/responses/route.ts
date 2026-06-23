@@ -25,6 +25,14 @@ export async function GET(
     const adminAuth = await getAdminAuth();
     const decoded = await adminAuth.verifyIdToken(token);
     const email = decoded.email ?? "";
+    const provider = decoded.firebase?.sign_in_provider ?? "unknown";
+    // Reject anonymous tokens that somehow made it through
+    if (provider === "anonymous") {
+      return NextResponse.json(
+        { error: "Anonymous sessions cannot access admin — please sign in with Google" },
+        { status: 403 }
+      );
+    }
     if (!email.endsWith("@buildkinship.com")) {
       return NextResponse.json(
         { error: "Forbidden — @buildkinship.com only" },

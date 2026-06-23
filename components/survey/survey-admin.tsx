@@ -283,7 +283,7 @@ export function SurveyAdminView({ survey }: { survey: SurveyConfig }) {
     setLoading(true);
     setError(null);
     try {
-      const token = await user.getIdToken();
+      const token = await user.getIdToken(/* forceRefresh */ true);
       const res = await fetch(`/api/survey/${survey.slug}/responses`, {
         headers: { Authorization: `Bearer ${token}` },
       });
