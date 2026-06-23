@@ -8,64 +8,132 @@
 ## What This Repo Is
 
 A Next.js 15 (App Router) prototype engine for Kinship. When Hermes receives a prototype request, it:
-1. Creates a branch (`prototype/<slug>-<YYYY-MM-DD>`)
-2. Delegates work to a coding agent (you) on that branch
-3. Pushes → Vercel auto-builds a preview URL
-4. Hermes shortens the URL and returns it to the requester
+1. Creates a Firestore doc (via MCP tool) → gets UUID
+2. Creates a branch (`prototype/<slug>-<YYYY-MM-DD>`)
+3. Delegates work to a coding agent (you) on that branch
+4. Registers the new prototype component in `PrototypeRegistry.tsx`
+5. Pushes → Vercel auto-builds → deploys to production
+6. Hermes shortens the UUID-based URL and returns it to the requester
 
-**This is a frontend-only prototype system.** No databases. No external APIs. No Redis. No auth systems.
-All data is mocked in `mock/` — simple TypeScript objects and arrays.
+**This is primarily a frontend prototype system.** Data is mocked in `mock/` — simple TypeScript objects and arrays.
+**Firebase Auth + Firestore are available for auth and persistence** (survey responses, gallery data).
+
+---
+
+## Authentication Architecture
+
+The app has two access tiers enforced by Next.js route groups:
+
+### Internal routes (Google Auth, @buildkinship.com only)
+```
+/                          → GoogleAuthGate
+/gallery                   → GoogleAuthGate
+/survey-admin/[slug]       → GoogleAuthGate
+```
+These live in `app/(internal)/` route group. `app/(internal)/layout.tsx` wraps all of them in `<GoogleAuthGate>`.
+Non-@buildkinship.com accounts see a "sign in with Google" page. Anonymous users are blocked.
+
+### Artifact routes (Anonymous Auth, public)
+```
+/artifact/[uuid]               → AnonAuthGate (silent, invisible)
+/artifact/[uuid]/survey/[slug] → AnonAuthGate (silent, invisible)
+```
+These live in `app/artifact/`. `app/artifact/layout.tsx` wraps all of them in `<AnonAuthGate>`.
+Visitors are silently signed in anonymously — they see no auth UI.
+
+### Auth components
+- `components/auth/AuthProvider.tsx` — React context, exports `useAuth()` hook
+- `components/auth/GoogleAuthGate.tsx` — blocks and shows sign-in for internal routes
+- `components/auth/AnonAuthGate.tsx` — silently signs in visitors anonymously
+- `components/auth/FullPageSpinner.tsx` — loading state
+
+**DO NOT** add auth logic outside these components. The gates are applied at the layout level — all child routes inherit them automatically.
 
 ---
 
 ## Project Structure
 
 ```
-app/                  Next.js App Router pages
-  page.tsx            Homepage (DO NOT MODIFY on feature branches)
-  globals.css         Kinship design tokens + base styles (DO NOT MODIFY)
-  layout.tsx          Root layout
+app/
+  (internal)/           Route group — GoogleAuthGate applied to all routes here
+    layout.tsx          Applies GoogleAuthGate
+    page.tsx            Homepage
+    gallery/            Gallery — reads from Firestore
+    survey-admin/[slug] Survey results (Google auth, no PIN)
+
+  artifact/             Artifact routes — AnonAuthGate applied to all routes here
+    layout.tsx          Applies AnonAuthGate
+    [uuid]/             Artifact page — fetches Firestore doc, renders by slug
+      page.tsx
+      survey/[slug]/    Survey artifact route
+
+  api/
+    prototypes/         Prototype CRUD (protected by PROTOTYPE_ADMIN_SECRET bearer token)
+    survey/[slug]/      Survey submit + results (submit: any auth, results: @buildkinship.com)
 
 components/
-  kinship/            Kinship-branded UI components
-    stat-card.tsx     StatCard, StatGrid
-    student.tsx       StudentAvatar, StudentStatusIndicator
-    accuracy-ring.tsx AccuracyRing (SVG progress circle)
-    badges.tsx        SubjectBadge, PlatformBadge, SubjectDot
-
-  slides/             Presentation primitives
-    slideshow.tsx     Slideshow engine, SlideTitleLayout, SlideContentLayout
-
-  animations/         Motion primitives
-    fade.tsx          FadeUp, Stagger (Framer Motion wrappers)
-
-  three/              3D scene helpers (add your own here)
+  auth/                 Auth gates and context (see above)
+  artifact/
+    PrototypeRegistry.tsx   ← EVERY new prototype must be registered here
+  kinship/              Kinship-branded UI components
+    stat-card.tsx       StatCard, StatGrid
+    student.tsx         StudentAvatar, StudentStatusIndicator
+    accuracy-ring.tsx   AccuracyRing (SVG progress circle)
+    badges.tsx          SubjectBadge, PlatformBadge, SubjectDot
+  slides/               Presentation primitives
+    slideshow.tsx       Slideshow engine, SlideTitleLayout, SlideContentLayout
+  animations/           Motion primitives
+    fade.tsx            FadeUp, Stagger (Framer Motion wrappers)
+  three/                3D scene helpers
 
 lib/
-  utils.ts            cn(), deterministicColor(), accuracyColor(), slugify()
+  firebase/
+    client.ts           Firebase client app init, exports auth + db
+    admin.ts            Firebase Admin SDK, exports adminDb + adminAuth
+    firestore.ts        Typed Firestore helpers: createPrototype, getPrototype, listPrototypes, updatePrototype
+    survey-store.ts     addResponseFirestore, getResponsesFirestore
+  utils.ts              cn(), deterministicColor(), accuracyColor(), slugify()
 
-mock/                 ALL mock data lives here
-  (add your data files here — e.g. mock/students.ts)
-
+mock/                   ALL mock data lives here (non-Firebase data)
 docs/
-  PROTOTYPE.md        Prototype-specific context (set by Hermes before agent runs)
+  PROTOTYPE.md          Prototype-specific context (set by Hermes before agent runs)
 ```
+
+---
+
+## The Prototype Registry — MANDATORY
+
+Every new prototype component **must** be registered in `components/artifact/PrototypeRegistry.tsx`:
+
+```typescript
+const registry: Record<string, ComponentType> = {
+  "colour-palette": dynamic(() => import("@/app/colour-palette/page")),
+  "pomodoro-timer": dynamic(() => import("@/app/pomodoro-timer/page")),
+  // ─── Add new prototypes below this line ────
+  "my-new-slug": dynamic(() => import("@/app/my-new-slug/page")),
+};
+```
+
+**Without this entry, `/artifact/[uuid]` shows "No component registered for: {slug}" even if the page file exists.**
+
+This replaces the old `prototypes/*/manifest.json` commit step. Same importance, different mechanism.
 
 ---
 
 ## The Golden Rules
 
-### 1. Mock data ONLY
+### 1. Mock data for visual content; Firestore for persistence
 ```ts
-// ✅ Correct — data in mock/
+// ✅ Correct — visual/display data in mock/
 import { students } from "@/mock/students";
 
-// ❌ Wrong — never fetch from real APIs
+// ✅ Correct — survey responses go to Firestore (handled by API routes)
+// API routes at app/api/survey/[slug]/submit/route.ts write to Firestore
+
+// ❌ Wrong — never fetch from real Kinship APIs
 fetch("https://api.kinship.io/...")
-// ❌ Wrong — never connect to DB
+// ❌ Wrong — never connect to Kinship's main DB
 import { db } from "@/packages/db"
-// ❌ Wrong — never use env vars for external services
-process.env.DATABASE_URL
 ```
 
 ### 2. Follow the Kinship design system
@@ -174,6 +242,7 @@ import { cn } from "../../lib/utils";                       // ❌ no relative c
 | `class-variance-authority` | Variant-based component styles |
 | `clsx` + `tailwind-merge` | Class utilities (use `cn()` from `@/lib/utils`) |
 | `@radix-ui/*` | Accessible headless components (dialog, tooltip, tabs, progress) |
+| `firebase` | Client SDK — auth (anon + Google), Firestore reads |
 
 **Do NOT install additional packages.** Use what's here. If something genuinely isn't possible without a new package, note it in a code comment.
 
@@ -183,7 +252,7 @@ import { cn } from "../../lib/utils";                       // ❌ no relative c
 
 ### Slide Deck
 ```tsx
-// app/page.tsx (or app/slides/page.tsx on the branch)
+// app/artifact/page.tsx (or app/slides/page.tsx on the branch)
 import { Slideshow, SlideTitleLayout, SlideContentLayout } from "@/components/slides/slideshow";
 
 const slides = [
@@ -220,6 +289,12 @@ import { motion } from "framer-motion";
 // For data-driven visuals — use D3 or Recharts
 import { BarChart, Bar, XAxis, YAxis, Tooltip } from "recharts";
 ```
+
+### Survey
+- Survey form: `app/artifact/[uuid]/survey/[slug]/page.tsx` — anon auth, uses survey engine
+- Survey admin: `app/(internal)/survey-admin/[slug]/page.tsx` — Google auth
+- Responses persist to Firestore `survey_responses` collection via `/api/survey/[slug]/submit`
+- No PIN gate — survey admin is protected by `GoogleAuthGate` route group
 
 ---
 
@@ -266,14 +341,16 @@ Rules for mock data:
 | Modals as first response | Inline panels, sheets |
 | `console.log(...)` left in | Remove before committing |
 | Importing from `app/` in components | Keep component deps clean |
-| Any `fetch()` or `axios` call | Mock data only |
-| Any env var for external services | Not applicable |
+| Any `fetch()` to real Kinship APIs | Mock data only |
+| Auth logic outside auth components | Use `useAuth()` hook or rely on layout gates |
+| Writing to `prototypes/*/manifest.json` | Use `update_prototype` MCP tool |
 
 ---
 
 ## Checklist Before Committing
 
-- [ ] All data comes from `mock/` — no external calls
+- [ ] Prototype component registered in `components/artifact/PrototypeRegistry.tsx`
+- [ ] Visual data comes from `mock/` — no external API calls
 - [ ] Colors match the Kinship palette — no arbitrary hex values
 - [ ] No `shadow-*` on cards — borders only
 - [ ] No peer comparison or leaderboard data shown
@@ -282,6 +359,7 @@ Rules for mock data:
 - [ ] Page loads without console errors
 - [ ] Animations respect `prefers-reduced-motion` (FadeUp/Stagger handle this automatically)
 - [ ] Mobile layout tested (Chromebook baseline: 1366×768, also check ~768px)
+- [ ] No `prototypes/*/manifest.json` files created — use Firestore instead
 
 ---
 
@@ -291,7 +369,8 @@ Hermes writes a `docs/PROTOTYPE.md` on each branch with:
 - The original user request
 - Specific scope and constraints
 - Which prototype type this is (slide deck / animation / dashboard page / other)
-- Any research notes relevant to the content
+- Research notes relevant to the content
+- The Firestore UUID and artifact URL (`https://quick.buildkinship.dev/artifact/{uuid}`)
 
 Read it before starting.
 
@@ -299,33 +378,37 @@ Read it before starting.
 
 ## The Gallery System — Rules for Coding Agents
 
-Every prototype is automatically listed in the **Prototype Gallery** at `/gallery`. The gallery
-is powered by a manifest file — not by code you write. **You do not touch the gallery page.**
+Every prototype is listed in the **Prototype Gallery** at `/gallery`. The gallery reads
+from **Firestore** (`prototypes` collection) at runtime — there are no manifest files.
 
 ### What you must NOT do
 
-- Do **not** modify `app/gallery/page.tsx` or `app/gallery/client.tsx`
-- Do **not** modify `app/page.tsx` or `app/home.tsx`
-- Do **not** create or edit any file in `prototypes/` — Hermes manages that
-- Do **not** modify `types/manifest.ts`
+- Do **not** modify `app/(internal)/gallery/page.tsx` or related gallery files
+- Do **not** modify `app/(internal)/page.tsx` or `app/home.tsx`
+- Do **not** create or edit any file in `prototypes/` — that folder is legacy, ignore it
+- Do **not** write `manifest.json` files — Hermes uses the `update_prototype` MCP tool instead
 
-### What the manifest system is (for context only)
+### What you MUST do
 
-When Hermes deploys your prototype, it automatically:
-1. Takes a screenshot of your finished page
-2. Creates `prototypes/<slug>/manifest.json` — metadata the gallery reads
-3. Commits that to `main`, then redeploys so the gallery shows your prototype
+When you build a new prototype, register its component in `components/artifact/PrototypeRegistry.tsx`:
 
-The gallery discovers all manifests at build time with `fs.readdirSync`. No database, no
-central file that causes merge conflicts. Each prototype slug gets its own folder that only
-Hermes writes to.
+```typescript
+// Add your slug → component mapping:
+"my-new-slug": dynamic(() => import("@/app/my-new-slug/page")),
+```
 
-### Your job
+Hermes handles everything else (Firestore doc creation, gallery metadata, URL shortening).
 
-Build the prototype page(s) at `app/<slug>/page.tsx`. That's it. Follow all the rules above
-(design tokens, mock data, no shadows, etc.). Hermes handles the gallery.
+### Artifact URL pattern
+
+Prototypes are served at: `https://quick.buildkinship.dev/artifact/{FIRESTORE_UUID}`
+
+The UUID comes from the Firestore document created by Hermes before your branch was created.
+It's in `docs/PROTOTYPE.md` on your branch. **Do not use slug-based URLs** — those are old
+and only exist as short-link aliases.
 
 ### The `prototypes/` folder
 
-If you see a `prototypes/` directory at the repo root, leave it alone. It contains
-`manifest.json` files that drive the gallery. Do not read, write, or delete anything there.
+The `prototypes/` directory contains legacy `manifest.json` files from before Firebase.
+They have been migrated to Firestore and are no longer read by the gallery. Leave them alone —
+do not add new ones.
