@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSurvey } from "@/mock/surveys";
-import { addResponse } from "@/lib/survey-store";
+import { addResponseFirestore } from "@/lib/firebase/survey-store";
 
 export async function POST(
   request: NextRequest,
@@ -13,7 +13,10 @@ export async function POST(
     return NextResponse.json({ error: "Survey not found" }, { status: 404 });
   }
 
-  let body: { answers: Record<string, string | string[] | number> };
+  let body: {
+    answers: Record<string, string | string[] | number>;
+    sessionId?: string;
+  };
   try {
     body = await request.json();
   } catch {
@@ -21,7 +24,10 @@ export async function POST(
   }
 
   if (!body.answers || typeof body.answers !== "object") {
-    return NextResponse.json({ error: "answers field required" }, { status: 400 });
+    return NextResponse.json(
+      { error: "answers field required" },
+      { status: 400 }
+    );
   }
 
   // Server-side validation of required fields
@@ -42,6 +48,11 @@ export async function POST(
     }
   }
 
-  const response = addResponse(slug, body.answers);
+  // Write to Firestore — persists across cold starts
+  const response = await addResponseFirestore(
+    slug,
+    body.answers,
+    body.sessionId // anon uid from the client, optional
+  );
   return NextResponse.json({ success: true, id: response.id }, { status: 201 });
 }

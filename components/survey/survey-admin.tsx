@@ -1,5 +1,6 @@
 "use client";
-// Admin view — requires 4-digit code gate, shows sortable/filterable response table
+// Admin view — guarded by Google auth (@buildkinship.com) via (internal) route group layout
+// PIN gate removed — replaced by GoogleAuthGate at the route level
 
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -10,12 +11,12 @@ import {
   ChevronUp,
   ChevronDown,
   ChevronsUpDown,
-  Lock,
   ClipboardList,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { SurveyConfig } from "@/mock/surveys";
 import type { SurveyResponse } from "@/lib/survey-store";
+import { auth } from "@/lib/firebase/client";
 
 const EASE_OUT = [0.22, 1, 0.36, 1] as unknown as Transition["ease"];
 
@@ -359,72 +360,55 @@ function AdminTable({
 /* ─── Main Admin View ───────────────────────────────────────── */
 
 export function SurveyAdminView({ survey }: { survey: SurveyConfig }) {
-  const [unlocked, setUnlocked] = useState(false);
-  const [wrongCode, setWrongCode] = useState(false);
   const [responses, setResponses] = useState<SurveyResponse[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const fetchResponses = useCallback(
-    async (code: string) => {
-      setLoading(true);
-      try {
-        const res = await fetch(
-          `/api/survey/${survey.slug}/responses?code=${code}`
-        );
-        const data = await res.json();
-        if (res.ok) {
-          setResponses(data.responses);
-          setUnlocked(true);
-          setWrongCode(false);
-          // Store code in sessionStorage so refresh still works
-          sessionStorage.setItem(`survey-admin-code-${survey.slug}`, code);
-        } else {
-          setWrongCode(true);
-        }
-      } catch {
-        setWrongCode(true);
-      } finally {
-        setLoading(false);
+  const fetchResponses = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      // Get the current user's ID token to authenticate the API call
+      const currentUser = auth.currentUser;
+      if (!currentUser) {
+        setError("Not signed in.");
+        return;
       }
-    },
-    [survey.slug]
-  );
+      const token = await currentUser.getIdToken();
+      const res = await fetch(`/api/survey/${survey.slug}/responses`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setResponses(data.responses);
+      } else {
+        setError(data.error ?? "Failed to load responses.");
+      }
+    } catch {
+      setError("Network error — please try again.");
+    } finally {
+      setLoading(false);
+    }
+  }, [survey.slug]);
 
-  // Check sessionStorage on mount
+  // Fetch on mount
   useEffect(() => {
-    const saved = sessionStorage.getItem(`survey-admin-code-${survey.slug}`);
-    if (saved) fetchResponses(saved);
-  }, [survey.slug, fetchResponses]);
-
-  const handleCodeSubmit = (code: string) => {
-    fetchResponses(code);
-  };
+    fetchResponses();
+  }, [fetchResponses]);
 
   const handleRefresh = () => {
-    const saved = sessionStorage.getItem(`survey-admin-code-${survey.slug}`);
-    if (saved) fetchResponses(saved);
+    fetchResponses();
   };
-
-  if (!unlocked) {
-    return (
-      <div className="relative">
-        <CodeGate onSubmit={handleCodeSubmit} />
-        {wrongCode && (
-          <motion.div
-            initial={{ opacity: 0, y: -8 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-red-500 text-white text-sm px-4 py-2 rounded-full"
-          >
-            Incorrect code — try again
-          </motion.div>
-        )}
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-[var(--kinship-cream)]">
       <div className="max-w-7xl mx-auto px-6 py-12">
+        {/* Error state */}
+        {error && (
+          <div className="mb-6 px-4 py-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+            {error}
+          </div>
+        )}
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
