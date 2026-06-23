@@ -1,13 +1,28 @@
 <!-- BEGIN:nextjs-agent-rules -->
-# This is NOT the Next.js you know
+# Kinship Prototype Engine — Agent Rules
 
-This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
+This is a prototype repo. The rules below apply to every agent working in this codebase.
 
-## Critical for this repo
+## Before writing any code
 
-- **This is a prototype repo.** Read `CLAUDE.md` in full before writing any code.
-- All mock data goes in `mock/` — never hardcode data in components
-- Use CSS variables from globals.css for colors — never arbitrary hex unless it matches the brand palette
-- `'use client'` requires an explanation comment on the NEXT LINE (not the same line)
-- No external API calls, no database connections, no Redis — mock data only
+1. `cat CLAUDE.md` — understand the repo, auth architecture, design system, absolute don'ts
+2. `cat docs/PROTOTYPE.md` — your specific brief, UUID, scope, success criteria
+3. `cat docs/surveys.md` | `cat docs/slideshows.md` | `cat docs/dashboards.md` — guide for your type
+
+## Non-negotiable rules
+
+- **All mock data goes in `mock/`** — never hardcode data in components
+- **CSS variables for colors** — never arbitrary hex unless it's a brand palette value
+- **`'use client'`** requires an explanation comment on the **immediately following line**
+- **No external API calls, no real database connections** — mock data only
+- **Register your component** in `components/artifact/PrototypeRegistry.tsx` (not for surveys)
+- **API routes using firebase-admin** must have `export const runtime = 'nodejs'` as line 1
+- **Firestore reads must wait** for `user && !authLoading` from `useAuth()` — always
+- **`firebase-admin` stays pinned to `^12`** — do not upgrade (v13+ breaks on Vercel)
+- **No `orderBy()` on Firestore** without a deployed composite index — sort client-side
+
+## This is Next.js 15 App Router
+
+APIs, conventions, and file structure differ from older versions.
+Read relevant docs before assuming anything about routing or data fetching.
 <!-- END:nextjs-agent-rules -->
