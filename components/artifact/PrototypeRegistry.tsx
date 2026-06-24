@@ -16,6 +16,9 @@ const registry: Record<string, ComponentType> = {
   // The /artifact/[uuid] page redirects there when proto.type === "survey"
   //
   // ─── Add new prototypes below this line ────────────────────────────────
+  "collective-intelligence-magazine": dynamic(
+    () => import("@/app/collective-intelligence-magazine/page")
+  ),
 };
 
 export function getPrototypeComponent(slug: string): ComponentType | null {
