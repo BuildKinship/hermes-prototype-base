@@ -1,72 +1,42 @@
 # Prototype Brief
 
 > This file is written by Hermes before handing off to the coding agent.
-> It defines scope, constraints, and context for this specific prototype.
-> **Read this before writing any code. It is the single source of truth for what to build.**
 
 ---
 
 ## Request
 
-_[Hermes fills this in from the user's original request — verbatim]_
+"Go through all the messages in #topic-collective-intelligence, learn from these messages. Most of the messages are twitter links, you should read those twitter links. The purpose is to put together a prototype — a magazine style slideshow giving everyone a summary of collective intelligence tweet covers. Use images where needed. Use citations to redirect users to the source."
 
 ---
 
 ## Prototype Type
 
 - [ ] Survey
-- [ ] Slide deck / presentation
-- [ ] Dashboard page (Hearth — teacher view)
-- [ ] Dashboard page (Horizon — student/parent view)
-- [ ] Data visualisation
-- [ ] Animation / visual concept
-- [ ] 3D / interactive scene
-- [ ] Other: ___
-
-**Read the dedicated guide for your type:**
-- Survey → `docs/surveys.md`
-- Slide deck → `docs/slideshows.md`
-- Dashboard / Animation / 3D / Other → `docs/dashboards.md`
+- [x] Slide deck / presentation
+- [ ] Dashboard page
 
 ---
 
 ## Firestore
 
-**Prototype UUID:** `_[Hermes fills this in]_`
-**Artifact URL:** `https://quick.buildkinship.dev/artifact/_[UUID]_`
-
-For surveys, also:
-**Survey slug:** `_[Hermes fills this in — matches key in mock/surveys.ts]_`
+**Prototype UUID:** `AmZH608T8JVQjYn1q4lD`
+**Artifact URL:** `https://quick.buildkinship.dev/artifact/AmZH608T8JVQjYn1q4lD`
 
 ---
 
 ## Scope
 
-_[What pages/routes to build. E.g.: "Single page at app/my-deck/page.tsx — no sub-routing needed"]_
-
----
-
-## Content / Research Notes
-
-_[Any research Hermes has done relevant to this prototype's content]_
-
----
-
-## Design Constraints
-
-- Follow the Kinship design system (CLAUDE.md §Design System)
-- Mock data only — no external services or real API calls
-- Mobile-aware layout (test at 1366×768 Chromebook baseline + ~768px)
-- No peer comparison, leaderboards, XP, or streaks
+Single page at `app/collective-intelligence-magazine/page.tsx`  
+Registered in `components/artifact/PrototypeRegistry.tsx`
 
 ---
 
 ## Success Criteria
 
-_[Specific things the prototype must demonstrate — filled in by Hermes]_
-
----
-
-## Branch
-
-`prototype/[slug]-[YYYY-MM-DD]`
+- Magazine-style cover slide with bold visual design
+- 8-12 thematic content slides covering key insights from the channel
+- Each slide has a citation linking back to the source tweet/article
+- Dark and light alternating slide themes
+- Mobile responsive, keyboard navigable
+- SVG illustrations on cover and key slides
