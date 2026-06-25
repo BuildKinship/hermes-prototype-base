@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
+import { useMediaUrl, useMediaUrls } from "@/hooks/useMediaUrl";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   X,
@@ -149,37 +150,49 @@ function DrawerImageViewer({ images, name }: { images: string[]; name: string })
   const [idx, setIdx] = useState(0);
   const prev = useCallback(() => setIdx((i) => (i - 1 + images.length) % images.length), [images.length]);
   const next = useCallback(() => setIdx((i) => (i + 1) % images.length), [images.length]);
+  // Resolve all image keys → live presigned URLs
+  const resolvedUrls = useMediaUrls(images);
 
   if (images.length === 0) return null;
+
+  const currentSrc = resolvedUrls[idx];
 
   return (
     <div className="flex flex-col gap-3">
       {/* Main image */}
       <div className="relative rounded-lg overflow-hidden" style={{ background: "rgba(0,0,0,0.3)" }}>
         <AnimatePresence mode="wait">
-          <motion.img
-            key={idx}
-            src={images[idx]}
-            alt={`${name} — image ${idx + 1} of ${images.length}`}
-            className="w-full object-contain max-h-72"
-            style={{ display: "block" }}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.18 }}
-          />
+          {currentSrc ? (
+            <motion.img
+              key={idx}
+              src={currentSrc}
+              alt={`${name} — image ${idx + 1} of ${images.length}`}
+              className="w-full object-contain max-h-72"
+              style={{ display: "block" }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.18 }}
+            />
+          ) : (
+            <div key="loading" className="w-full max-h-72 h-40 flex items-center justify-center" style={{ background: "rgba(0,0,0,0.2)" }}>
+              <ImageIcon className="w-8 h-8 opacity-20 text-white" />
+            </div>
+          )}
         </AnimatePresence>
         {/* Open full size */}
-        <a
-          href={images[idx]}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="absolute top-2 right-2 w-7 h-7 rounded-full flex items-center justify-center"
-          style={{ background: "rgba(0,0,0,0.55)", color: "white" }}
-          title="Open full size"
-        >
-          <ExternalLink className="w-3.5 h-3.5" />
-        </a>
+        {currentSrc && (
+          <a
+            href={currentSrc}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="absolute top-2 right-2 w-7 h-7 rounded-full flex items-center justify-center"
+            style={{ background: "rgba(0,0,0,0.55)", color: "white" }}
+            title="Open full size"
+          >
+            <ExternalLink className="w-3.5 h-3.5" />
+          </a>
+        )}
       </div>
 
       {/* Controls for multi-image */}
@@ -208,22 +221,31 @@ function DrawerImageViewer({ images, name }: { images: string[]; name: string })
       {/* Thumbnail strip for multi-image */}
       {images.length > 1 && (
         <div className="flex gap-2 overflow-x-auto pb-1">
-          {images.map((src, i) => (
-            <button
-              key={i}
-              onClick={() => setIdx(i)}
-              className="flex-shrink-0 rounded overflow-hidden"
-              style={{
-                width: 56,
-                height: 40,
-                outline: i === idx ? "2px solid #6366F1" : "2px solid transparent",
-                outlineOffset: 1,
-              }}
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={src} alt={`Thumbnail ${i + 1}`} className="w-full h-full object-cover" />
-            </button>
-          ))}
+          {images.map((_, i) => {
+            const thumbSrc = resolvedUrls[i];
+            return (
+              <button
+                key={i}
+                onClick={() => setIdx(i)}
+                className="flex-shrink-0 rounded overflow-hidden"
+                style={{
+                  width: 56,
+                  height: 40,
+                  outline: i === idx ? "2px solid #6366F1" : "2px solid transparent",
+                  outlineOffset: 1,
+                }}
+              >
+                {thumbSrc ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={thumbSrc} alt={`Thumbnail ${i + 1}`} className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center" style={{ background: "rgba(255,255,255,0.05)" }}>
+                    <ImageIcon className="w-3 h-3 opacity-30 text-white" />
+                  </div>
+                )}
+              </button>
+            );
+          })}
         </div>
       )}
     </div>
@@ -231,29 +253,38 @@ function DrawerImageViewer({ images, name }: { images: string[]; name: string })
 }
 
 // ─── Video Player (drawer version) ────────────────────────────────────────────
-function DrawerVideoPlayer({ src, name }: { src: string; name: string }) {
+function DrawerVideoPlayer({ src: keyOrUrl, name }: { src: string; name: string }) {
+  const { url: src } = useMediaUrl(keyOrUrl);
   return (
     <div className="flex flex-col gap-2">
       <div className="rounded-lg overflow-hidden" style={{ background: "rgba(0,0,0,0.4)" }}>
-        {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
-        <video
-          src={src}
-          controls
-          playsInline
-          className="w-full max-h-64"
-          style={{ display: "block" }}
-        />
+        {src ? (
+          /* eslint-disable-next-line jsx-a11y/media-has-caption */
+          <video
+            src={src}
+            controls
+            playsInline
+            className="w-full max-h-64"
+            style={{ display: "block" }}
+          />
+        ) : (
+          <div className="w-full h-40 flex items-center justify-center">
+            <Video className="w-8 h-8 opacity-20 text-white" />
+          </div>
+        )}
       </div>
-      <a
-        href={src}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="flex items-center gap-1.5 text-xs self-start"
-        style={{ color: "#9CA3AF" }}
-      >
-        <ExternalLink className="w-3 h-3" />
-        Open video in new tab
-      </a>
+      {src && (
+        <a
+          href={src}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-1.5 text-xs self-start"
+          style={{ color: "#9CA3AF" }}
+        >
+          <ExternalLink className="w-3 h-3" />
+          Open video in new tab
+        </a>
+      )}
     </div>
   );
 }
@@ -317,13 +348,17 @@ export function PrototypeDrawer({
 
   const typeMeta = m ? (TYPE_META[m.type] ?? TYPE_META.other) : null;
 
+  // Resolve live URLs for the header "open" button — never use stored presigned URLs directly
+  const firstImageKey = m?.type === "image" ? (m.media_images?.[0] ?? null) : null;
+  const videoKey      = m?.type === "video" ? (m.media_video ?? null) : null;
+  const { url: firstImageUrl } = useMediaUrl(firstImageKey);
+  const { url: videoUrl }      = useMediaUrl(videoKey);
+
   // For image/video artifacts, the "open" link goes to the media directly
   const openHref =
-    m?.type === "image" && m.media_images?.[0]
-      ? m.media_images[0]
-      : m?.type === "video" && m.media_video
-      ? m.media_video
-      : m?.url;
+    m?.type === "image" ? (firstImageUrl ?? "#")
+    : m?.type === "video" ? (videoUrl ?? "#")
+    : m?.url;
 
   const openLabel =
     m?.type === "image" ? "View Image" : m?.type === "video" ? "Watch Video" : "Open Artifact";

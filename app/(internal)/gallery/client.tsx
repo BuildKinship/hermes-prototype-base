@@ -2,6 +2,7 @@
 // needed for search/filter/sort state, Help modal, image carousel, and interactive gallery
 
 import React, { useState, useMemo, useEffect, useCallback, useRef } from "react";
+import { useMediaUrl, useMediaUrls } from "@/hooks/useMediaUrl";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Search,
@@ -243,6 +244,8 @@ function HelpModal({ onClose }: { onClose: () => void }) {
 /* ─── Image Carousel ─────────────────────────────────────── */
 
 function ImageCarousel({ images, name }: { images: string[]; name: string }) {
+  // images[] may be S3 keys OR legacy presigned URLs — resolve to live URLs
+  const resolvedUrls = useMediaUrls(images);
   const [idx, setIdx] = useState(0);
   const prev = useCallback(() => setIdx((i) => (i - 1 + images.length) % images.length), [images.length]);
   const next = useCallback(() => setIdx((i) => (i + 1) % images.length), [images.length]);
@@ -250,29 +253,39 @@ function ImageCarousel({ images, name }: { images: string[]; name: string }) {
   if (images.length === 0) return null;
 
   if (images.length === 1) {
+    const src = resolvedUrls[0];
+    if (!src) return (
+      <div className="w-full h-full flex items-center justify-center" style={{ background: "rgba(0,0,0,0.06)" }}>
+        <ImageIcon className="w-8 h-8 opacity-20" />
+      </div>
+    );
     return (
       // eslint-disable-next-line @next/next/no-img-element
-      <img
-        src={images[0]}
-        alt={name}
-        className="w-full h-full object-cover object-center"
-      />
+      <img src={src} alt={name} className="w-full h-full object-cover object-center" />
     );
   }
+
+  const currentSrc = resolvedUrls[idx];
 
   return (
     <div className="relative w-full h-full group/carousel">
       <AnimatePresence mode="wait">
-        <motion.img
-          key={idx}
-          src={images[idx]}
-          alt={`${name} ${idx + 1} of ${images.length}`}
-          className="w-full h-full object-cover object-center absolute inset-0"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.2 }}
-        />
+        {currentSrc ? (
+          <motion.img
+            key={idx}
+            src={currentSrc}
+            alt={`${name} ${idx + 1} of ${images.length}`}
+            className="w-full h-full object-cover object-center absolute inset-0"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+          />
+        ) : (
+          <div key="loading" className="w-full h-full absolute inset-0 flex items-center justify-center" style={{ background: "rgba(0,0,0,0.06)" }}>
+            <ImageIcon className="w-8 h-8 opacity-20" />
+          </div>
+        )}
       </AnimatePresence>
       {/* Prev/Next */}
       <button
@@ -306,21 +319,29 @@ function ImageCarousel({ images, name }: { images: string[]; name: string }) {
 
 /* ─── Video Thumbnail ────────────────────────────────────── */
 
-function VideoThumbnail({ src, name }: { src: string; name: string }) {
+function VideoThumbnail({ src: keyOrUrl, name }: { src: string; name: string }) {
+  // keyOrUrl may be an S3 key or a legacy presigned URL — resolve to a live URL
+  const { url: src } = useMediaUrl(keyOrUrl);
   const videoRef = useRef<HTMLVideoElement>(null);
   return (
     <div className="relative w-full h-full group/video">
-      {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
-      <video
-        ref={videoRef}
-        src={src}
-        className="w-full h-full object-cover"
-        preload="metadata"
-        playsInline
-        muted
-        onMouseEnter={() => videoRef.current?.play()}
-        onMouseLeave={() => { if (videoRef.current) { videoRef.current.pause(); videoRef.current.currentTime = 0; } }}
-      />
+      {src ? (
+        /* eslint-disable-next-line jsx-a11y/media-has-caption */
+        <video
+          ref={videoRef}
+          src={src}
+          className="w-full h-full object-cover"
+          preload="metadata"
+          playsInline
+          muted
+          onMouseEnter={() => videoRef.current?.play()}
+          onMouseLeave={() => { if (videoRef.current) { videoRef.current.pause(); videoRef.current.currentTime = 0; } }}
+        />
+      ) : (
+        <div className="w-full h-full flex items-center justify-center" style={{ background: "rgba(0,0,0,0.08)" }}>
+          <Video className="w-8 h-8 opacity-20" />
+        </div>
+      )}
       {/* Play icon overlay */}
       <div
         className="absolute inset-0 flex items-center justify-center pointer-events-none group-hover/video:opacity-0 transition-opacity"
@@ -373,6 +394,15 @@ function PrototypeCard({ m, onOpenDrawer }: { m: PrototypeManifest; onOpenDrawer
     .toUpperCase()
     .slice(0, 2);
 
+  // Resolve the "open" href for image/video cards via the API route.
+  // For images we resolve just the first image key for the card-level link;
+  // ImageCarousel handles all of them internally.
+  // For non-media types we use the static artifact URL as-is.
+  const firstImageKey = m.type === "image" ? (m.media_images?.[0] ?? null) : null;
+  const videoKey      = m.type === "video" ? (m.media_video ?? null) : null;
+  const { url: firstImageUrl } = useMediaUrl(firstImageKey);
+  const { url: videoUrl }      = useMediaUrl(videoKey);
+
   // Determine thumbnail content based on type
   const renderThumbnail = () => {
     if (m.type === "image" && m.media_images && m.media_images.length > 0) {
@@ -401,14 +431,12 @@ function PrototypeCard({ m, onOpenDrawer }: { m: PrototypeManifest; onOpenDrawer
     );
   };
 
-  // For image/video types, the thumbnail itself IS the artifact — link opens the media
-  // For prototype types, thumbnail links to the artifact page
+  // For image/video types, the thumbnail itself IS the artifact — link opens the media.
+  // Use resolved (fresh) URLs, not whatever was stored in Firestore.
   const artifactHref =
-    m.type === "image" && m.media_images?.[0]
-      ? m.media_images[0]
-      : m.type === "video" && m.media_video
-      ? m.media_video
-      : m.url;
+    m.type === "image" ? (firstImageUrl ?? "#")
+    : m.type === "video" ? (videoUrl ?? "#")
+    : m.url;
 
   const openLabel = m.type === "image" ? "View" : m.type === "video" ? "Watch" : "Open";
 
