@@ -460,9 +460,9 @@ function HowToUseSlide() {
       <SectionLabel dark>5 · How to Start</SectionLabel>
       <SlideTitle title="Just talk to me. No setup required." dark size="sm"
         subtitle='DM me or @mention me in any channel. Natural language — no special syntax.​'/>
-      <div className="flex flex-col gap-3 w-full max-w-3xl">
+      <div className="flex flex-col gap-2 w-full max-w-3xl">
         {demos.map(({ prompt, result }, i) => (
-          <div key={i} className="rounded-xl p-4 flex flex-col sm:flex-row sm:items-center gap-3"
+          <div key={i} className="rounded-xl px-4 py-3 flex flex-col sm:flex-row sm:items-center gap-2"
             style={{ background: "oklch(18% 0.05 293)", border: "1px solid oklch(28% 0.06 293)" }}>
             <div className="flex-1">
               <div className="text-sm font-600 italic" style={{ color: "oklch(80% 0.08 293)", fontWeight: 600 }}>{prompt}</div>
