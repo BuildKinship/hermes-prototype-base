@@ -71,22 +71,23 @@ function HermesCoverAnimation() {
 }
 
 function CapabilitiesHubAnimation() {
+  // Spoke positions with 28px padding from all edges to prevent clip
+  // ViewBox: 0 0 380 270 — hub at center (190, 135)
   const spokes = [
-    { x: 170, y: 14,  label: "Knowledge",  icon: "/logos/notion.png",   color: "#000" },
-    { x: 318, y: 72,  label: "Productivity", icon: "/logos/google-workspace.webp", color: "#34A853" },
-    { x: 318, y: 166, label: "Creative",   icon: "/logos/slack.png",    color: "#4A154B" },
-    { x: 170, y: 220, label: "Research",   icon: "/logos/google.webp",  color: "#4285F4" },
-    { x: 22,  y: 166, label: "Zoom/Comms", icon: "/logos/zoom.webp",    color: "#2D8CFF" },
-    { x: 22,  y: 72,  label: "Engineering", icon: "/logos/notion.png",   color: "#000" },
+    { x: 190, y: 28,  label: "Knowledge",    icon: "/logos/notion.png" },
+    { x: 348, y: 82,  label: "Productivity", icon: "/logos/google-workspace.webp" },
+    { x: 348, y: 188, label: "Creative",     icon: "/logos/slack.png" },
+    { x: 190, y: 242, label: "Research",     icon: "/logos/google.webp" },
+    { x: 32,  y: 188, label: "Zoom/Comms",   icon: "/logos/zoom.webp" },
+    { x: 32,  y: 82,  label: "Engineering",  icon: "/logos/notion.png" },
   ];
 
-  const cx = 170, cy = 119;
+  const cx = 190, cy = 135;
 
   return (
-    <svg width="340" height="234" viewBox="0 0 340 234" fill="none" aria-hidden="true"
-      style={{ width: "min(100%, 360px)", height: "auto" }}>
+    <svg width="380" height="270" viewBox="0 0 380 270" fill="none" aria-hidden="true"
+      style={{ width: "min(100%, 380px)", height: "auto", overflow: "visible" }}>
       <style>{`
-        @keyframes cap-particle { 0%,100%{opacity:0;offset-distance:0%} 10%{opacity:0.9} 90%{opacity:0.9} 100%{opacity:0;offset-distance:100%} }
         @keyframes cap-hub-glow { 0%,100%{opacity:0.5} 50%{opacity:1} }
         .cap-hub { animation:cap-hub-glow 3s ease-in-out infinite; }
       `}</style>
@@ -122,9 +123,9 @@ function CapabilitiesHubAnimation() {
       <image href="/logos/hermes.png" x={cx - 38} y={cy - 38} width="76" height="76"
         preserveAspectRatio="xMidYMid meet" clipPath="url(#cap-hermes-clip)"/>
 
-      {/* Spoke nodes */}
+      {/* Spoke nodes — r=22 gives enough room; labels below at +r+13 */}
       {spokes.map((s, i) => {
-        const r = 20;
+        const r = 22;
         const pad = r * 0.22;
         const clipId = `cap-clip-${i}`;
         return (
@@ -140,7 +141,7 @@ function CapabilitiesHubAnimation() {
               preserveAspectRatio="xMidYMid meet"
               clipPath={`url(#${clipId})`}
             />
-            <text x={s.x} y={s.y + r + 12} fontSize="9" textAnchor="middle"
+            <text x={s.x} y={s.y + r + 13} fontSize="9" textAnchor="middle"
               fill="oklch(45% 0.06 293)" fontFamily="system-ui" fontWeight="600">{s.label}</text>
           </g>
         );
@@ -169,7 +170,7 @@ function PersonalizationAnimation() {
       {/* User A */}
       <circle cx="40" cy="60" r="24" fill="oklch(94% 0.04 293)" stroke="oklch(78% 0.08 293)" strokeWidth="1.5"/>
       <text x="40" y="55" fontSize="18" textAnchor="middle">👩</text>
-      <text x="40" y="72" fontSize="8.5" textAnchor="middle" fill="oklch(40% 0.06 293)" fontWeight="600">Juzar</text>
+      <text x="40" y="72" fontSize="8.5" textAnchor="middle" fill="oklch(40% 0.06 293)" fontWeight="600">User</text>
 
       {/* User B */}
       <circle cx="200" cy="60" r="24" fill="oklch(94% 0.04 293)" stroke="oklch(78% 0.08 293)" strokeWidth="1.5"/>
@@ -320,7 +321,7 @@ function CoverSlide() {
           color: "var(--kinship-cream)",
           letterSpacing: "-0.03em",
           lineHeight: 1.05,
-        }}>Meet Hermes</h1>
+        }}>Hermes Update</h1>
         <p className="mt-3" style={{
           fontSize: "clamp(1rem, 2.4vw, 1.4rem)",
           color: "oklch(72% 0.08 293)",
@@ -341,7 +342,7 @@ function WhatHermesIsSlide() {
     { icon: Brain,        title: "Persistent Memory",    body: "Unlike ChatGPT, I remember Kinship — the team, the schools, the context. I learn over time." },
     { icon: Zap,          title: "Takes Real Actions",   body: "I don't just answer questions. I can schedule a Zoom, draft a document, generate a prototype, or search Notion." },
     { icon: MessageSquare,title: "Lives in Slack",       body: "Just DM me or @mention me in any channel. No special app, no prompting skills needed." },
-    { icon: Star,         title: "Knows Your Context",  body: "If you're in #schools-onboarding, I know that context. I tailor every response to where you are." },
+    { icon: Star,         title: "Knows Your Context",  body: "If you're in #open-kinship or any other channel, I know that context. I tailor every response to where you are." },
   ];
   return (
     <SlideShell>
@@ -405,7 +406,7 @@ function PersonalizationSlide() {
       <PersonalizationAnimation />
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full max-w-3xl mt-2">
         {[
-          { name: "Juzar", role: "Education",  example: '"Show me the Grade 3 school pipeline"' },
+          { name: "User",  role: "Education",  example: '"Show me the Grade 3 school pipeline"' },
           { name: "Dan",   role: "Sales",       example: '"Summarize my Q2 deals + next steps"' },
           { name: "Dev",   role: "Engineering", example: '"Deploy the staging branch to Vercel"' },
         ].map(({ name, role, example }) => (
@@ -472,6 +473,23 @@ function HowToUseSlide() {
             </div>
           </div>
         ))}
+        <div className="rounded-xl p-4 flex items-start gap-3 mt-1"
+          style={{ background: "oklch(20% 0.06 293)", border: "1px solid oklch(55% 0.12 293)" }}>
+          <Star className="w-4 h-4 mt-0.5 flex-shrink-0" style={{ color: "oklch(72% 0.18 293)" }}/>
+          <div>
+            <p className="text-sm font-600" style={{ color: "var(--kinship-cream)", fontWeight: 600 }}>
+              All generated artifacts are saved to the gallery
+            </p>
+            <p className="text-xs mt-1 leading-relaxed" style={{ color: "oklch(60% 0.08 293)" }}>
+              Sign in with your Kinship Google account at{" "}
+              <a href="https://quick.buildkinship.dev" target="_blank" rel="noreferrer"
+                style={{ color: "oklch(72% 0.18 293)", textDecoration: "underline" }}>
+                quick.buildkinship.dev
+              </a>
+              {" "}to browse prototypes, slides, images and surveys — and see exactly how they were created.
+            </p>
+          </div>
+        </div>
       </div>
     </SlideShell>
   );
@@ -479,17 +497,16 @@ function HowToUseSlide() {
 
 function RolesSlide() {
   const roles = [
-    { role: "Admin",       who: "Azim + designated admins", access: "Everything — all tools, config, training",                   color: "oklch(58% 0.18 293)" },
-    { role: "Team",        who: "Kinship staff",              access: "Notion, Zoom, Google Workspace, creative tools, research",   color: "oklch(55% 0.15 142)" },
-    { role: "User",        who: "Teachers, partners",         access: "Creative tools (image/video/slides), research, read-only",   color: "oklch(58% 0.16 60)" },
-    { role: "Guest",       who: "External / untrusted",       access: "Chat only — no tools",                                       color: "oklch(52% 0.10 25)" },
+    { role: "Admin",  who: "Admin users",   access: "Everything — all tools, config, training",                   color: "oklch(58% 0.18 293)" },
+    { role: "Team",   who: "Kinship staff", access: "Notion, Zoom, Google Workspace, creative tools, research",   color: "oklch(55% 0.15 142)" },
+    { role: "User",   who: "Teachers, partners", access: "Creative tools (image/video/slides), research, read-only", color: "oklch(58% 0.16 60)" },
   ];
   return (
     <SlideShell>
       <SectionLabel>6 · Roles & Getting Started</SectionLabel>
       <SlideTitle title="Not everyone gets the same access." size="sm"
         subtitle="That's intentional. Role-based access keeps everyone safe and efficient."/>
-      <div className="flex flex-col gap-2 w-full max-w-3xl mb-4">
+      <div className="flex flex-col gap-2 w-full max-w-3xl mb-3">
         {roles.map(({ role, who, access, color }) => (
           <div key={role} className="rounded-xl p-3 sm:p-4 flex items-start gap-3"
             style={{ background: "white", border: "1px solid oklch(90% 0.03 293)" }}>
@@ -504,15 +521,27 @@ function RolesSlide() {
           </div>
         ))}
       </div>
-      <div className="rounded-xl p-4 sm:p-5 w-full max-w-3xl text-center"
-        style={{ background: "var(--kinship-ink)", border: "1px solid oklch(30% 0.06 293)" }}>
-        <Users className="w-5 h-5 mx-auto mb-2" style={{ color: "oklch(72% 0.14 293)" }}/>
-        <p className="text-sm font-600" style={{ color: "var(--kinship-cream)", fontWeight: 600 }}>
-          If you get a permission denied reply — DM Azim to get upgraded.
-        </p>
-        <p className="text-xs mt-1.5" style={{ color: "oklch(60% 0.08 293)" }}>
-          Start now: DM @Hermes or mention me in any channel.
-        </p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full max-w-3xl">
+        <div className="rounded-xl p-4 text-center"
+          style={{ background: "var(--kinship-ink)", border: "1px solid oklch(30% 0.06 293)" }}>
+          <Users className="w-4 h-4 mx-auto mb-1.5" style={{ color: "oklch(72% 0.14 293)" }}/>
+          <p className="text-xs font-600" style={{ color: "var(--kinship-cream)", fontWeight: 600 }}>
+            Permission denied? Post in <span style={{ color: "oklch(72% 0.14 293)" }}>#brain-feedback</span>
+          </p>
+          <p className="text-xs mt-1" style={{ color: "oklch(55% 0.08 293)" }}>
+            All feedback for Hermes goes to #brain-feedback
+          </p>
+        </div>
+        <div className="rounded-xl p-4 text-center"
+          style={{ background: "white", border: "1px solid oklch(88% 0.04 293)" }}>
+          <MessageSquare className="w-4 h-4 mx-auto mb-1.5" style={{ color: "oklch(50% 0.10 293)" }}/>
+          <p className="text-xs font-600" style={{ color: "var(--kinship-ink)", fontWeight: 600 }}>
+            Start now
+          </p>
+          <p className="text-xs mt-1" style={{ color: "oklch(45% 0.05 293)" }}>
+            DM @Hermes or mention me in any channel
+          </p>
+        </div>
       </div>
     </SlideShell>
   );
