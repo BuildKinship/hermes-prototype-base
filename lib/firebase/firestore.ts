@@ -44,12 +44,21 @@ export async function listPrototypes(): Promise<
     id: d.id,
     ...(d.data() as FirestorePrototype),
   }));
-  // Sort client-side: newest first
-  return docs.sort((a, b) => {
-    const aTime = (a.createdAt as any)?.seconds ?? 0;
-    const bTime = (b.createdAt as any)?.seconds ?? 0;
-    return bTime - aTime;
-  });
+  // Sort client-side: newest first.
+  // createdAt may be a Firestore Timestamp ({ seconds, nanoseconds }) OR an ISO string
+  // (when written by firebase-admin SDK or the MCP tool).
+  function toMs(createdAt: unknown): number {
+    if (!createdAt) return 0;
+    if (typeof createdAt === "object" && "seconds" in (createdAt as object)) {
+      return ((createdAt as { seconds: number }).seconds) * 1000;
+    }
+    if (typeof createdAt === "string") {
+      const ms = new Date(createdAt).getTime();
+      return isNaN(ms) ? 0 : ms;
+    }
+    return 0;
+  }
+  return docs.sort((a, b) => toMs(b.createdAt) - toMs(a.createdAt));
 }
 
 /** Update prototype metadata by UUID */

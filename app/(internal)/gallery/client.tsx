@@ -381,11 +381,13 @@ function TypeBadge({ type }: { type: PrototypeType }) {
 /* ─── Prototype Card ─────────────────────────────────────── */
 
 function PrototypeCard({ m, onOpenDrawer }: { m: PrototypeManifest; onOpenDrawer: () => void }) {
-  const date = new Date(m.created_at).toLocaleDateString("en-CA", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
+  // created_at (manifest field) may be absent on older docs written by firebase-admin MCP,
+  // which stores the timestamp as `createdAt` instead. Fall back gracefully.
+  const rawDate = m.created_at || (m as unknown as Record<string, unknown>).createdAt as string | undefined;
+  const dateObj = rawDate ? new Date(rawDate) : null;
+  const date = dateObj && !isNaN(dateObj.getTime())
+    ? dateObj.toLocaleDateString("en-CA", { year: "numeric", month: "short", day: "numeric" })
+    : "—";
 
   const initials = m.created_by_name
     .split(/\s+/)
@@ -678,10 +680,24 @@ export function GalleryClient({ manifests }: { manifests: PrototypeManifest[] })
 
     switch (sort) {
       case "newest":
-        list.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+        list.sort((a, b) => {
+          const getMs = (m: PrototypeManifest) => {
+            const raw = m.created_at || (m as unknown as Record<string, unknown>).createdAt as string | undefined;
+            const ms = raw ? new Date(raw).getTime() : 0;
+            return isNaN(ms) ? 0 : ms;
+          };
+          return getMs(b) - getMs(a);
+        });
         break;
       case "oldest":
-        list.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+        list.sort((a, b) => {
+          const getMs = (m: PrototypeManifest) => {
+            const raw = m.created_at || (m as unknown as Record<string, unknown>).createdAt as string | undefined;
+            const ms = raw ? new Date(raw).getTime() : 0;
+            return isNaN(ms) ? 0 : ms;
+          };
+          return getMs(a) - getMs(b);
+        });
         break;
       case "creator":
         list.sort((a, b) => a.created_by_name.localeCompare(b.created_by_name));
