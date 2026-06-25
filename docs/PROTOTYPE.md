@@ -1,72 +1,36 @@
-# Prototype Brief
+# PROTOTYPE: Meet Hermes — Team Introduction Slide Deck
 
-> This file is written by Hermes before handing off to the coding agent.
-> It defines scope, constraints, and context for this specific prototype.
-> **Read this before writing any code. It is the single source of truth for what to build.**
+## Firestore UUID
+`uHBscf9PFzHBOX6RJE7S`
 
----
-
-## Request
-
-_[Hermes fills this in from the user's original request — verbatim]_
-
----
-
-## Prototype Type
-
-- [ ] Survey
-- [ ] Slide deck / presentation
-- [ ] Dashboard page (Hearth — teacher view)
-- [ ] Dashboard page (Horizon — student/parent view)
-- [ ] Data visualisation
-- [ ] Animation / visual concept
-- [ ] 3D / interactive scene
-- [ ] Other: ___
-
-**Read the dedicated guide for your type:**
-- Survey → `docs/surveys.md`
-- Slide deck → `docs/slideshows.md`
-- Dashboard / Animation / 3D / Other → `docs/dashboards.md`
-
----
-
-## Firestore
-
-**Prototype UUID:** `_[Hermes fills this in]_`
-**Artifact URL:** `https://quick.buildkinship.dev/artifact/_[UUID]_`
-
-For surveys, also:
-**Survey slug:** `_[Hermes fills this in — matches key in mock/surveys.ts]_`
-
----
-
-## Scope
-
-_[What pages/routes to build. E.g.: "Single page at app/my-deck/page.tsx — no sub-routing needed"]_
-
----
-
-## Content / Research Notes
-
-_[Any research Hermes has done relevant to this prototype's content]_
-
----
-
-## Design Constraints
-
-- Follow the Kinship design system (CLAUDE.md §Design System)
-- Mock data only — no external services or real API calls
-- Mobile-aware layout (test at 1366×768 Chromebook baseline + ~768px)
-- No peer comparison, leaderboards, XP, or streaks
-
----
-
-## Success Criteria
-
-_[Specific things the prototype must demonstrate — filled in by Hermes]_
-
----
+## Artifact URL
+https://quick.buildkinship.dev/artifact/uHBscf9PFzHBOX6RJE7S
 
 ## Branch
+`prototype/meet-hermes-2026-06-25`
 
-`prototype/[slug]-[YYYY-MM-DD]`
+## Original Request (verbatim)
+Build a slideshow based on the information below. I want to show how you can help slack users with all the skills and tools that you have access to. Validate the information I have provided you with the memory of the recent chats in case anything needs to change. Create this slideshow
+
+## Type
+Slide deck
+
+## Scope
+Single route: `app/meet-hermes/page.tsx`
+Must register in `components/artifact/PrototypeRegistry.tsx`
+
+## Content Structure (7 slides)
+1. **Cover** — "Meet Hermes" hero, dark background
+2. **What Hermes Is** — persistent AI agent, memory, takes actions, lives in Slack
+3. **What It Has Access To** — hub-and-spoke capability map (5 categories)
+4. **What Makes It Different** — per-user profiles, personalization, RBAC
+5. **What It Can't Do (By Design)** — guardrails, no admin actions, budget limits
+6. **How to Use It** — DM or @mention, natural language, 3 quick demos
+7. **Roles & Getting Started** — role table + CTA
+
+## Success Criteria
+- Fullscreen keyboard-navigable deck (←→ Space)
+- Animated hub-and-spoke SVG on capabilities slide
+- Hermes logo on cover
+- Mobile-responsive (100dvh, flex-col shell)
+- Progress dots nav
