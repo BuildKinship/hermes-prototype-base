@@ -68,6 +68,9 @@ export interface PrototypeManifest {
   /** Input files/images the user provided with their request */
   input_attachments?: InputAttachment[];
 
+  /** Primary S3 object key (for media types) — used by the weekly URL refresh cron */
+  s3_key?: string;
+
   // ─── Rich context for the detail drawer ────────────────────────────────────
 
   /** Full verbatim Slack request (may be longer than prompt) */
