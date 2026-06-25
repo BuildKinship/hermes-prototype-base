@@ -1,9 +1,8 @@
 "use client";
-// needed for search/filter/sort state and interactive gallery
+// needed for search/filter/sort state, Help modal, image carousel, and interactive gallery
 
-import { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import Link from "next/link";
 import {
   Search,
   ExternalLink,
@@ -13,10 +12,15 @@ import {
   LayoutDashboard,
   ClipboardList,
   Shapes,
-  SortAsc,
-  SortDesc,
   X,
-  ArrowLeft,
+  HelpCircle,
+  ChevronLeft,
+  ChevronRight,
+  ImageIcon,
+  Video,
+  Copy,
+  Check,
+  ArrowRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { PrototypeManifest, PrototypeType } from "@/types/manifest";
@@ -33,15 +37,310 @@ const TYPE_META: Record<
   "3d": { label: "3D / Interactive", icon: Box, color: "var(--subject-science)" },
   dashboard: { label: "Dashboard", icon: LayoutDashboard, color: "var(--kinship-mid)" },
   survey: { label: "Survey", icon: ClipboardList, color: "var(--subject-writing)" },
+  image: { label: "Image", icon: ImageIcon, color: "#EC4899" },
+  video: { label: "Video", icon: Video, color: "#F97316" },
   other: { label: "Other", icon: Shapes, color: "var(--kinship-dim)" },
 };
 
+const HELP_STORAGE_KEY = "kinship-gallery-visited";
+
 type SortKey = "newest" | "oldest" | "creator" | "name";
 
-/* ─── Sub-components ────────────────────────────────────── */
+/* ─── Help Modal ─────────────────────────────────────────── */
+
+const prototypeExamples = [
+  { type: "Slide deck", prompt: "Build a 6-slide deck for a school principal intro meeting — the Kinship pitch." },
+  { type: "Dashboard", prompt: "Prototype a teacher morning view — 22 Grade 3 students, color-coded by status." },
+  { type: "Animation", prompt: "Animate how Kinship ingests IXL data and surfaces it on the teacher dashboard." },
+  { type: "3D visual", prompt: "Build a 3D rotating Kinship K-mark with soft studio lighting." },
+  { type: "Image", prompt: "Generate a hero image for the Kinship brain all-hands deck — abstract, on-brand." },
+  { type: "Video", prompt: "Turn this reference image into a 5-second animated brand video." },
+];
+
+function CopyPromptButton({ text }: { text: string }) {
+  const [copied, setCopied] = useState(false);
+  return (
+    <button
+      onClick={() => {
+        navigator.clipboard.writeText(text);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 1800);
+      }}
+      className="flex items-center gap-1 text-[10px] opacity-40 hover:opacity-80 transition-opacity"
+    >
+      {copied ? <Check className="w-3 h-3 text-green-500" /> : <Copy className="w-3 h-3" />}
+      {copied ? "copied" : "copy"}
+    </button>
+  );
+}
+
+function HelpModal({ onClose }: { onClose: () => void }) {
+  // Close on Escape
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [onClose]);
+
+  return (
+    <AnimatePresence>
+      <motion.div
+        key="help-backdrop"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.2 }}
+        className="fixed inset-0 z-50 flex items-center justify-center p-4"
+        style={{ background: "rgba(0,0,0,0.5)", backdropFilter: "blur(4px)" }}
+        onClick={onClose}
+      >
+        <motion.div
+          key="help-panel"
+          initial={{ opacity: 0, y: 24, scale: 0.96 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: 16, scale: 0.97 }}
+          transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+          className="relative w-full max-w-2xl max-h-[85vh] overflow-y-auto rounded-2xl flex flex-col"
+          style={{ background: "var(--kinship-cream)", boxShadow: "0 24px 80px rgba(0,0,0,0.25)" }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          {/* Header */}
+          <div
+            className="flex-shrink-0 flex items-start justify-between px-8 pt-8 pb-6"
+            style={{ borderBottom: "1px solid color-mix(in oklch, var(--kinship-dim) 30%, transparent)" }}
+          >
+            <div>
+              <p className="section-label mb-2">kinship prototype engine</p>
+              <h2 className="text-serif text-3xl font-bold mb-2" style={{ color: "var(--kinship-ink)" }}>
+                From idea to artifact<br />
+                <span style={{ color: "var(--kinship-mid)" }}>in minutes.</span>
+              </h2>
+              <p className="text-sm leading-relaxed" style={{ color: "var(--kinship-mid)", maxWidth: "42ch" }}>
+                Ask Hermes in Slack to build something — slide decks, dashboard mockups,
+                3D visuals, animations, images, and videos — all on brand, all tracked here.
+              </p>
+            </div>
+            <button
+              onClick={onClose}
+              className="flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center ml-4 mt-1 transition-colors hover:bg-[color-mix(in_oklch,var(--kinship-dim)_20%,transparent)]"
+              style={{ color: "var(--kinship-mid)" }}
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+
+          <div className="px-8 py-6 flex flex-col gap-8">
+            {/* How it works */}
+            <div>
+              <p className="section-label mb-4">how to use</p>
+              <div className="grid grid-cols-3 gap-3">
+                {[
+                  { n: "01", label: "Message Hermes", text: "Send a request in Slack — describe what you want built or generated." },
+                  { n: "02", label: "Hermes builds it", text: "Hermes plans, builds, and delivers a live URL or file in minutes." },
+                  { n: "03", label: "It lands here", text: "Every artifact — prototype, image, or video — appears in this gallery." },
+                ].map((step) => (
+                  <div
+                    key={step.n}
+                    className="rounded-lg border p-4"
+                    style={{
+                      borderColor: "color-mix(in oklch, var(--kinship-dim) 30%, transparent)",
+                      background: "white",
+                    }}
+                  >
+                    <p className="text-serif mb-2" style={{ fontSize: "1.5rem", color: "var(--kinship-dim)" }}>
+                      {step.n}
+                    </p>
+                    <p className="text-xs font-semibold mb-1" style={{ color: "var(--kinship-ink)" }}>
+                      {step.label}
+                    </p>
+                    <p className="text-xs leading-relaxed" style={{ color: "var(--kinship-mid)" }}>
+                      {step.text}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Example prompts */}
+            <div>
+              <p className="section-label mb-4">example prompts — copy and send to Hermes in Slack</p>
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                {prototypeExamples.map((ex) => (
+                  <div
+                    key={ex.type}
+                    className="rounded-lg border p-3"
+                    style={{
+                      borderColor: "color-mix(in oklch, var(--kinship-dim) 25%, transparent)",
+                      background: "white",
+                    }}
+                  >
+                    <div className="flex items-center justify-between mb-1.5">
+                      <span
+                        className="text-[10px] font-semibold uppercase tracking-wide"
+                        style={{ color: "var(--kinship-mid)" }}
+                      >
+                        {ex.type}
+                      </span>
+                      <CopyPromptButton text={ex.prompt} />
+                    </div>
+                    <p className="text-xs leading-relaxed" style={{ color: "var(--kinship-mid)" }}>
+                      &ldquo;{ex.prompt}&rdquo;
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Reading gallery cards */}
+            <div>
+              <p className="section-label mb-3">reading the gallery</p>
+              <div
+                className="rounded-lg border p-4 text-xs leading-relaxed space-y-2"
+                style={{
+                  borderColor: "color-mix(in oklch, var(--kinship-dim) 25%, transparent)",
+                  background: "white",
+                  color: "var(--kinship-mid)",
+                }}
+              >
+                <p>
+                  <span className="font-semibold" style={{ color: "var(--kinship-ink)" }}>Thumbnail area</span>
+                  {" "}— click the image/video to open the artifact directly. Image cards show a carousel if multiple images were generated.
+                </p>
+                <p>
+                  <span className="font-semibold" style={{ color: "var(--kinship-ink)" }}>Card body</span>
+                  {" "}— click anywhere below the thumbnail to open the detail drawer: full prompt, Slack thread, design decisions, and input attachments.
+                </p>
+                <p>
+                  <span className="font-semibold" style={{ color: "var(--kinship-ink)" }}>Filters</span>
+                  {" "}— use type filters and tag pills to narrow the gallery. Search works across name, prompt, creator, and tags.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Footer */}
+          <div
+            className="flex-shrink-0 flex items-center justify-between px-8 py-5"
+            style={{ borderTop: "1px solid color-mix(in oklch, var(--kinship-dim) 30%, transparent)" }}
+          >
+            <p className="text-xs" style={{ color: "var(--kinship-dim)" }}>
+              kinship prototype engine · managed by hermes
+            </p>
+            <button
+              onClick={onClose}
+              className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-colors"
+              style={{ background: "var(--kinship-ink)", color: "var(--kinship-cream)" }}
+            >
+              Got it <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
+  );
+}
+
+/* ─── Image Carousel ─────────────────────────────────────── */
+
+function ImageCarousel({ images, name }: { images: string[]; name: string }) {
+  const [idx, setIdx] = useState(0);
+  const prev = useCallback(() => setIdx((i) => (i - 1 + images.length) % images.length), [images.length]);
+  const next = useCallback(() => setIdx((i) => (i + 1) % images.length), [images.length]);
+
+  if (images.length === 0) return null;
+
+  if (images.length === 1) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={images[0]}
+        alt={name}
+        className="w-full h-full object-cover object-center"
+      />
+    );
+  }
+
+  return (
+    <div className="relative w-full h-full group/carousel">
+      <AnimatePresence mode="wait">
+        <motion.img
+          key={idx}
+          src={images[idx]}
+          alt={`${name} ${idx + 1} of ${images.length}`}
+          className="w-full h-full object-cover object-center absolute inset-0"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+        />
+      </AnimatePresence>
+      {/* Prev/Next */}
+      <button
+        onClick={(e) => { e.preventDefault(); e.stopPropagation(); prev(); }}
+        className="absolute left-1.5 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full flex items-center justify-center opacity-0 group-hover/carousel:opacity-100 transition-opacity z-10"
+        style={{ background: "rgba(0,0,0,0.55)", color: "white" }}
+      >
+        <ChevronLeft className="w-3.5 h-3.5" />
+      </button>
+      <button
+        onClick={(e) => { e.preventDefault(); e.stopPropagation(); next(); }}
+        className="absolute right-1.5 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full flex items-center justify-center opacity-0 group-hover/carousel:opacity-100 transition-opacity z-10"
+        style={{ background: "rgba(0,0,0,0.55)", color: "white" }}
+      >
+        <ChevronRight className="w-3.5 h-3.5" />
+      </button>
+      {/* Dots */}
+      <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-1 z-10">
+        {images.map((_, i) => (
+          <button
+            key={i}
+            onClick={(e) => { e.preventDefault(); e.stopPropagation(); setIdx(i); }}
+            className="w-1.5 h-1.5 rounded-full transition-all"
+            style={{ background: i === idx ? "white" : "rgba(255,255,255,0.4)" }}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ─── Video Thumbnail ────────────────────────────────────── */
+
+function VideoThumbnail({ src, name }: { src: string; name: string }) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  return (
+    <div className="relative w-full h-full group/video">
+      {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
+      <video
+        ref={videoRef}
+        src={src}
+        className="w-full h-full object-cover"
+        preload="metadata"
+        playsInline
+        muted
+        onMouseEnter={() => videoRef.current?.play()}
+        onMouseLeave={() => { if (videoRef.current) { videoRef.current.pause(); videoRef.current.currentTime = 0; } }}
+      />
+      {/* Play icon overlay */}
+      <div
+        className="absolute inset-0 flex items-center justify-center pointer-events-none group-hover/video:opacity-0 transition-opacity"
+        style={{ background: "rgba(0,0,0,0.25)" }}
+      >
+        <div
+          className="w-10 h-10 rounded-full flex items-center justify-center"
+          style={{ background: "rgba(0,0,0,0.55)" }}
+        >
+          <Video className="w-4 h-4 text-white" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ─── Type Badge ─────────────────────────────────────────── */
 
 function TypeBadge({ type }: { type: PrototypeType }) {
-  const meta = TYPE_META[type];
+  const meta = TYPE_META[type] ?? TYPE_META.other;
   const Icon = meta.icon;
   return (
     <span
@@ -58,6 +357,8 @@ function TypeBadge({ type }: { type: PrototypeType }) {
   );
 }
 
+/* ─── Prototype Card ─────────────────────────────────────── */
+
 function PrototypeCard({ m, onOpenDrawer }: { m: PrototypeManifest; onOpenDrawer: () => void }) {
   const date = new Date(m.created_at).toLocaleDateString("en-CA", {
     year: "numeric",
@@ -71,6 +372,45 @@ function PrototypeCard({ m, onOpenDrawer }: { m: PrototypeManifest; onOpenDrawer
     .join("")
     .toUpperCase()
     .slice(0, 2);
+
+  // Determine thumbnail content based on type
+  const renderThumbnail = () => {
+    if (m.type === "image" && m.media_images && m.media_images.length > 0) {
+      return <ImageCarousel images={m.media_images} name={m.name} />;
+    }
+    if (m.type === "video" && m.media_video) {
+      return <VideoThumbnail src={m.media_video} name={m.name} />;
+    }
+    if (m.thumbnail) {
+      return (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={`/prototypes/${m.slug}/thumbnail.png`}
+          alt={m.name}
+          className="w-full h-full object-cover object-top"
+        />
+      );
+    }
+    return (
+      <div
+        className="w-full h-full flex items-center justify-center"
+        style={{ background: "color-mix(in oklch, var(--kinship-mid) 8%, var(--kinship-cream))" }}
+      >
+        <span className="text-4xl opacity-20">⬡</span>
+      </div>
+    );
+  };
+
+  // For image/video types, the thumbnail itself IS the artifact — link opens the media
+  // For prototype types, thumbnail links to the artifact page
+  const artifactHref =
+    m.type === "image" && m.media_images?.[0]
+      ? m.media_images[0]
+      : m.type === "video" && m.media_video
+      ? m.media_video
+      : m.url;
+
+  const openLabel = m.type === "image" ? "View" : m.type === "video" ? "Watch" : "Open";
 
   return (
     <motion.div
@@ -88,36 +428,37 @@ function PrototypeCard({ m, onOpenDrawer }: { m: PrototypeManifest; onOpenDrawer
         style={{ background: "color-mix(in oklch, var(--kinship-mid) 6%, var(--kinship-cream))" }}
       >
         <a
-          href={m.url}
+          href={artifactHref}
           target="_blank"
           rel="noopener noreferrer"
           className="absolute inset-0 flex items-center justify-center group"
         >
-          {m.thumbnail ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={`/prototypes/${m.slug}/thumbnail.png`}
-              alt={m.name}
-              className="w-full h-full object-cover object-top"
-            />
-          ) : (
-            <div
-              className="w-full h-full flex items-center justify-center"
-              style={{ background: "color-mix(in oklch, var(--kinship-mid) 8%, var(--kinship-cream))" }}
-            >
-              <span className="text-4xl opacity-20">⬡</span>
+          {renderThumbnail()}
+          {/* hover overlay — only show for non-image/video since those have their own controls */}
+          {m.type !== "image" && m.type !== "video" && (
+            <>
+              <div className="absolute inset-0 bg-[var(--kinship-ink)] opacity-0 group-hover:opacity-20 transition-opacity duration-200" />
+              <div className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                <span
+                  className="flex items-center gap-1 text-xs px-2 py-1 rounded-full font-medium"
+                  style={{ background: "var(--kinship-ink)", color: "var(--kinship-cream)" }}
+                >
+                  <ExternalLink className="w-3 h-3" /> {openLabel}
+                </span>
+              </div>
+            </>
+          )}
+          {/* For image/video, just show a subtle open indicator */}
+          {(m.type === "image" || m.type === "video") && (
+            <div className="absolute bottom-2 right-2">
+              <span
+                className="flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded font-medium opacity-70"
+                style={{ background: "rgba(0,0,0,0.5)", color: "white" }}
+              >
+                <ExternalLink className="w-2.5 h-2.5" /> {openLabel}
+              </span>
             </div>
           )}
-          {/* hover overlay */}
-          <div className="absolute inset-0 bg-[var(--kinship-ink)] opacity-0 group-hover:opacity-20 transition-opacity duration-200" />
-          <div className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-            <span
-              className="flex items-center gap-1 text-xs px-2 py-1 rounded-full font-medium"
-              style={{ background: "var(--kinship-ink)", color: "var(--kinship-cream)" }}
-            >
-              <ExternalLink className="w-3 h-3" /> Open
-            </span>
-          </div>
         </a>
       </div>
 
@@ -155,8 +496,21 @@ function PrototypeCard({ m, onOpenDrawer }: { m: PrototypeManifest; onOpenDrawer
             borderLeft: "2px solid var(--kinship-dim)",
           }}
         >
-          "{m.prompt}"
+          &ldquo;{m.prompt}&rdquo;
         </div>
+
+        {/* Input attachments indicator */}
+        {m.input_attachments && m.input_attachments.length > 0 && (
+          <div
+            className="flex items-center gap-1.5 text-[10px]"
+            style={{ color: "var(--kinship-dim)" }}
+          >
+            <span>📎</span>
+            <span>
+              {m.input_attachments.length} input attachment{m.input_attachments.length !== 1 ? "s" : ""}
+            </span>
+          </div>
+        )}
 
         {/* Tags */}
         {m.tags.length > 0 && (
@@ -251,6 +605,18 @@ export function GalleryClient({ manifests }: { manifests: PrototypeManifest[] })
   const [activeTag, setActiveTag] = useState<string | null>(null);
   const [sort, setSort] = useState<SortKey>("newest");
   const [drawerManifest, setDrawerManifest] = useState<PrototypeManifest | null>(null);
+  const [showHelp, setShowHelp] = useState(false);
+
+  // First-visit detection: show Help modal automatically once
+  useEffect(() => {
+    const visited = localStorage.getItem(HELP_STORAGE_KEY);
+    if (!visited) {
+      setShowHelp(true);
+      localStorage.setItem(HELP_STORAGE_KEY, "1");
+    }
+  }, []);
+
+  const closeHelp = useCallback(() => setShowHelp(false), []);
 
   // Collect all unique tags from manifests
   const allTags = useMemo(() => {
@@ -259,16 +625,9 @@ export function GalleryClient({ manifests }: { manifests: PrototypeManifest[] })
     return Array.from(tagSet).sort();
   }, [manifests]);
 
-  // All unique creators
-  const allCreators = useMemo(() => {
-    const names = new Set(manifests.map((m) => m.created_by_name));
-    return Array.from(names).sort();
-  }, [manifests]);
-
   const filtered = useMemo(() => {
     let list = [...manifests];
 
-    // Text search across name, prompt, description, creator, tags
     if (query.trim()) {
       const q = query.trim().toLowerCase();
       list = list.filter(
@@ -289,7 +648,6 @@ export function GalleryClient({ manifests }: { manifests: PrototypeManifest[] })
       list = list.filter((m) => m.tags.includes(activeTag));
     }
 
-    // Sort
     switch (sort) {
       case "newest":
         list.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
@@ -313,25 +671,37 @@ export function GalleryClient({ manifests }: { manifests: PrototypeManifest[] })
       className="min-h-screen"
       style={{ background: "var(--kinship-cream)", color: "var(--kinship-ink)" }}
     >
+      {/* Help Modal */}
+      {showHelp && <HelpModal onClose={closeHelp} />}
+
       {/* Header */}
       <div
-        className="border-b px-6 py-8"
+        className="border-b px-6 py-6"
         style={{ borderColor: "color-mix(in oklch, var(--kinship-dim) 30%, transparent)" }}
       >
-        <div className="max-w-6xl mx-auto">
-          <Link
-            href="/"
-            className="inline-flex items-center gap-1.5 text-xs font-medium mb-4 opacity-50 hover:opacity-100 transition-opacity"
-            style={{ color: "var(--kinship-ink)" }}
+        <div className="max-w-6xl mx-auto flex items-center justify-between gap-4">
+          <div>
+            <p className="section-label mb-1">kinship prototype engine</p>
+            <h1 className="text-serif text-3xl font-bold" style={{ color: "var(--kinship-ink)" }}>
+              Artifact Gallery
+            </h1>
+            <p className="text-sm mt-0.5" style={{ color: "var(--kinship-mid)" }}>
+              {manifests.length} artifact{manifests.length !== 1 ? "s" : ""} — prototypes, images, and videos built by the team
+            </p>
+          </div>
+          {/* Help button */}
+          <button
+            onClick={() => setShowHelp(true)}
+            className="flex items-center gap-2 px-3 py-2 rounded-lg border text-xs font-medium transition-all hover:bg-white"
+            style={{
+              borderColor: "color-mix(in oklch, var(--kinship-dim) 40%, transparent)",
+              color: "var(--kinship-mid)",
+            }}
+            title="How to use the prototype engine"
           >
-            <ArrowLeft className="w-3.5 h-3.5" />
-            Home
-          </Link>
-          <p className="section-label mb-2">kinship prototype engine</p>
-          <h1 className="text-serif text-4xl font-bold mb-1">Prototype Gallery</h1>
-          <p className="text-sm" style={{ color: "var(--kinship-mid)" }}>
-            {manifests.length} prototype{manifests.length !== 1 ? "s" : ""} built by the team
-          </p>
+            <HelpCircle className="w-4 h-4" />
+            <span className="hidden sm:inline">Help</span>
+          </button>
         </div>
       </div>
 
@@ -389,7 +759,7 @@ export function GalleryClient({ manifests }: { manifests: PrototypeManifest[] })
                     : { borderColor: "var(--kinship-dim)", color: "var(--kinship-mid)" }
                 }
               >
-                {t === "all" ? "All types" : TYPE_META[t as PrototypeType].label}
+                {t === "all" ? "All" : TYPE_META[t as PrototypeType].label}
               </button>
             ))}
           </div>
@@ -444,13 +814,13 @@ export function GalleryClient({ manifests }: { manifests: PrototypeManifest[] })
       <div className="max-w-6xl mx-auto px-6 py-8">
         {filtered.length === 0 ? (
           <div className="text-center py-24" style={{ color: "var(--kinship-dim)" }}>
-            <p className="text-2xl mb-2">No prototypes found</p>
+            <p className="text-2xl mb-2">No artifacts found</p>
             <p className="text-sm">Try adjusting your search or filters</p>
           </div>
         ) : (
           <>
             <p className="text-xs mb-6" style={{ color: "var(--kinship-dim)" }}>
-              {filtered.length} of {manifests.length} prototype{manifests.length !== 1 ? "s" : ""}
+              {filtered.length} of {manifests.length} artifact{manifests.length !== 1 ? "s" : ""}
             </p>
             <motion.div
               layout

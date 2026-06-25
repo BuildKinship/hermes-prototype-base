@@ -4,6 +4,8 @@ export type PrototypeType =
   | "3d"
   | "dashboard"
   | "survey"
+  | "image"
+  | "video"
   | "other";
 
 export interface SlackMessage {
@@ -15,6 +17,16 @@ export interface SlackMessage {
   content: string;
   /** ISO timestamp */
   timestamp?: string;
+}
+
+/** A file or image the user provided as input to the request */
+export interface InputAttachment {
+  /** Human-readable label (e.g. "Reference image", "Content markdown") */
+  label: string;
+  /** URL — Railway S3 permanent URL (preferred) or Slack CDN permalink */
+  url: string;
+  /** Type hint for rendering */
+  type: "image" | "doc" | "video" | "other";
 }
 
 export interface PrototypeManifest {
@@ -36,16 +48,27 @@ export interface PrototypeManifest {
   type: PrototypeType;
   /** Freeform tags for filtering (lowercase, hyphens) */
   tags: string[];
-  /** Full GitHub branch name */
+  /** Full GitHub branch name (empty string for non-prototype artifacts) */
   branch: string;
-  /** Public production URL */
+  /** Public production URL (artifact page or direct media URL) */
   url: string;
   /** Kinship short link (may be empty if not yet shortened) */
   short_url: string;
-  /** Filename of the thumbnail relative to public/prototypes/<slug>/ */
+  /** Filename of the thumbnail relative to public/prototypes/<slug>/ (may be empty for media types) */
   thumbnail: string;
 
-  // ─── Rich context for the detail drawer ────────────────────────────────
+  // ─── Media fields (for image / video artifact types) ───────────────────────
+
+  /** For type="image": one or more Railway S3 / public image URLs. Supports carousel. */
+  media_images?: string[];
+
+  /** For type="video": Railway S3 / public video URL (mp4 preferred) */
+  media_video?: string;
+
+  /** Input files/images the user provided with their request */
+  input_attachments?: InputAttachment[];
+
+  // ─── Rich context for the detail drawer ────────────────────────────────────
 
   /** Full verbatim Slack request (may be longer than prompt) */
   full_prompt?: string;

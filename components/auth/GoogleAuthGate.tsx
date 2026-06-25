@@ -18,7 +18,7 @@ export function GoogleAuthGate({ children }: { children: React.ReactNode }) {
             Kinship Internal
           </h1>
           <p className="text-[var(--kinship-dim)] text-sm">
-            This area is for @buildkinship.com team members only.
+            This area is for @buildkinship.com and @buildkinship.ai team members.
           </p>
         </div>
         <button
@@ -46,9 +46,9 @@ export function GoogleAuthGate({ children }: { children: React.ReactNode }) {
           </svg>
           Sign in with Google
         </button>
-        {user && !isBuildkinshipUser && (
+          {user && !isBuildkinshipUser && (
           <p className="text-red-400 text-xs mt-2">
-            {user.email} is not a @buildkinship.com account.
+            {user.email} is not a @buildkinship.com or @buildkinship.ai account.
           </p>
         )}
       </div>

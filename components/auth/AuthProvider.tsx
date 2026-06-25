@@ -40,11 +40,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     user?.providerData?.some((p) => p.providerId === "google.com") ?? false;
 
   const isBuildkinshipUser =
-    isGoogleUser && (user?.email?.endsWith("@buildkinship.com") ?? false);
+    isGoogleUser &&
+    (user?.email?.endsWith("@buildkinship.com") ||
+      user?.email?.endsWith("@buildkinship.ai") ||
+      false);
 
   const signInWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
-    // Hint the account chooser to show @buildkinship.com accounts
+    // Hint the account chooser to show @buildkinship.com / @buildkinship.ai accounts
+    // Note: hd only allows one domain hint — use .com since it's the primary GSuite domain
     provider.setCustomParameters({ hd: "buildkinship.com" });
     // If currently signed in anonymously, sign out first so the Google
     // credential fully replaces the session (not a link attempt)

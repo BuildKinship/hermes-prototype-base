@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   X,
@@ -9,6 +9,8 @@ import {
   ExternalLink,
   ChevronDown,
   ChevronUp,
+  ChevronLeft,
+  ChevronRight,
   GitBranch,
   Tag,
   Lock,
@@ -16,9 +18,11 @@ import {
   Lightbulb,
   Code2,
   Sparkles,
+  Paperclip,
+  ImageIcon,
+  Video,
 } from "lucide-react";
-import { useState } from "react";
-import type { PrototypeManifest, SlackMessage } from "@/types/manifest";
+import type { PrototypeManifest, SlackMessage, InputAttachment } from "@/types/manifest";
 
 // ─── Type Badge ────────────────────────────────────────────────────────────────
 const TYPE_META: Record<string, { label: string; color: string }> = {
@@ -27,6 +31,8 @@ const TYPE_META: Record<string, { label: string; color: string }> = {
   "3d": { label: "3D / Interactive", color: "#059669" },
   dashboard: { label: "Dashboard", color: "#1A1A2E" },
   survey: { label: "Survey", color: "#0F766E" },
+  image: { label: "Image", color: "#EC4899" },
+  video: { label: "Video", color: "#F97316" },
   other: { label: "Other", color: "#6B7280" },
 };
 
@@ -101,7 +107,6 @@ function MessageBubble({ msg }: { msg: SlackMessage }) {
   const isHermes = msg.role === "hermes";
   return (
     <div className={`flex gap-3 ${isHermes ? "flex-row-reverse" : ""}`}>
-      {/* Avatar */}
       <div
         className="w-7 h-7 rounded-full flex-shrink-0 flex items-center justify-center text-xs font-bold"
         style={{
@@ -139,6 +144,154 @@ function MessageBubble({ msg }: { msg: SlackMessage }) {
   );
 }
 
+// ─── Image Viewer (drawer version, full-width) ─────────────────────────────────
+function DrawerImageViewer({ images, name }: { images: string[]; name: string }) {
+  const [idx, setIdx] = useState(0);
+  const prev = useCallback(() => setIdx((i) => (i - 1 + images.length) % images.length), [images.length]);
+  const next = useCallback(() => setIdx((i) => (i + 1) % images.length), [images.length]);
+
+  if (images.length === 0) return null;
+
+  return (
+    <div className="flex flex-col gap-3">
+      {/* Main image */}
+      <div className="relative rounded-lg overflow-hidden" style={{ background: "rgba(0,0,0,0.3)" }}>
+        <AnimatePresence mode="wait">
+          <motion.img
+            key={idx}
+            src={images[idx]}
+            alt={`${name} — image ${idx + 1} of ${images.length}`}
+            className="w-full object-contain max-h-72"
+            style={{ display: "block" }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.18 }}
+          />
+        </AnimatePresence>
+        {/* Open full size */}
+        <a
+          href={images[idx]}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="absolute top-2 right-2 w-7 h-7 rounded-full flex items-center justify-center"
+          style={{ background: "rgba(0,0,0,0.55)", color: "white" }}
+          title="Open full size"
+        >
+          <ExternalLink className="w-3.5 h-3.5" />
+        </a>
+      </div>
+
+      {/* Controls for multi-image */}
+      {images.length > 1 && (
+        <div className="flex items-center justify-between">
+          <button
+            onClick={prev}
+            className="flex items-center gap-1 text-xs px-2 py-1 rounded"
+            style={{ background: "rgba(255,255,255,0.08)", color: "#9CA3AF" }}
+          >
+            <ChevronLeft className="w-3 h-3" /> Prev
+          </button>
+          <span className="text-[10px]" style={{ color: "#6B7280" }}>
+            {idx + 1} / {images.length}
+          </span>
+          <button
+            onClick={next}
+            className="flex items-center gap-1 text-xs px-2 py-1 rounded"
+            style={{ background: "rgba(255,255,255,0.08)", color: "#9CA3AF" }}
+          >
+            Next <ChevronRight className="w-3 h-3" />
+          </button>
+        </div>
+      )}
+
+      {/* Thumbnail strip for multi-image */}
+      {images.length > 1 && (
+        <div className="flex gap-2 overflow-x-auto pb-1">
+          {images.map((src, i) => (
+            <button
+              key={i}
+              onClick={() => setIdx(i)}
+              className="flex-shrink-0 rounded overflow-hidden"
+              style={{
+                width: 56,
+                height: 40,
+                outline: i === idx ? "2px solid #6366F1" : "2px solid transparent",
+                outlineOffset: 1,
+              }}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={src} alt={`Thumbnail ${i + 1}`} className="w-full h-full object-cover" />
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Video Player (drawer version) ────────────────────────────────────────────
+function DrawerVideoPlayer({ src, name }: { src: string; name: string }) {
+  return (
+    <div className="flex flex-col gap-2">
+      <div className="rounded-lg overflow-hidden" style={{ background: "rgba(0,0,0,0.4)" }}>
+        {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
+        <video
+          src={src}
+          controls
+          playsInline
+          className="w-full max-h-64"
+          style={{ display: "block" }}
+        />
+      </div>
+      <a
+        href={src}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex items-center gap-1.5 text-xs self-start"
+        style={{ color: "#9CA3AF" }}
+      >
+        <ExternalLink className="w-3 h-3" />
+        Open video in new tab
+      </a>
+    </div>
+  );
+}
+
+// ─── Input Attachments ─────────────────────────────────────────────────────────
+function AttachmentRow({ att }: { att: InputAttachment }) {
+  const icon =
+    att.type === "image" ? (
+      <ImageIcon className="w-3.5 h-3.5 flex-shrink-0" style={{ color: "#EC4899" }} />
+    ) : att.type === "video" ? (
+      <Video className="w-3.5 h-3.5 flex-shrink-0" style={{ color: "#F97316" }} />
+    ) : (
+      <Paperclip className="w-3.5 h-3.5 flex-shrink-0" style={{ color: "#9CA3AF" }} />
+    );
+
+  return (
+    <div className="flex items-center gap-2.5">
+      {icon}
+      <a
+        href={att.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-xs hover:underline truncate flex-1"
+        style={{ color: "#93C5FD" }}
+        title={att.url}
+      >
+        {att.label}
+      </a>
+      <span
+        className="text-[10px] px-1.5 py-0.5 rounded flex-shrink-0"
+        style={{ background: "rgba(255,255,255,0.07)", color: "#6B7280" }}
+      >
+        {att.type}
+      </span>
+    </div>
+  );
+}
+
 // ─── Main Drawer ───────────────────────────────────────────────────────────────
 export function PrototypeDrawer({
   manifest,
@@ -150,12 +303,10 @@ export function PrototypeDrawer({
   const m = manifest;
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Reset scroll when prototype changes
   useEffect(() => {
     if (m && scrollRef.current) scrollRef.current.scrollTop = 0;
   }, [m?.slug]);
 
-  // ESC to close
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -165,6 +316,17 @@ export function PrototypeDrawer({
   }, [onClose]);
 
   const typeMeta = m ? (TYPE_META[m.type] ?? TYPE_META.other) : null;
+
+  // For image/video artifacts, the "open" link goes to the media directly
+  const openHref =
+    m?.type === "image" && m.media_images?.[0]
+      ? m.media_images[0]
+      : m?.type === "video" && m.media_video
+      ? m.media_video
+      : m?.url;
+
+  const openLabel =
+    m?.type === "image" ? "View Image" : m?.type === "video" ? "Watch Video" : "Open Artifact";
 
   return (
     <AnimatePresence>
@@ -191,18 +353,17 @@ export function PrototypeDrawer({
             transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
             className="fixed top-0 right-0 h-full z-50 flex flex-col"
             style={{
-              width: "min(480px, 92vw)",
+              width: "min(520px, 92vw)",
               background: "#111118",
               boxShadow: "-8px 0 40px rgba(0,0,0,0.6)",
             }}
           >
-            {/* ── Header ── */}
+            {/* Header */}
             <div
               className="flex-shrink-0 flex items-start justify-between px-6 py-5"
               style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}
             >
               <div className="flex flex-col gap-2 pr-4">
-                {/* Type badge */}
                 <span
                   className="inline-flex items-center self-start text-[10px] font-semibold uppercase tracking-widest px-2 py-0.5 rounded-full"
                   style={{
@@ -229,20 +390,20 @@ export function PrototypeDrawer({
               </button>
             </div>
 
-            {/* ── Scrollable body ── */}
+            {/* Scrollable body */}
             <div ref={scrollRef} className="flex-1 overflow-y-auto">
 
-              {/* Open prototype CTA */}
+              {/* Open CTA */}
               <div className="px-6 py-4" style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
                 <a
-                  href={m.url}
+                  href={openHref}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg text-sm font-medium transition-colors"
                   style={{ background: "var(--kinship-ink)", color: "var(--kinship-cream)" }}
                 >
                   <ExternalLink className="w-4 h-4" />
-                  Open Prototype
+                  {openLabel}
                 </a>
                 {m.admin_url && (
                   <a
@@ -266,8 +427,39 @@ export function PrototypeDrawer({
                 )}
               </div>
 
+              {/* ── Media sections (image / video artifacts) ── */}
+
+              {m.type === "image" && m.media_images && m.media_images.length > 0 && (
+                <Section icon={<ImageIcon className="w-3.5 h-3.5" />} title="Images" defaultOpen>
+                  <DrawerImageViewer images={m.media_images} name={m.name} />
+                </Section>
+              )}
+
+              {m.type === "video" && m.media_video && (
+                <Section icon={<Video className="w-3.5 h-3.5" />} title="Video" defaultOpen>
+                  <DrawerVideoPlayer src={m.media_video} name={m.name} />
+                </Section>
+              )}
+
+              {/* ── Input attachments ── */}
+              {m.input_attachments && m.input_attachments.length > 0 && (
+                <Section icon={<Paperclip className="w-3.5 h-3.5" />} title="Input Attachments" defaultOpen>
+                  <div className="flex flex-col gap-3">
+                    <p className="text-[10px]" style={{ color: "#6B7280" }}>
+                      Files and images the user provided with their request.
+                    </p>
+                    {m.input_attachments.map((att, i) => (
+                      <AttachmentRow key={i} att={att} />
+                    ))}
+                  </div>
+                </Section>
+              )}
+
               {/* Creator + meta row */}
-              <div className="px-6 py-4 flex items-center justify-between" style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+              <div
+                className="px-6 py-4 flex items-center justify-between"
+                style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}
+              >
                 <div className="flex items-center gap-2.5">
                   <div
                     className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold"
@@ -337,8 +529,10 @@ export function PrototypeDrawer({
                   <ul className="flex flex-col gap-2">
                     {m.design_decisions.map((d, i) => (
                       <li key={i} className="flex gap-2.5 text-xs leading-relaxed" style={{ color: "#D1D5DB" }}>
-                        <span className="flex-shrink-0 w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-bold mt-0.5"
-                          style={{ background: "rgba(255,255,255,0.08)", color: "#9CA3AF" }}>
+                        <span
+                          className="flex-shrink-0 w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-bold mt-0.5"
+                          style={{ background: "rgba(255,255,255,0.08)", color: "#9CA3AF" }}
+                        >
                           {i + 1}
                         </span>
                         {d}
@@ -375,7 +569,7 @@ export function PrototypeDrawer({
               <Section icon={<GitBranch className="w-3.5 h-3.5" />} title="Build Details" defaultOpen={false}>
                 <div className="flex flex-col gap-2">
                   {[
-                    { label: "Branch", value: m.branch },
+                    ...(m.branch ? [{ label: "Branch", value: m.branch }] : []),
                     { label: "Channel", value: m.slack_channel ?? "—" },
                     ...(m.session_id ? [{ label: "Session", value: m.session_id }] : []),
                     { label: "URL", value: m.url },
