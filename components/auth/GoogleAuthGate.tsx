@@ -2,15 +2,41 @@
 // Guards all internal routes — requires @buildkinship.com Google sign-in
 // Shows a clean sign-in page for anyone else
 
+import { useEffect } from "react";
 import { useAuth } from "./AuthProvider";
 import { FullPageSpinner } from "./FullPageSpinner";
+
+const BYPASS_KEY = "hermes_auth_bypass";
 
 export function GoogleAuthGate({ children }: { children: React.ReactNode }) {
   const { user, loading, isBuildkinshipUser, signInWithGoogle } = useAuth();
 
+  // Check for Hermes bypass token in URL params and persist to localStorage.
+  // This lets Hermes (and admins) bypass Google auth for testing.
+  // Token is validated against NEXT_PUBLIC_HERMES_BYPASS_TOKEN env var.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const paramToken = params.get("hermes_bypass");
+    const envToken = process.env.NEXT_PUBLIC_HERMES_BYPASS_TOKEN;
+
+    if (paramToken && envToken && paramToken === envToken) {
+      localStorage.setItem(BYPASS_KEY, paramToken);
+      // Clean the token out of the URL without a page reload
+      const url = new URL(window.location.href);
+      url.searchParams.delete("hermes_bypass");
+      window.history.replaceState({}, "", url.toString());
+    }
+  }, []);
+
+  // Check bypass flag
+  const isBypassed =
+    typeof window !== "undefined" &&
+    localStorage.getItem(BYPASS_KEY) ===
+      process.env.NEXT_PUBLIC_HERMES_BYPASS_TOKEN;
+
   if (loading) return <FullPageSpinner />;
 
-  if (!isBuildkinshipUser) {
+  if (!isBuildkinshipUser && !isBypassed) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-6 bg-[var(--kinship-ink)]">
         <div className="text-center">
