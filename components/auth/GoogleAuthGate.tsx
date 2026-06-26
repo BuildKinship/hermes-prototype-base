@@ -9,7 +9,7 @@ import { FullPageSpinner } from "./FullPageSpinner";
 const BYPASS_KEY = "hermes_auth_bypass";
 
 export function GoogleAuthGate({ children }: { children: React.ReactNode }) {
-  const { user, loading, isBuildkinshipUser, signInWithGoogle } = useAuth();
+  const { user, loading, isBuildkinshipUser, signInWithGoogle, signInAnon } = useAuth();
 
   // Check for Hermes bypass token in URL params and persist to localStorage.
   // This lets Hermes (and admins) bypass Google auth for testing.
@@ -28,11 +28,19 @@ export function GoogleAuthGate({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  // Check bypass flag
+  // When bypass is active and no Firebase user exists yet, sign in anonymously
+  // so Firestore reads work (Firestore rules require isSignedIn() for prototype reads).
+  const envToken = process.env.NEXT_PUBLIC_HERMES_BYPASS_TOKEN;
   const isBypassed =
     typeof window !== "undefined" &&
-    localStorage.getItem(BYPASS_KEY) ===
-      process.env.NEXT_PUBLIC_HERMES_BYPASS_TOKEN;
+    envToken != null &&
+    localStorage.getItem(BYPASS_KEY) === envToken;
+
+  useEffect(() => {
+    if (isBypassed && !loading && !user) {
+      signInAnon().catch(() => {/* silent — Firestore will just fail */});
+    }
+  }, [isBypassed, loading, user, signInAnon]);
 
   if (loading) return <FullPageSpinner />;
 
