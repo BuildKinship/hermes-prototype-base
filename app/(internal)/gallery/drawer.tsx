@@ -548,7 +548,7 @@ export function PrototypeDrawer({
               </Section>
 
               {/* Slack thread */}
-              {m.slack_thread && m.slack_thread.length > 0 && (
+              {m.slack_thread && Array.isArray(m.slack_thread) && m.slack_thread.length > 0 && (
                 <Section icon={<MessageSquare className="w-3.5 h-3.5" />} title="Slack Thread" defaultOpen>
                   <div className="flex flex-col gap-4">
                     {m.slack_thread.map((msg, i) => (
@@ -559,7 +559,7 @@ export function PrototypeDrawer({
               )}
 
               {/* Design decisions */}
-              {m.design_decisions && m.design_decisions.length > 0 && (
+              {m.design_decisions && Array.isArray(m.design_decisions) && m.design_decisions.length > 0 && (
                 <Section icon={<Lightbulb className="w-3.5 h-3.5" />} title="Design Decisions" defaultOpen={false}>
                   <ul className="flex flex-col gap-2">
                     {m.design_decisions.map((d, i) => (
@@ -578,7 +578,7 @@ export function PrototypeDrawer({
               )}
 
               {/* Tech notes */}
-              {m.tech_notes && m.tech_notes.length > 0 && (
+              {m.tech_notes && Array.isArray(m.tech_notes) && m.tech_notes.length > 0 && (
                 <Section icon={<Code2 className="w-3.5 h-3.5" />} title="Technical Notes" defaultOpen={false}>
                   <ul className="flex flex-col gap-2">
                     {m.tech_notes.map((n, i) => (
