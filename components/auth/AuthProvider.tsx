@@ -6,6 +6,8 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import {
   onAuthStateChanged,
   signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
   GoogleAuthProvider,
   signInAnonymously,
   signOut,
@@ -25,11 +27,25 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
+/** Returns true on mobile browsers that block popups (iOS Safari, Android Chrome, etc.) */
+function isMobileBrowser(): boolean {
+  if (typeof navigator === "undefined") return false;
+  return /Android|iPhone|iPad|iPod|Mobile|webOS|BlackBerry|IEMobile|Opera Mini/i.test(
+    navigator.userAgent
+  );
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Handle the return from a signInWithRedirect flow on mobile.
+    // getRedirectResult() resolves immediately with null if there's no pending redirect.
+    getRedirectResult(auth).catch(() => {
+      // Silently ignore errors (e.g. user closed the OAuth page)
+    });
+
     return onAuthStateChanged(auth, (u) => {
       setUser(u);
       setLoading(false);
@@ -55,7 +71,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (user && user.isAnonymous) {
       await signOut(auth);
     }
-    await signInWithPopup(auth, provider);
+    // Mobile browsers block popups — use redirect flow instead.
+    // Desktop uses popup for a smoother UX (no full-page navigation).
+    if (isMobileBrowser()) {
+      await signInWithRedirect(auth, provider);
+      // Page will navigate away; onAuthStateChanged fires after the redirect returns.
+    } else {
+      await signInWithPopup(auth, provider);
+    }
   };
 
   const signInAnon = async () => {
