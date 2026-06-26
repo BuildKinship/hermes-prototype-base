@@ -101,40 +101,40 @@ function HelpModal({ onClose }: { onClose: () => void }) {
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 16, scale: 0.97 }}
           transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-          className="relative w-full max-w-2xl max-h-[85vh] overflow-y-auto rounded-2xl flex flex-col"
+          className="relative w-full max-w-2xl max-h-[90dvh] overflow-y-auto rounded-2xl flex flex-col"
           style={{ background: "var(--kinship-cream)", boxShadow: "0 24px 80px rgba(0,0,0,0.25)" }}
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
           <div
-            className="flex-shrink-0 flex items-start justify-between px-8 pt-8 pb-6"
+            className="flex-shrink-0 flex items-start justify-between px-5 pt-6 pb-5 sm:px-8 sm:pt-8 sm:pb-6"
             style={{ borderBottom: "1px solid color-mix(in oklch, var(--kinship-dim) 30%, transparent)" }}
           >
-            <div>
+            <div className="min-w-0 flex-1 pr-3">
               <p className="section-label mb-2">kinship prototype engine</p>
-              <h2 className="text-serif text-3xl font-bold mb-2" style={{ color: "var(--kinship-ink)" }}>
-                From idea to artifact<br />
+              <h2 className="text-serif text-2xl sm:text-3xl font-bold mb-2" style={{ color: "var(--kinship-ink)" }}>
+                From idea to artifact{" "}
                 <span style={{ color: "var(--kinship-mid)" }}>in minutes.</span>
               </h2>
-              <p className="text-sm leading-relaxed" style={{ color: "var(--kinship-mid)", maxWidth: "42ch" }}>
+              <p className="text-sm leading-relaxed" style={{ color: "var(--kinship-mid)" }}>
                 Ask Hermes in Slack to build something — slide decks, dashboard mockups,
                 3D visuals, animations, images, and videos — all on brand, all tracked here.
               </p>
             </div>
             <button
               onClick={onClose}
-              className="flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center ml-4 mt-1 transition-colors hover:bg-[color-mix(in_oklch,var(--kinship-dim)_20%,transparent)]"
+              className="flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center transition-colors hover:bg-[color-mix(in_oklch,var(--kinship-dim)_20%,transparent)]"
               style={{ color: "var(--kinship-mid)" }}
             >
               <X className="w-5 h-5" />
             </button>
           </div>
 
-          <div className="px-8 py-6 flex flex-col gap-8">
+          <div className="px-5 py-5 sm:px-8 sm:py-6 flex flex-col gap-6 sm:gap-8">
             {/* How it works */}
             <div>
-              <p className="section-label mb-4">how to use</p>
-              <div className="grid grid-cols-3 gap-3">
+              <p className="section-label mb-3">how to use</p>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3">
                 {[
                   { n: "01", label: "Message Hermes", text: "Send a request in Slack — describe what you want built or generated." },
                   { n: "02", label: "Hermes builds it", text: "Hermes plans, builds, and delivers a live URL or file in minutes." },
@@ -142,21 +142,23 @@ function HelpModal({ onClose }: { onClose: () => void }) {
                 ].map((step) => (
                   <div
                     key={step.n}
-                    className="rounded-lg border p-4"
+                    className="rounded-lg border p-3 sm:p-4 flex sm:flex-col gap-3 sm:gap-0"
                     style={{
                       borderColor: "color-mix(in oklch, var(--kinship-dim) 30%, transparent)",
                       background: "white",
                     }}
                   >
-                    <p className="text-serif mb-2" style={{ fontSize: "1.5rem", color: "var(--kinship-dim)" }}>
+                    <p className="text-serif flex-shrink-0 sm:mb-2" style={{ fontSize: "1.5rem", color: "var(--kinship-dim)", lineHeight: 1 }}>
                       {step.n}
                     </p>
-                    <p className="text-xs font-semibold mb-1" style={{ color: "var(--kinship-ink)" }}>
-                      {step.label}
-                    </p>
-                    <p className="text-xs leading-relaxed" style={{ color: "var(--kinship-mid)" }}>
-                      {step.text}
-                    </p>
+                    <div>
+                      <p className="text-xs font-semibold mb-0.5 sm:mb-1" style={{ color: "var(--kinship-ink)" }}>
+                        {step.label}
+                      </p>
+                      <p className="text-xs leading-relaxed" style={{ color: "var(--kinship-mid)" }}>
+                        {step.text}
+                      </p>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -164,7 +166,7 @@ function HelpModal({ onClose }: { onClose: () => void }) {
 
             {/* Example prompts */}
             <div>
-              <p className="section-label mb-4">example prompts — copy and send to Hermes in Slack</p>
+              <p className="section-label mb-3">example prompts — copy and send to Hermes in Slack</p>
               <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                 {prototypeExamples.map((ex) => (
                   <div
@@ -196,7 +198,7 @@ function HelpModal({ onClose }: { onClose: () => void }) {
             <div>
               <p className="section-label mb-3">reading the gallery</p>
               <div
-                className="rounded-lg border p-4 text-xs leading-relaxed space-y-2"
+                className="rounded-lg border p-3 sm:p-4 text-xs leading-relaxed space-y-2"
                 style={{
                   borderColor: "color-mix(in oklch, var(--kinship-dim) 25%, transparent)",
                   background: "white",
@@ -213,7 +215,7 @@ function HelpModal({ onClose }: { onClose: () => void }) {
                 </p>
                 <p>
                   <span className="font-semibold" style={{ color: "var(--kinship-ink)" }}>Filters</span>
-                  {" "}— use type filters and tag pills to narrow the gallery. Search works across name, prompt, creator, and tags.
+                  {" "}— use the type filters at the top to narrow the gallery. Search works across name, prompt, creator, and tags.
                 </p>
               </div>
             </div>
@@ -221,15 +223,15 @@ function HelpModal({ onClose }: { onClose: () => void }) {
 
           {/* Footer */}
           <div
-            className="flex-shrink-0 flex items-center justify-between px-8 py-5"
+            className="flex-shrink-0 flex items-center justify-between gap-4 px-5 py-4 sm:px-8 sm:py-5"
             style={{ borderTop: "1px solid color-mix(in oklch, var(--kinship-dim) 30%, transparent)" }}
           >
-            <p className="text-xs" style={{ color: "var(--kinship-dim)" }}>
+            <p className="text-xs hidden sm:block" style={{ color: "var(--kinship-dim)" }}>
               kinship prototype engine · managed by hermes
             </p>
             <button
               onClick={onClose}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-colors"
+              className="w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-3 sm:py-2.5 rounded-xl text-sm font-medium transition-colors"
               style={{ background: "var(--kinship-ink)", color: "var(--kinship-cream)" }}
             >
               Got it <ArrowRight className="w-3.5 h-3.5" />
