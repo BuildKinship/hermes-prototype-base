@@ -749,27 +749,30 @@ export function GalleryClient({ manifests }: { manifests: PrototypeManifest[] })
         </div>
       </div>
 
-      {/* Controls */}
+      {/* Controls — single sticky row, horizontally scrollable overflow */}
       <div
-        className="sticky top-0 z-10 border-b px-6 py-4 backdrop-blur-sm"
+        className="sticky top-0 z-10 border-b backdrop-blur-sm"
         style={{
           borderColor: "color-mix(in oklch, var(--kinship-dim) 30%, transparent)",
           background: "color-mix(in oklch, var(--kinship-cream) 90%, transparent)",
         }}
       >
-        <div className="max-w-6xl mx-auto flex flex-wrap gap-3 items-center">
-          {/* Search */}
-          <div className="relative flex-1 min-w-48">
+        <div
+          className="max-w-6xl mx-auto flex items-center gap-2 px-6 py-3 overflow-x-auto"
+          style={{ scrollbarWidth: "none" }}
+        >
+          {/* Search — fixed width, never shrinks below this */}
+          <div className="relative flex-shrink-0 w-52">
             <Search
-              className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4"
+              className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5"
               style={{ color: "var(--kinship-dim)" }}
             />
             <input
               type="text"
-              placeholder="Search by name, prompt, creator, tag…"
+              placeholder="Search…"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              className="w-full rounded-lg border pl-9 pr-3 py-2 text-sm outline-none focus:ring-2"
+              className="w-full rounded-full border pl-8 pr-3 py-1.5 text-xs outline-none focus:ring-2"
               style={{
                 background: "white",
                 borderColor: "var(--kinship-dim)",
@@ -779,40 +782,47 @@ export function GalleryClient({ manifests }: { manifests: PrototypeManifest[] })
             {query && (
               <button
                 onClick={() => setQuery("")}
-                className="absolute right-3 top-1/2 -translate-y-1/2"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2"
                 style={{ color: "var(--kinship-dim)" }}
               >
-                <X className="w-3.5 h-3.5" />
+                <X className="w-3 h-3" />
               </button>
             )}
           </div>
 
-          {/* Type filter */}
-          <div className="flex items-center gap-1.5 flex-wrap">
-            {(["all", ...Object.keys(TYPE_META)] as (PrototypeType | "all")[]).map((t) => (
-              <button
-                key={t}
-                onClick={() => setActiveType(t)}
-                className={cn(
-                  "px-3 py-1.5 rounded-full text-xs font-medium border transition-all duration-150",
-                  activeType === t ? "border-transparent" : "bg-white"
-                )}
-                style={
-                  activeType === t
-                    ? { background: "var(--kinship-ink)", color: "var(--kinship-cream)", borderColor: "var(--kinship-ink)" }
-                    : { borderColor: "var(--kinship-dim)", color: "var(--kinship-mid)" }
-                }
-              >
-                {t === "all" ? "All" : TYPE_META[t as PrototypeType].label}
-              </button>
-            ))}
-          </div>
+          {/* Divider */}
+          <div className="flex-shrink-0 w-px h-5 self-center" style={{ background: "color-mix(in oklch, var(--kinship-dim) 40%, transparent)" }} />
+
+          {/* Type filter pills — inline, no wrap */}
+          {(["all", ...Object.keys(TYPE_META)] as (PrototypeType | "all")[]).map((t) => (
+            <button
+              key={t}
+              onClick={() => setActiveType(t)}
+              className={cn(
+                "flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium border transition-all duration-150 whitespace-nowrap",
+                activeType === t ? "border-transparent" : "bg-white"
+              )}
+              style={
+                activeType === t
+                  ? { background: "var(--kinship-ink)", color: "var(--kinship-cream)", borderColor: "var(--kinship-ink)" }
+                  : { borderColor: "var(--kinship-dim)", color: "var(--kinship-mid)" }
+              }
+            >
+              {t === "all" ? "All" : TYPE_META[t as PrototypeType].label}
+            </button>
+          ))}
+
+          {/* Spacer pushes sort to the right when there's room */}
+          <div className="flex-1 flex-shrink-0 min-w-2" />
+
+          {/* Divider */}
+          <div className="flex-shrink-0 w-px h-5 self-center" style={{ background: "color-mix(in oklch, var(--kinship-dim) 40%, transparent)" }} />
 
           {/* Sort */}
           <select
             value={sort}
             onChange={(e) => setSort(e.target.value as SortKey)}
-            className="rounded-lg border px-3 py-1.5 text-xs outline-none"
+            className="flex-shrink-0 rounded-full border px-3 py-1.5 text-xs outline-none whitespace-nowrap"
             style={{
               background: "white",
               borderColor: "var(--kinship-dim)",
@@ -825,33 +835,6 @@ export function GalleryClient({ manifests }: { manifests: PrototypeManifest[] })
             <option value="name">By name</option>
           </select>
         </div>
-
-        {/* Tag pills */}
-        {allTags.length > 0 && (
-          <div className="max-w-6xl mx-auto mt-3 flex gap-2 flex-wrap">
-            {allTags.map((tag) => (
-              <button
-                key={tag}
-                onClick={() => setActiveTag(activeTag === tag ? null : tag)}
-                className={cn(
-                  "text-[11px] px-2 py-0.5 rounded font-mono border transition-all duration-150",
-                  activeTag === tag ? "border-transparent" : ""
-                )}
-                style={
-                  activeTag === tag
-                    ? { background: "var(--kinship-mid)", color: "white", borderColor: "var(--kinship-mid)" }
-                    : {
-                        background: "color-mix(in oklch, var(--kinship-dim) 20%, transparent)",
-                        color: "var(--kinship-mid)",
-                        borderColor: "color-mix(in oklch, var(--kinship-dim) 30%, transparent)",
-                      }
-                }
-              >
-                #{tag}
-              </button>
-            ))}
-          </div>
-        )}
       </div>
 
       {/* Grid */}
