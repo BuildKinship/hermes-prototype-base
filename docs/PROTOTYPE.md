@@ -1,72 +1,33 @@
-# Prototype Brief
+# Prototype: Claude for Auditors
 
-> This file is written by Hermes before handing off to the coding agent.
-> It defines scope, constraints, and context for this specific prototype.
-> **Read this before writing any code. It is the single source of truth for what to build.**
+**Firestore UUID:** y9n8o4onv13Dox9ZkVLL
+**Artifact URL:** https://quick.buildkinship.dev/artifact/y9n8o4onv13Dox9ZkVLL
+**Branch:** prototype/claude-for-auditors-2026-07-14
+**Type:** other (guided training artefact)
 
----
-
-## Request
-
-_[Hermes fills this in from the user's original request — verbatim]_
-
----
-
-## Prototype Type
-
-- [ ] Survey
-- [ ] Slide deck / presentation
-- [ ] Dashboard page (Hearth — teacher view)
-- [ ] Dashboard page (Horizon — student/parent view)
-- [ ] Data visualisation
-- [ ] Animation / visual concept
-- [ ] 3D / interactive scene
-- [ ] Other: ___
-
-**Read the dedicated guide for your type:**
-- Survey → `docs/surveys.md`
-- Slide deck → `docs/slideshows.md`
-- Dashboard / Animation / 3D / Other → `docs/dashboards.md`
-
----
-
-## Firestore
-
-**Prototype UUID:** `_[Hermes fills this in]_`
-**Artifact URL:** `https://quick.buildkinship.dev/artifact/_[UUID]_`
-
-For surveys, also:
-**Survey slug:** `_[Hermes fills this in — matches key in mock/surveys.ts]_`
-
----
+## Original request
+Create a prototype that is a unique web artefact — not really a slideshow but sort of like one. Training a client on Claude and how to use it for accreditation audits. The spec doc has thorough content. Should be organized, mobile-friendly, with subtle animations, and include reference links to Anthropic docs. This is a specific guide to Claude for auditors — not generic.
 
 ## Scope
+- Single-page scrollable guide, 5 "moves" (Connect → Configure → Command → Chain → Take home)
+- Kinship design system: Ink/Mid/Dim/Cream palette, no shadows, no gradients
+- Animated entrance: FadeUp on section scroll-in, respects prefers-reduced-motion
+- Copy-to-clipboard on every prompt block (the core interaction)
+- Progress spine (left margin dots, desktop only)
+- Interactive checklist for take-home assignment
+- Verified Anthropic help links
 
-_[What pages/routes to build. E.g.: "Single page at app/my-deck/page.tsx — no sub-routing needed"]_
+## Success criteria
+- All 5 moves load with correct content from spec
+- Copy buttons work on all prompt blocks
+- SKILL.md displays in dark "code" style
+- Checklist items are toggleable
+- Mobile-friendly (max-width layout, no fixed widths)
+- Kinship palette only, no pure black/white
 
----
-
-## Content / Research Notes
-
-_[Any research Hermes has done relevant to this prototype's content]_
-
----
-
-## Design Constraints
-
-- Follow the Kinship design system (CLAUDE.md §Design System)
-- Mock data only — no external services or real API calls
-- Mobile-aware layout (test at 1366×768 Chromebook baseline + ~768px)
-- No peer comparison, leaderboards, XP, or streaks
-
----
-
-## Success Criteria
-
-_[Specific things the prototype must demonstrate — filled in by Hermes]_
-
----
-
-## Branch
-
-`prototype/[slug]-[YYYY-MM-DD]`
+## Design decisions
+- Dark card for the "Command" intro item (ink background) to vary density
+- Skill file uses dark (#2a1038) code panel style to visually distinguish from prompts
+- Progress spine hides on mobile (< 900px) — too cramped
+- `why` line under each move header in Mid colour for hierarchy
+- Compliance note uses bordered `${C.mid}11` tint — informational, not alarming
