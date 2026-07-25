@@ -210,36 +210,31 @@ const AI_IN_EDUCATION = [
 ];
 
 // Brain contributors — from #brain-changelog (C0BA7AKA5K2), week of Jul 21–25
-// Slack avatar URLs (192px for crispness on retina)
+// Counted from block-level attributions ("Added to the Kinship Brain · by <@UID>")
 const BRAIN_CONTRIBUTORS = [
   {
-    name: 'Azim Ahmed',
-    handle: '@azim',
-    avatar: 'https://avatars.slack-edge.com/2026-04-02/10821641558487_a0dfae0a81c08ffc8313_192.png',
-    count: 2,          // entries submitted this week
-    isThisWeek: true,
-  },
-  {
-    name: 'Thomas Aston',
-    handle: '@thomas',
-    avatar: 'https://avatars.slack-edge.com/2026-07-18/11618421739669_fb2520b13a537c71bbb6_192.png',
-    count: 0,
-    isThisWeek: true,  // joined this week
-    isNew: true,
-  },
-  {
-    name: 'Nadim Nasser',
-    handle: '@nadim',
-    avatar: 'https://avatars.slack-edge.com/2026-04-30/11061844636048_47ea8de396b09926179c_192.png',
-    count: 0,
-    isThisWeek: false,
+    name: 'Tyler Rooney',
+    handle: '@tyler',
+    avatar: 'https://avatars.slack-edge.com/2026-05-15/11124384692455_32ef225206c97b45e64c_192.png',
+    count: 3,
   },
   {
     name: 'Brittany Aubin',
     handle: '@brittany',
     avatar: 'https://secure.gravatar.com/avatar/14a8ed7eec2b6f516b9f7a28c0c1cd80.jpg?s=192&d=https%3A%2F%2Fa.slack-edge.com%2Fdf10d%2Fimg%2Favatars%2Fava_0023-192.png',
-    count: 0,
-    isThisWeek: false,
+    count: 2,
+  },
+  {
+    name: 'Alan Gertner',
+    handle: '@alan',
+    avatar: 'https://avatars.slack-edge.com/2026-04-03/10822090527047_36002bd659cdb8506a36_192.jpg',
+    count: 1,
+  },
+  {
+    name: 'Azim Ahmed',
+    handle: '@azim',
+    avatar: 'https://avatars.slack-edge.com/2026-04-02/10821641558487_a0dfae0a81c08ffc8313_192.png',
+    count: 1,
   },
 ];
 
@@ -839,20 +834,19 @@ export default function KinshipMagazineIssue4() {
           <div style={{ padding: 'clamp(20px, 3vw, 28px) 0 0' }}>
             <SectionHeadline>People keeping the Brain alive this week</SectionHeadline>
 
-            {/* GitHub-style avatar grid — active contributors first */}
+            {/* GitHub-style avatar grid */}
             <div style={{ display: 'flex', flexWrap: 'wrap' as const, gap: '14px', alignItems: 'flex-start' }}>
               {BRAIN_CONTRIBUTORS.map((c) => (
                 <div key={c.handle} style={{
                   display: 'flex', flexDirection: 'column' as const,
                   alignItems: 'center', gap: '6px',
-                  opacity: c.isThisWeek ? 1 : 0.45,
                 }}>
-                  {/* Avatar ring — colored for active contributors */}
+                  {/* Avatar with purple ring */}
                   <div style={{
                     width: '52px', height: '52px',
                     borderRadius: '50%',
                     padding: '2px',
-                    background: c.isThisWeek ? C.brain.line : C.paperDark,
+                    background: C.brain.line,
                     flexShrink: 0,
                   }}>
                     <img
@@ -871,32 +865,18 @@ export default function KinshipMagazineIssue4() {
                     />
                   </div>
 
-                  {/* Count badge — only for those with entries */}
-                  {c.count > 0 && (
-                    <div style={{
-                      fontFamily: MONO, fontSize: '10px', fontWeight: 700,
-                      color: C.brain.line,
-                      lineHeight: 1,
-                    }}>
-                      {c.count} {c.count === 1 ? 'entry' : 'entries'}
-                    </div>
-                  )}
-
-                  {/* New badge */}
-                  {c.isNew && !c.count && (
-                    <div style={{
-                      fontFamily: SANS, fontSize: '9px', fontWeight: 700,
-                      letterSpacing: '0.08em', textTransform: 'uppercase' as const,
-                      color: C.brain.line,
-                    }}>
-                      New ✦
-                    </div>
-                  )}
+                  {/* Entry count badge */}
+                  <div style={{
+                    fontFamily: MONO, fontSize: '10px', fontWeight: 700,
+                    color: C.brain.line, lineHeight: 1,
+                  }}>
+                    {c.count} {c.count === 1 ? 'entry' : 'entries'}
+                  </div>
 
                   {/* Handle */}
                   <div style={{
                     fontFamily: MONO, fontSize: '10px',
-                    color: c.isThisWeek ? C.inkMid : C.inkFaint,
+                    color: C.inkMid,
                     textAlign: 'center' as const, lineHeight: 1.2,
                     maxWidth: '64px', wordBreak: 'break-word' as const,
                   }}>
@@ -911,8 +891,7 @@ export default function KinshipMagazineIssue4() {
               fontFamily: SANS, fontSize: '11px', color: C.inkFaint, lineHeight: 1.55,
               borderTop: `1px solid ${C.paperDark}`, paddingTop: '12px',
             }}>
-              <strong style={{ color: C.inkDim }}>Active this week</strong> — highlighted contributors logged entries to the Brain manually.
-              Dimmed members are in <span style={{ fontFamily: MONO }}>#brain-changelog</span> but had no activity this week.
+              Contributors counted from <span style={{ fontFamily: MONO }}>#brain-changelog</span> — everyone shown logged at least one meeting to the Brain this week.
             </div>
 
             {/* Automated entries */}
@@ -965,7 +944,7 @@ export default function KinshipMagazineIssue4() {
             <div>
               <Kicker>Brain Activity</Kicker>
               <div style={{ fontFamily: SANS, fontSize: '13px', color: C.inkMid, lineHeight: 1.6 }}>
-                {BRAIN_CONTRIBUTORS.filter(c => c.isThisWeek).length} active contributors · {BRAIN_AUTOMATED.length} automated entries
+                {BRAIN_CONTRIBUTORS.length} contributors · {BRAIN_AUTOMATED.length} automated entries
               </div>
             </div>
           </div>
