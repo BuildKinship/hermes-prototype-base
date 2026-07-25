@@ -210,24 +210,36 @@ const AI_IN_EDUCATION = [
 ];
 
 // Brain contributors — from #brain-changelog (C0BA7AKA5K2), week of Jul 21–25
+// Slack avatar URLs (192px for crispness on retina)
 const BRAIN_CONTRIBUTORS = [
   {
     name: 'Azim Ahmed',
     handle: '@azim',
-    contributions: [
-      { title: '30 min with Azim (Brenda Montgomery)', detail: 'External meeting with Brenda Montgomery at CAIS — logged via Zoom + Notion notes on Jul 22. Manually submitted to the Brain.' },
-      { title: 'kinship weekly all hands', detail: 'Weekly all-hands meeting added to the Brain on Jul 25.' },
-    ],
-    emoji: '⭐',
-    note: 'Manually submitted meetings to the Brain this week — keeping the institutional memory sharp.',
+    avatar: 'https://avatars.slack-edge.com/2026-04-02/10821641558487_a0dfae0a81c08ffc8313_192.png',
+    count: 2,          // entries submitted this week
+    isThisWeek: true,
   },
   {
     name: 'Thomas Aston',
     handle: '@thomas',
-    contributions: [],
-    emoji: '👋',
-    note: 'Joined #brain-changelog this week. Welcome to the loop, Thomas.',
+    avatar: 'https://avatars.slack-edge.com/2026-07-18/11618421739669_fb2520b13a537c71bbb6_192.png',
+    count: 0,
+    isThisWeek: true,  // joined this week
     isNew: true,
+  },
+  {
+    name: 'Nadim Nasser',
+    handle: '@nadim',
+    avatar: 'https://avatars.slack-edge.com/2026-04-30/11061844636048_47ea8de396b09926179c_192.png',
+    count: 0,
+    isThisWeek: false,
+  },
+  {
+    name: 'Brittany Aubin',
+    handle: '@brittany',
+    avatar: 'https://secure.gravatar.com/avatar/14a8ed7eec2b6f516b9f7a28c0c1cd80.jpg?s=192&d=https%3A%2F%2Fa.slack-edge.com%2Fdf10d%2Fimg%2Favatars%2Fava_0023-192.png',
+    count: 0,
+    isThisWeek: false,
   },
 ];
 
@@ -824,97 +836,98 @@ export default function KinshipMagazineIssue4() {
         <section style={{ marginTop: 'clamp(40px, 5vw, 56px)' }}>
           <SectionLabel id="brain" emoji="🧠" title="Brain Contributors" color={C.brain.line} bg={C.brain.bg} />
 
-          <div style={{ padding: 'clamp(20px, 3vw, 32px) 0 0' }}>
+          <div style={{ padding: 'clamp(20px, 3vw, 28px) 0 0' }}>
             <SectionHeadline>People keeping the Brain alive this week</SectionHeadline>
 
-            <p style={{
-              fontFamily: SANS, fontSize: '13px', color: C.inkMid, lineHeight: 1.65,
-              margin: '0 0 clamp(20px, 3vw, 28px) 0',
-              paddingBottom: '12px', borderBottom: `1px solid ${C.paperDark}`,
-            }}>
-              The Brain grows because people take the time to feed it. Every transcript, meeting note, and engagement logged this week makes Kinship smarter next week. Here's who showed up.
-            </p>
-
-            {/* Human contributors */}
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))',
-              gap: 'clamp(16px, 3vw, 28px)',
-              marginBottom: 'clamp(24px, 3vw, 32px)',
-            }}>
+            {/* GitHub-style avatar grid — active contributors first */}
+            <div style={{ display: 'flex', flexWrap: 'wrap' as const, gap: '14px', alignItems: 'flex-start' }}>
               {BRAIN_CONTRIBUTORS.map((c) => (
-                <div key={c.handle} style={{ borderTop: `2px solid ${C.brain.line}`, paddingTop: '16px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
-                    <span style={{ fontSize: '24px', lineHeight: 1 }}>{c.emoji}</span>
-                    <div>
-                      <div style={{ fontFamily: SERIF, fontSize: '18px', fontWeight: 700, color: C.ink, lineHeight: 1.2 }}>
-                        {c.name}
-                      </div>
-                      <div style={{ fontFamily: MONO, fontSize: '11px', color: C.inkFaint }}>{c.handle}</div>
-                    </div>
-                    {c.isNew && (
-                      <span style={{
-                        fontFamily: SANS, fontSize: '9px', fontWeight: 700,
-                        letterSpacing: '0.1em', textTransform: 'uppercase' as const,
-                        color: C.brain.line, background: C.brain.bg,
-                        border: `1px solid ${C.brain.line}`, padding: '2px 6px',
-                        marginLeft: 'auto',
-                      }}>
-                        New
-                      </span>
-                    )}
+                <div key={c.handle} style={{
+                  display: 'flex', flexDirection: 'column' as const,
+                  alignItems: 'center', gap: '6px',
+                  opacity: c.isThisWeek ? 1 : 0.45,
+                }}>
+                  {/* Avatar ring — colored for active contributors */}
+                  <div style={{
+                    width: '52px', height: '52px',
+                    borderRadius: '50%',
+                    padding: '2px',
+                    background: c.isThisWeek ? C.brain.line : C.paperDark,
+                    flexShrink: 0,
+                  }}>
+                    <img
+                      src={c.avatar}
+                      alt={c.name}
+                      width={48}
+                      height={48}
+                      style={{
+                        borderRadius: '50%',
+                        display: 'block',
+                        width: '48px',
+                        height: '48px',
+                        objectFit: 'cover' as const,
+                        border: `2px solid ${C.paper}`,
+                      }}
+                    />
                   </div>
 
-                  {c.contributions.length > 0 && (
-                    <div style={{ marginBottom: '10px' }}>
-                      {c.contributions.map((entry, i) => (
-                        <div key={i} style={{
-                          borderLeft: `2px solid ${C.paperDark}`,
-                          paddingLeft: '10px', marginBottom: '8px',
-                        }}>
-                          <div style={{ fontFamily: SANS, fontWeight: 600, fontSize: '12px', color: C.inkMid }}>
-                            {entry.title}
-                          </div>
-                          <div style={{ fontFamily: SANS, fontSize: '12px', color: C.inkDim, lineHeight: 1.55 }}>
-                            {entry.detail}
-                          </div>
-                        </div>
-                      ))}
+                  {/* Count badge — only for those with entries */}
+                  {c.count > 0 && (
+                    <div style={{
+                      fontFamily: MONO, fontSize: '10px', fontWeight: 700,
+                      color: C.brain.line,
+                      lineHeight: 1,
+                    }}>
+                      {c.count} {c.count === 1 ? 'entry' : 'entries'}
                     </div>
                   )}
 
+                  {/* New badge */}
+                  {c.isNew && !c.count && (
+                    <div style={{
+                      fontFamily: SANS, fontSize: '9px', fontWeight: 700,
+                      letterSpacing: '0.08em', textTransform: 'uppercase' as const,
+                      color: C.brain.line,
+                    }}>
+                      New ✦
+                    </div>
+                  )}
+
+                  {/* Handle */}
                   <div style={{
-                    fontFamily: SANS, fontSize: '12px', fontStyle: 'italic',
-                    color: C.inkDim, lineHeight: 1.5,
+                    fontFamily: MONO, fontSize: '10px',
+                    color: c.isThisWeek ? C.inkMid : C.inkFaint,
+                    textAlign: 'center' as const, lineHeight: 1.2,
+                    maxWidth: '64px', wordBreak: 'break-word' as const,
                   }}>
-                    {c.note}
+                    {c.handle}
                   </div>
                 </div>
               ))}
             </div>
 
-            {/* Automated entries this week */}
             <div style={{
-              background: C.paperWarm, border: `1px solid ${C.paperDark}`,
-              padding: 'clamp(14px, 2vw, 18px)',
+              marginTop: '16px',
+              fontFamily: SANS, fontSize: '11px', color: C.inkFaint, lineHeight: 1.55,
+              borderTop: `1px solid ${C.paperDark}`, paddingTop: '12px',
             }}>
-              <Kicker color={C.inkDim}>Also logged this week — via Kinship Workflows automation</Kicker>
-              <div style={{
-                display: 'flex', flexWrap: 'wrap' as const, gap: '6px 16px', marginTop: '8px',
-              }}>
+              <strong style={{ color: C.inkDim }}>Active this week</strong> — highlighted contributors logged entries to the Brain manually.
+              Dimmed members are in <span style={{ fontFamily: MONO }}>#brain-changelog</span> but had no activity this week.
+            </div>
+
+            {/* Automated entries */}
+            <div style={{
+              marginTop: 'clamp(16px, 2.5vw, 20px)',
+              background: C.paperWarm, border: `1px solid ${C.paperDark}`,
+              padding: 'clamp(12px, 2vw, 16px)',
+            }}>
+              <Kicker color={C.inkFaint}>Auto-logged via Kinship Workflows bot</Kicker>
+              <div style={{ display: 'flex', flexWrap: 'wrap' as const, gap: '4px 14px', marginTop: '6px' }}>
                 {BRAIN_AUTOMATED.map((entry, i) => (
-                  <span key={i} style={{
-                    fontFamily: SANS, fontSize: '12px', color: C.inkMid,
-                  }}>
+                  <span key={i} style={{ fontFamily: SANS, fontSize: '12px', color: C.inkMid }}>
                     · {entry}
                   </span>
                 ))}
-              </div>
-              <div style={{
-                fontFamily: SANS, fontSize: '11px', color: C.inkFaint,
-                marginTop: '10px', lineHeight: 1.5,
-              }}>
-                The automation handles meeting transcripts automatically. Human contributions — manually submitted notes, insights, and external meeting context — are what give the Brain its edge.
               </div>
             </div>
           </div>
@@ -952,7 +965,7 @@ export default function KinshipMagazineIssue4() {
             <div>
               <Kicker>Brain Activity</Kicker>
               <div style={{ fontFamily: SANS, fontSize: '13px', color: C.inkMid, lineHeight: 1.6 }}>
-                {BRAIN_CONTRIBUTORS.filter(c => !c.isNew && c.contributions.length > 0).length} human contributors · {BRAIN_AUTOMATED.length} automated entries
+                {BRAIN_CONTRIBUTORS.filter(c => c.isThisWeek).length} active contributors · {BRAIN_AUTOMATED.length} automated entries
               </div>
             </div>
           </div>
