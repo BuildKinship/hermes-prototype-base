@@ -39,13 +39,13 @@ function QuoteCard({ quote, author, role, sentiment }: { quote: string; author: 
     : "border-amber-200 bg-amber-50";
   const icon = sentiment === "positive" ? "✅" : "⚠️";
   return (
-    <div className={`rounded-xl border p-4 ${colors}`}>
-      <div className="text-xs font-semibold mb-2">{icon}</div>
-      <p className="text-sm text-[var(--kinship-ink)] leading-relaxed italic mb-3">&ldquo;{quote}&rdquo;</p>
-      <div>
-        <div className="text-xs font-semibold text-[var(--kinship-ink)]">{author}</div>
-        <div className="text-xs text-[var(--kinship-dim)]">{role}</div>
+    <div className={`rounded-xl border p-3 ${colors}`}>
+      <div className="flex items-center gap-1.5 mb-1.5">
+        <span className="text-xs">{icon}</span>
+        <span className="text-xs font-semibold text-[var(--kinship-ink)]">{author}</span>
       </div>
+      <p className="text-xs text-[var(--kinship-ink)] leading-relaxed italic mb-1.5">&ldquo;{quote}&rdquo;</p>
+      <div className="text-xs text-[var(--kinship-dim)]">{role}</div>
     </div>
   );
 }
