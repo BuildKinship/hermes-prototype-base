@@ -18,8 +18,9 @@ import type { Slide } from "@/components/slides/slideshow";
 //
 //  Dark slides (dark=true), bg is --kinship-ink (~#3D1A4E):
 //    • Primary text:   text-[var(--kinship-cream)]       oklch 93%
-//    • Body / subtext: text-[var(--kinship-cream)] + opacity-85  — stays ≥4.5:1 ✓
-//    • ❌ NEVER use:   opacity-60 or opacity-70 on body text — too faint
+//    • Body / subtext: style={{color:"rgba(245,240,232,0.92)"}}  — guaranteed ≥4.5:1 ✓
+//    • ❌ NEVER use:   opacity-60/70/80 on body text (Tailwind opacity classes unreliable for contrast)
+//    • ❌ NEVER use:   opacity-XX Tailwind class for contrast-critical text (use inline rgba instead)
 //
 //  Tinted/colored card backgrounds (emerald-50, amber-50, white):
 //    • Body text:      text-[var(--kinship-mid)]  ✓  (darker than card bg)
@@ -277,21 +278,21 @@ const slides: Slide[] = [
             <div className="text-2xl mb-2">📉</div>
             <div className="font-semibold text-sm text-[var(--kinship-cream)]">400,000+</div>
             {/* Dark slide body: cream at 85% — passes AA on dark bg */}
-            <div className="text-xs text-[var(--kinship-cream)] opacity-85 mt-1">Vacant or underqualified teaching positions in the US. Teacher burnout is a national crisis.</div>
+            <div className="text-xs mt-1" style={{color:"rgba(245,240,232,0.92)"}}>Vacant or underqualified teaching positions in the US. Teacher burnout is a national crisis.</div>
           </SlideDarkCard>
           <SlideDarkCard>
             <div className="text-2xl mb-2">🔬</div>
             <div className="font-semibold text-sm text-[var(--kinship-cream)]">Stanford SCALE research</div>
-            <div className="text-xs text-[var(--kinship-cream)] opacity-85 mt-1">AI tools for teachers (not students) show more consistently positive outcomes. Teacher-side AI → stronger instructional practice.</div>
+            <div className="text-xs mt-1" style={{color:"rgba(245,240,232,0.92)"}}>AI tools for teachers (not students) show more consistently positive outcomes. Teacher-side AI → stronger instructional practice.</div>
           </SlideDarkCard>
           <SlideDarkCard>
             <div className="text-2xl mb-2">🏫</div>
             <div className="font-semibold text-sm text-[var(--kinship-cream)]">Under-resourced schools first</div>
-            <div className="text-xs text-[var(--kinship-cream)] opacity-85 mt-1">Detroit Public Schools is the pilot site. Anthropic explicitly names equity as the primary goal — not premium schools.</div>
+            <div className="text-xs mt-1" style={{color:"rgba(245,240,232,0.92)"}}>Detroit Public Schools is the pilot site. Anthropic explicitly names equity as the primary goal — not premium schools.</div>
           </SlideDarkCard>
         </SlideCardGrid>
         {/* Supporting body text: cream at 85% */}
-        <div className="max-w-xl text-center text-[var(--kinship-cream)] opacity-85 text-sm leading-relaxed px-4">
+        <div className="max-w-xl text-center text-sm leading-relaxed px-4" style={{color:"rgba(245,240,232,0.92)"}}>
           What research shows works — differentiation, mastery-based learning, small-group instruction — requires massive prep time teachers don&apos;t have. Claude handles the prep.
         </div>
       </div>
@@ -346,21 +347,21 @@ const slides: Slide[] = [
           <SlideDarkCard>
             <div className="text-2xl mb-2">🔌</div>
             <div className="font-semibold text-sm text-[var(--kinship-cream)]">Plugin opportunity</div>
-            <div className="text-xs text-[var(--kinship-cream)] opacity-85 mt-1">Anyone can build Claude integrations. A Kinship plugin could surface student progress, suggest interventions, and automate teacher prep — right inside Claude.</div>
+            <div className="text-xs mt-1" style={{color:"rgba(245,240,232,0.92)"}}>Anyone can build Claude integrations. A Kinship plugin could surface student progress, suggest interventions, and automate teacher prep — right inside Claude.</div>
           </SlideDarkCard>
           <SlideDarkCard>
             <div className="text-2xl mb-2">🏗️</div>
             <div className="font-semibold text-sm text-[var(--kinship-cream)]">Playlab model</div>
-            <div className="text-xs text-[var(--kinship-cream)] opacity-85 mt-1">Playlab.ai (named partner) helps teachers become AI builders. Kinship&apos;s teacher training product could take a similar angle — hands-on AI tool creation.</div>
+            <div className="text-xs mt-1" style={{color:"rgba(245,240,232,0.92)"}}>Playlab.ai (named partner) helps teachers become AI builders. Kinship&apos;s teacher training product could take a similar angle — hands-on AI tool creation.</div>
           </SlideDarkCard>
           <SlideDarkCard>
             <div className="text-2xl mb-2">📡</div>
             <div className="font-semibold text-sm text-[var(--kinship-cream)]">Data layer</div>
-            <div className="text-xs text-[var(--kinship-cream)] opacity-85 mt-1">Snorkl and TeachFX provide progress + classroom talk insights to Claude. Kinship&apos;s data could power similar teacher-facing AI workflows.</div>
+            <div className="text-xs mt-1" style={{color:"rgba(245,240,232,0.92)"}}>Snorkl and TeachFX provide progress + classroom talk insights to Claude. Kinship&apos;s data could power similar teacher-facing AI workflows.</div>
           </SlideDarkCard>
         </SlideCardGrid>
         {/* Footer quote: 80% opacity — clearly readable on dark */}
-        <div className="text-center text-[var(--kinship-cream)] opacity-80 text-xs max-w-lg px-4">
+        <div className="text-center text-xs max-w-lg px-4" style={{color:"rgba(245,240,232,0.88)"}}>
           Note from Azim in the thread: &ldquo;If we ever go down the path of creating a Kinship Claude plugin, I think that would be an easy lift. Not sure if it aligns with our product — it might align with our teacher training product.&rdquo;
         </div>
       </div>
