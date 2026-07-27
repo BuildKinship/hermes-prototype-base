@@ -88,38 +88,43 @@ function Step({ n, title, desc }: { n: number; title: string; desc: string }) {
 // ── Cover animation ────────────────────────────────────────────────────────
 function CoverAnim() {
   return (
-    <svg viewBox="0 0 480 160" width="100%" style={{ maxWidth: 480 }}>
+    <svg viewBox="0 0 480 140" width="100%" style={{ maxWidth: 480, display: "block" }}>
       <style>{`
-        @keyframes float1 { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
-        @keyframes float2 { 0%,100%{transform:translateY(-4px)} 50%{transform:translateY(4px)} }
-        @keyframes orb1 { 0%{opacity:.4;r:8} 50%{opacity:.9;r:12} 100%{opacity:.4;r:8} }
-        @keyframes orb2 { 0%{opacity:.6;r:6} 50%{opacity:.3;r:10} 100%{opacity:.6;r:6} }
-        .bob1{animation:float1 3.2s ease-in-out infinite}
-        .bob2{animation:float2 4s ease-in-out infinite}
-        .pulse1{animation:orb1 2.8s ease-in-out infinite}
-        .pulse2{animation:orb2 3.5s ease-in-out infinite}
+        @keyframes cfloat1 { 0%,100%{transform:translateY(0px)} 50%{transform:translateY(-8px)} }
+        @keyframes cfloat2 { 0%,100%{transform:translateY(-4px)} 50%{transform:translateY(4px)} }
+        @keyframes corb1 { 0%,100%{opacity:.4} 50%{opacity:.9} }
+        @keyframes corb2 { 0%,100%{opacity:.6} 50%{opacity:.3} }
+        .cbob1{animation:cfloat1 3.2s ease-in-out infinite}
+        .cbob2{animation:cfloat2 4s ease-in-out infinite}
+        .cpulse1{animation:corb1 2.8s ease-in-out infinite}
+        .cpulse2{animation:corb2 3.5s ease-in-out infinite}
       `}</style>
-      {/* Left: teacher icon */}
-      <g className="bob1" transform="translate(80,80)">
-        <circle r="28" fill="#1a1a1a" opacity="0.8" />
-        <text x="0" y="8" textAnchor="middle" fontSize="22" fill="white">👩‍🏫</text>
+      {/* Left: teacher circle */}
+      <g className="cbob1">
+        <circle cx="80" cy="70" r="28" fill="rgba(255,255,255,0.12)" />
+        <circle cx="80" cy="70" r="24" fill="rgba(255,255,255,0.18)" />
+        <text x="80" y="78" textAnchor="middle" fontSize="20" fill="white" opacity="0.9">T</text>
+        <text x="80" y="108" textAnchor="middle" fontSize="9" fill="rgba(255,255,255,0.5)">Teacher</text>
       </g>
-      {/* Center: Claude logo */}
-      <g className="bob2" transform="translate(240,80)">
-        <circle r="36" fill="#D97706" opacity="0.15" className="pulse1" />
-        <circle r="26" fill="#D97706" opacity="0.9" />
-        <text x="0" y="8" textAnchor="middle" fontSize="22" fill="white" fontWeight="bold">A</text>
+      {/* Center: Anthropic mark */}
+      <g className="cbob2">
+        <circle cx="240" cy="70" r="36" fill="#D97706" opacity="0.15" className="cpulse1" />
+        <circle cx="240" cy="70" r="28" fill="#D97706" opacity="0.9" />
+        <text x="240" y="79" textAnchor="middle" fontSize="22" fontWeight="bold" fill="white">A</text>
+        <text x="240" y="116" textAnchor="middle" fontSize="9" fill="rgba(255,255,255,0.5)">Claude</text>
       </g>
-      {/* Right: classroom icon */}
-      <g className="bob1" transform="translate(400,80)">
-        <circle r="28" fill="#1a1a1a" opacity="0.8" />
-        <text x="0" y="8" textAnchor="middle" fontSize="22" fill="white">🏫</text>
+      {/* Right: school circle */}
+      <g className="cbob1">
+        <circle cx="400" cy="70" r="28" fill="rgba(255,255,255,0.12)" />
+        <circle cx="400" cy="70" r="24" fill="rgba(255,255,255,0.18)" />
+        <text x="400" y="78" textAnchor="middle" fontSize="20" fill="white" opacity="0.9">K</text>
+        <text x="400" y="108" textAnchor="middle" fontSize="9" fill="rgba(255,255,255,0.5)">K-12</text>
       </g>
       {/* Connecting lines */}
-      <line x1="108" y1="80" x2="214" y2="80" stroke="rgba(255,255,255,0.3)" strokeWidth="1.5" strokeDasharray="4 4" />
-      <line x1="266" y1="80" x2="372" y2="80" stroke="rgba(255,255,255,0.3)" strokeWidth="1.5" strokeDasharray="4 4" />
-      <circle cx="160" cy="80" r="4" fill="#D97706" className="pulse2" />
-      <circle cx="320" cy="80" r="4" fill="#D97706" className="pulse1" />
+      <line x1="108" y1="70" x2="212" y2="70" stroke="rgba(255,255,255,0.25)" strokeWidth="1.5" strokeDasharray="4 4" />
+      <line x1="268" y1="70" x2="372" y2="70" stroke="rgba(255,255,255,0.25)" strokeWidth="1.5" strokeDasharray="4 4" />
+      <circle cx="160" cy="70" r="4" fill="#D97706" className="cpulse2" />
+      <circle cx="320" cy="70" r="4" fill="#D97706" className="cpulse1" />
     </svg>
   );
 }
@@ -284,30 +289,30 @@ const slides: Slide[] = [
     dark: false,
     label: "5 · What People Say",
     content: (
-      <div className="flex flex-col items-center gap-4 w-full">
+      <div className="flex flex-col items-center gap-3 w-full">
         <SectionLabel>5 · What People Are Saying</SectionLabel>
         <SlideTitle title="Educators are excited. District admins are worried." size="sm" />
-        <div className="w-full max-w-3xl grid grid-cols-1 sm:grid-cols-2 gap-3 px-4">
+        <div className="w-full max-w-3xl grid grid-cols-1 sm:grid-cols-2 gap-2 px-4">
           <QuoteCard
-            quote="You have a stealth education product on your hands and you may not know it. Teacher here, using Claude daily for Danielson/UDL lesson plans, HTML decks, and annotated editions. K-12 is yours to take!"
+            quote="You have a stealth education product on your hands. Teacher here — using Claude daily for lesson plans, HTML decks, annotated editions. K-12 is yours to take!"
             author="Educator on X"
             role="July 26, 2026"
             sentiment="positive"
           />
           <QuoteCard
-            quote="We've been working with Anthropic on a Gold Standard that sets out industry best practices for safety and privacy in K-12 education. This tool is designed by and for educators."
+            quote="We've been working with Anthropic on a Gold Standard for safety and privacy in K-12 education. This tool is designed by and for educators."
             author="Randi Weingarten"
             role="President, American Federation of Teachers"
             sentiment="positive"
           />
           <QuoteCard
-            quote="The district offering should have come first. Not later. If your product encourages workflows involving protected student information, districts need governance before teachers have access."
+            quote="The district offering should have come first. If your product encourages workflows involving student data, districts need governance before teachers have access."
             author="Dr. Joe Phillips"
             role="District Administrator — blocked the tool for his district"
             sentiment="critical"
           />
           <QuoteCard
-            quote="Teachers aren't privacy attorneys. They aren't FERPA experts. They're teachers. When a company says a product is safe with student data, many educators will reasonably assume workflows are appropriate."
+            quote="Teachers aren't FERPA experts. When a company says a product is safe with student data, many educators will assume those workflows are appropriate."
             author="Dr. Joe Phillips"
             role="Full article: drjoephillips.substack.com"
             sentiment="critical"
