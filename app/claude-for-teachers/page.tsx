@@ -503,7 +503,7 @@ const slides: Slide[] = [
           />
           <ResourceCard
             title="Critical: Why Is Claude for Teachers?"
-            desc="Benjamin Riley: \"Anthropic bumbles its way into education\" — a skeptic's take"
+            desc={`Benjamin Riley: \u201cAnthropic bumbles its way into education\u201d \u2014 a skeptic's take`}
             url="https://buildcognitiveresonance.substack.com/p/why-is-claude-for-teachers"
             tag="Critical"
           />
