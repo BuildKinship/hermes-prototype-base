@@ -307,7 +307,7 @@ export function SlideTitle({
       {eyebrow && (
         <p
           className="mb-4 text-xs font-mono tracking-[0.2em] uppercase sm:mb-6 sm:text-sm"
-          style={{ color: dark ? "oklch(70% 0.05 293)" : "var(--kinship-mid)" }}
+          style={{ color: dark ? "oklch(88% 0.04 293)" : "var(--kinship-mid)" }}
         >
           {eyebrow}
         </p>
@@ -325,7 +325,7 @@ export function SlideTitle({
       {subtitle && (
         <p
           className="mt-5 text-base leading-relaxed mx-auto max-w-2xl sm:mt-8 sm:text-xl"
-          style={{ color: dark ? "oklch(70% 0.05 293)" : "oklch(50% 0.06 293)", fontWeight: 400 }}
+          style={{ color: dark ? "oklch(88% 0.04 293)" : "oklch(44% 0.07 293)", fontWeight: 400 }}
         >
           {subtitle}
         </p>
