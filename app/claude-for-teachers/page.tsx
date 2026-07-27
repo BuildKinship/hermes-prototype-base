@@ -1,0 +1,415 @@
+"use client";
+// Client component: interactive slideshow with state, keyboard navigation, localStorage
+import React, { type ReactNode } from "react";
+import {
+  Slideshow, SlideTitle, SectionLabel,
+  SlideCard, SlideCardGrid, SlideDarkCard,
+  ResponsiveSVG, AskBubble,
+} from "@/components/slides/slideshow";
+import type { Slide } from "@/components/slides/slideshow";
+import { ClaudeLogo } from "@/components/slides/brand-logos";
+
+// ── Anthropic brand mark as a simple SVG ──────────────────────────────────────
+function AnthropicMark({ size = 40 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="20" cy="20" r="20" fill="#D97706" />
+      <text x="20" y="27" textAnchor="middle" fontSize="18" fontWeight="bold" fill="white" fontFamily="serif">A</text>
+    </svg>
+  );
+}
+
+// ── Tool pill for integrations ──────────────────────────────────────────────
+function ToolPill({ name, desc }: { name: string; desc: string }) {
+  return (
+    <div className="flex items-start gap-3 p-3 rounded-lg border border-[var(--kinship-mid)] bg-white">
+      <div className="mt-0.5 w-2 h-2 rounded-full bg-[var(--kinship-amber)] flex-shrink-0" />
+      <div>
+        <div className="font-semibold text-[var(--kinship-ink)] text-sm">{name}</div>
+        <div className="text-[var(--kinship-dim)] text-xs mt-0.5">{desc}</div>
+      </div>
+    </div>
+  );
+}
+
+// ── Quote card ─────────────────────────────────────────────────────────────
+function QuoteCard({ quote, author, role, sentiment }: { quote: string; author: string; role: string; sentiment: "positive" | "critical" }) {
+  const colors = sentiment === "positive"
+    ? "border-emerald-200 bg-emerald-50"
+    : "border-amber-200 bg-amber-50";
+  const icon = sentiment === "positive" ? "✅" : "⚠️";
+  return (
+    <div className={`rounded-xl border p-4 ${colors}`}>
+      <div className="text-xs font-semibold mb-2">{icon}</div>
+      <p className="text-sm text-[var(--kinship-ink)] leading-relaxed italic mb-3">&ldquo;{quote}&rdquo;</p>
+      <div>
+        <div className="text-xs font-semibold text-[var(--kinship-ink)]">{author}</div>
+        <div className="text-xs text-[var(--kinship-dim)]">{role}</div>
+      </div>
+    </div>
+  );
+}
+
+// ── Resource link card ─────────────────────────────────────────────────────
+function ResourceCard({ title, desc, url, tag }: { title: string; desc: string; url: string; tag: string }) {
+  return (
+    <a
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="block p-3 rounded-xl border border-[var(--kinship-mid)] bg-white hover:border-[var(--kinship-ink)] hover:shadow-sm transition-all"
+    >
+      <div className="flex items-start justify-between gap-2">
+        <div className="flex-1 min-w-0">
+          <div className="font-semibold text-[var(--kinship-ink)] text-sm truncate">{title}</div>
+          <div className="text-[var(--kinship-dim)] text-xs mt-0.5 leading-relaxed">{desc}</div>
+        </div>
+        <span className="text-xs px-2 py-0.5 rounded-full bg-[var(--kinship-cream)] text-[var(--kinship-dim)] border border-[var(--kinship-mid)] flex-shrink-0">{tag}</span>
+      </div>
+    </a>
+  );
+}
+
+// ── Step item ─────────────────────────────────────────────────────────────
+function Step({ n, title, desc }: { n: number; title: string; desc: string }) {
+  return (
+    <div className="flex gap-3 items-start">
+      <div className="w-7 h-7 rounded-full bg-[var(--kinship-ink)] text-white text-sm font-bold flex items-center justify-center flex-shrink-0 mt-0.5">
+        {n}
+      </div>
+      <div>
+        <div className="font-semibold text-[var(--kinship-ink)] text-sm">{title}</div>
+        <div className="text-xs text-[var(--kinship-dim)] mt-0.5 leading-relaxed">{desc}</div>
+      </div>
+    </div>
+  );
+}
+
+// ── Cover animation ────────────────────────────────────────────────────────
+function CoverAnim() {
+  return (
+    <svg viewBox="0 0 480 160" width="100%" style={{ maxWidth: 480 }}>
+      <style>{`
+        @keyframes float1 { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+        @keyframes float2 { 0%,100%{transform:translateY(-4px)} 50%{transform:translateY(4px)} }
+        @keyframes orb1 { 0%{opacity:.4;r:8} 50%{opacity:.9;r:12} 100%{opacity:.4;r:8} }
+        @keyframes orb2 { 0%{opacity:.6;r:6} 50%{opacity:.3;r:10} 100%{opacity:.6;r:6} }
+        .bob1{animation:float1 3.2s ease-in-out infinite}
+        .bob2{animation:float2 4s ease-in-out infinite}
+        .pulse1{animation:orb1 2.8s ease-in-out infinite}
+        .pulse2{animation:orb2 3.5s ease-in-out infinite}
+      `}</style>
+      {/* Left: teacher icon */}
+      <g className="bob1" transform="translate(80,80)">
+        <circle r="28" fill="#1a1a1a" opacity="0.8" />
+        <text x="0" y="8" textAnchor="middle" fontSize="22" fill="white">👩‍🏫</text>
+      </g>
+      {/* Center: Claude logo */}
+      <g className="bob2" transform="translate(240,80)">
+        <circle r="36" fill="#D97706" opacity="0.15" className="pulse1" />
+        <circle r="26" fill="#D97706" opacity="0.9" />
+        <text x="0" y="8" textAnchor="middle" fontSize="22" fill="white" fontWeight="bold">A</text>
+      </g>
+      {/* Right: classroom icon */}
+      <g className="bob1" transform="translate(400,80)">
+        <circle r="28" fill="#1a1a1a" opacity="0.8" />
+        <text x="0" y="8" textAnchor="middle" fontSize="22" fill="white">🏫</text>
+      </g>
+      {/* Connecting lines */}
+      <line x1="108" y1="80" x2="214" y2="80" stroke="rgba(255,255,255,0.3)" strokeWidth="1.5" strokeDasharray="4 4" />
+      <line x1="266" y1="80" x2="372" y2="80" stroke="rgba(255,255,255,0.3)" strokeWidth="1.5" strokeDasharray="4 4" />
+      <circle cx="160" cy="80" r="4" fill="#D97706" className="pulse2" />
+      <circle cx="320" cy="80" r="4" fill="#D97706" className="pulse1" />
+    </svg>
+  );
+}
+
+// ── Slides ─────────────────────────────────────────────────────────────────
+const slides: Slide[] = [
+  {
+    id: "cover",
+    dark: true,
+    label: "Cover",
+    content: (
+      <div className="flex flex-col items-center gap-6 w-full py-4">
+        <div className="text-xs font-semibold tracking-widest text-[var(--kinship-cream)] opacity-60 uppercase">
+          Anthropic · Announced July 14, 2026
+        </div>
+        <SlideTitle
+          title="Claude for Teachers"
+          subtitle="Free AI for every US K-12 educator — what it is, how it works, and what people are saying"
+          dark
+        />
+        <ResponsiveSVG maxWidth={480}>
+          <CoverAnim />
+        </ResponsiveSVG>
+        <div className="flex gap-3 text-xs text-[var(--kinship-cream)] opacity-50">
+          <span>8 slides</span>
+          <span>·</span>
+          <span>← → to navigate</span>
+        </div>
+      </div>
+    ),
+  },
+  {
+    id: "what",
+    dark: false,
+    label: "1 · What Is It?",
+    content: (
+      <div className="flex flex-col items-center gap-5 w-full">
+        <SectionLabel>1 · What Is It?</SectionLabel>
+        <SlideTitle title="Free Claude Pro for every US K-12 teacher." size="sm" />
+        <div className="max-w-2xl text-center text-[var(--kinship-dim)] text-sm leading-relaxed px-4">
+          Anthropic launched <strong className="text-[var(--kinship-ink)]">Claude for Teachers</strong> on July 14, 2026 —
+          a specialized, completely free offering giving verified US K-12 educators access to
+          full <strong className="text-[var(--kinship-ink)]">Claude Pro capabilities</strong>,
+          plus a library of teaching-specific AI skills built around learning science and real curricula.
+        </div>
+        <SlideCardGrid>
+          <SlideCard>
+            <div className="text-2xl mb-2">🎓</div>
+            <div className="font-semibold text-sm">Who qualifies</div>
+            <div className="text-xs text-[var(--kinship-dim)] mt-1">Verified US K-12 educators — teachers, coaches, librarians, counselors, specialists</div>
+          </SlideCard>
+          <SlideCard>
+            <div className="text-2xl mb-2">💸</div>
+            <div className="font-semibold text-sm">Cost</div>
+            <div className="text-xs text-[var(--kinship-dim)] mt-1">Completely free. Sign up before June 30, 2027 and get a full year of Claude Pro</div>
+          </SlideCard>
+          <SlideCard>
+            <div className="text-2xl mb-2">🌍</div>
+            <div className="font-semibold text-sm">Where</div>
+            <div className="text-xs text-[var(--kinship-dim)] mt-1">US only for now. District-level access is coming soon (currently individual educators only)</div>
+          </SlideCard>
+        </SlideCardGrid>
+      </div>
+    ),
+  },
+  {
+    id: "features",
+    dark: false,
+    label: "2 · Key Features",
+    content: (
+      <div className="flex flex-col items-center gap-5 w-full">
+        <SectionLabel>2 · Key Features</SectionLabel>
+        <SlideTitle title="Everything a teacher needs, built in." size="sm" />
+        <div className="w-full max-w-3xl grid grid-cols-1 sm:grid-cols-2 gap-3 px-4">
+          <SlideCard>
+            <div className="font-semibold text-sm text-[var(--kinship-ink)] mb-1">📚 Real Curriculum Integration</div>
+            <div className="text-xs text-[var(--kinship-dim)] leading-relaxed">Connects to academic standards in all 50 states via the Learning Commons connector. Supports Illustrative Mathematics and OpenSciEd curricula.</div>
+          </SlideCard>
+          <SlideCard>
+            <div className="font-semibold text-sm text-[var(--kinship-ink)] mb-1">🔧 Teaching-Specific Skills</div>
+            <div className="text-xs text-[var(--kinship-dim)] leading-relaxed">Open-source skills co-developed with educators, evaluated for rigor and pedagogical alignment. Available on GitHub.</div>
+          </SlideCard>
+          <SlideCard>
+            <div className="font-semibold text-sm text-[var(--kinship-ink)] mb-1">🔗 9 Edtech Integrations</div>
+            <div className="text-xs text-[var(--kinship-dim)] leading-relaxed">ASSISTments, Brisk Teaching, Canva Education, Coteach, Diffit, Eedi, MagicSchool, Snorkl, TeachFX — all connected.</div>
+          </SlideCard>
+          <SlideCard>
+            <div className="font-semibold text-sm text-[var(--kinship-ink)] mb-1">🔒 Privacy First</div>
+            <div className="text-xs text-[var(--kinship-dim)] leading-relaxed">No model training on teacher inputs or student data. US K-12 Terms of Service + FERPA-aligned Data Processing Addendum.</div>
+          </SlideCard>
+          <SlideCard>
+            <div className="font-semibold text-sm text-[var(--kinship-ink)] mb-1">⚡ Full Claude Pro</div>
+            <div className="text-xs text-[var(--kinship-dim)] leading-relaxed">Includes Claude Code and Claude Cowork (agentic features). Same tier as the paid $20/mo subscription.</div>
+          </SlideCard>
+          <SlideCard>
+            <div className="font-semibold text-sm text-[var(--kinship-ink)] mb-1">🤝 Key Partners</div>
+            <div className="text-xs text-[var(--kinship-dim)] leading-relaxed">AFT, Teach For America, Gates Foundation, Detroit Public Schools, Prospect Schools, and Playlab.ai for teacher-built AI tools.</div>
+          </SlideCard>
+        </div>
+      </div>
+    ),
+  },
+  {
+    id: "how-to",
+    dark: false,
+    label: "3 · How To Use It",
+    content: (
+      <div className="flex flex-col items-center gap-5 w-full">
+        <SectionLabel>3 · How To Use It</SectionLabel>
+        <SlideTitle title="Get started in 5 steps." size="sm" />
+        <div className="w-full max-w-2xl flex flex-col gap-3 px-4">
+          <Step n={1} title="Go to claude.com/solutions/teachers" desc="Click &quot;Get verified&quot; — you'll sign up with your school email address to confirm K-12 educator status" />
+          <Step n={2} title="Connect the Learning Commons connector" desc="Links Claude to your state's academic standards, prerequisite skills, and learning progressions" />
+          <Step n={3} title="Optionally add edtech integrations" desc="Connect ASSISTments for math problems, Brisk Teaching for student activities, Canva Education for lesson materials, and more" />
+          <Step n={4} title="Use built-in teaching skill workflows" desc="Plan differentiated lessons from real curricula, analyze class data, create formative assessments — all standards-aligned" />
+          <Step n={5} title="Take the AI Fluency course (optional but great)" desc="Free course co-created with Teach For America: anthropic.skilljar.com/path/ai-fluency-for-pk-12-educators" />
+        </div>
+        <div className="w-full max-w-2xl px-4">
+          <div className="rounded-xl border border-[var(--kinship-mid)] bg-[var(--kinship-cream)] p-3">
+            <div className="text-xs font-semibold text-[var(--kinship-dim)] mb-2">Example prompt to try:</div>
+            <div className="text-sm text-[var(--kinship-ink)] italic leading-relaxed">
+              &ldquo;Plan a 45-min 7th grade math lesson on two-step equations. I teach Illustrative Math and students have mastered one-step equations. Create a do-now, worked example, and exit ticket.&rdquo;
+            </div>
+          </div>
+        </div>
+      </div>
+    ),
+  },
+  {
+    id: "value-prop",
+    dark: true,
+    label: "4 · Why It Matters",
+    content: (
+      <div className="flex flex-col items-center gap-6 w-full">
+        <SectionLabel dark>4 · Why It Matters</SectionLabel>
+        <SlideTitle title="Closing the gap between what research says works and what teachers have time to do." size="sm" dark />
+        <SlideCardGrid>
+          <SlideDarkCard>
+            <div className="text-2xl mb-2">📉</div>
+            <div className="font-semibold text-sm text-[var(--kinship-cream)]">400,000+</div>
+            <div className="text-xs text-[var(--kinship-cream)] opacity-70 mt-1">Vacant or underqualified teaching positions in the US. Teacher burnout is a national crisis.</div>
+          </SlideDarkCard>
+          <SlideDarkCard>
+            <div className="text-2xl mb-2">🔬</div>
+            <div className="font-semibold text-sm text-[var(--kinship-cream)]">Stanford SCALE research</div>
+            <div className="text-xs text-[var(--kinship-cream)] opacity-70 mt-1">AI tools for teachers (not students) show more consistently positive outcomes. Teacher-side AI → stronger instructional practice.</div>
+          </SlideDarkCard>
+          <SlideDarkCard>
+            <div className="text-2xl mb-2">🏫</div>
+            <div className="font-semibold text-sm text-[var(--kinship-cream)]">Under-resourced schools first</div>
+            <div className="text-xs text-[var(--kinship-cream)] opacity-70 mt-1">Detroit Public Schools is the pilot site. Anthropic explicitly names equity as the primary goal — not premium schools.</div>
+          </SlideDarkCard>
+        </SlideCardGrid>
+        <div className="max-w-xl text-center text-[var(--kinship-cream)] opacity-70 text-sm leading-relaxed px-4">
+          What research shows works — differentiation, mastery-based learning, small-group instruction — requires massive prep time teachers don&apos;t have. Claude handles the prep.
+        </div>
+      </div>
+    ),
+  },
+  {
+    id: "reactions",
+    dark: false,
+    label: "5 · What People Say",
+    content: (
+      <div className="flex flex-col items-center gap-4 w-full">
+        <SectionLabel>5 · What People Are Saying</SectionLabel>
+        <SlideTitle title="Educators are excited. District admins are worried." size="sm" />
+        <div className="w-full max-w-3xl grid grid-cols-1 sm:grid-cols-2 gap-3 px-4">
+          <QuoteCard
+            quote="You have a stealth education product on your hands and you may not know it. Teacher here, using Claude daily for Danielson/UDL lesson plans, HTML decks, and annotated editions. K-12 is yours to take!"
+            author="Educator on X"
+            role="July 26, 2026"
+            sentiment="positive"
+          />
+          <QuoteCard
+            quote="We've been working with Anthropic on a Gold Standard that sets out industry best practices for safety and privacy in K-12 education. This tool is designed by and for educators."
+            author="Randi Weingarten"
+            role="President, American Federation of Teachers"
+            sentiment="positive"
+          />
+          <QuoteCard
+            quote="The district offering should have come first. Not later. If your product encourages workflows involving protected student information, districts need governance before teachers have access."
+            author="Dr. Joe Phillips"
+            role="District Administrator — blocked the tool for his district"
+            sentiment="critical"
+          />
+          <QuoteCard
+            quote="Teachers aren't privacy attorneys. They aren't FERPA experts. They're teachers. When a company says a product is safe with student data, many educators will reasonably assume workflows are appropriate."
+            author="Dr. Joe Phillips"
+            role="Full article: drjoephillips.substack.com"
+            sentiment="critical"
+          />
+        </div>
+      </div>
+    ),
+  },
+  {
+    id: "kinship",
+    dark: true,
+    label: "6 · Kinship Lens",
+    content: (
+      <div className="flex flex-col items-center gap-6 w-full">
+        <SectionLabel dark>6 · Kinship Lens</SectionLabel>
+        <SlideTitle title="What this means for us." size="sm" dark />
+        <SlideCardGrid>
+          <SlideDarkCard>
+            <div className="text-2xl mb-2">🔌</div>
+            <div className="font-semibold text-sm text-[var(--kinship-cream)]">Plugin opportunity</div>
+            <div className="text-xs text-[var(--kinship-cream)] opacity-70 mt-1">Anyone can build Claude integrations. A Kinship plugin could surface student progress, suggest interventions, and automate teacher prep — right inside Claude.</div>
+          </SlideDarkCard>
+          <SlideDarkCard>
+            <div className="text-2xl mb-2">🏗️</div>
+            <div className="font-semibold text-sm text-[var(--kinship-cream)]">Playlab model</div>
+            <div className="text-xs text-[var(--kinship-cream)] opacity-70 mt-1">Playlab.ai (named partner) helps teachers become AI builders. Kinship&apos;s teacher training product could take a similar angle — hands-on AI tool creation.</div>
+          </SlideDarkCard>
+          <SlideDarkCard>
+            <div className="text-2xl mb-2">📡</div>
+            <div className="font-semibold text-sm text-[var(--kinship-cream)]">Data layer</div>
+            <div className="text-xs text-[var(--kinship-cream)] opacity-70 mt-1">Snorkl and TeachFX provide progress + classroom talk insights to Claude. Kinship&apos;s data could power similar teacher-facing AI workflows.</div>
+          </SlideDarkCard>
+        </SlideCardGrid>
+        <div className="text-center text-[var(--kinship-cream)] opacity-60 text-xs max-w-lg px-4">
+          Note from Azim in the thread: &ldquo;If we ever go down the path of creating a Kinship Claude plugin, I think that would be an easy lift. Not sure if it aligns with our product — it might align with our teacher training product.&rdquo;
+        </div>
+      </div>
+    ),
+  },
+  {
+    id: "resources",
+    dark: false,
+    label: "7 · Go Deeper",
+    content: (
+      <div className="flex flex-col items-center gap-4 w-full">
+        <SectionLabel>7 · Go Deeper</SectionLabel>
+        <SlideTitle title="Everything you need to explore further." size="sm" />
+        <div className="w-full max-w-3xl grid grid-cols-1 sm:grid-cols-2 gap-2 px-4">
+          <ResourceCard
+            title="Get Verified as an Educator"
+            desc="Sign up for free Claude Pro access at claude.com/solutions/teachers"
+            url="https://claude.com/solutions/teachers"
+            tag="Official"
+          />
+          <ResourceCard
+            title="Claude for Teachers in Action"
+            desc="Video tutorials with real teachers (Zac & Karina) showing actual workflows"
+            url="https://claude.com/resources/tutorials/claude-for-teachers-in-action"
+            tag="Tutorial"
+          />
+          <ResourceCard
+            title="AI Fluency Course (Free)"
+            desc="Teach For America + Anthropic PD course for PK-12 educators"
+            url="https://anthropic.skilljar.com/path/ai-fluency-for-pk-12-educators"
+            tag="Course"
+          />
+          <ResourceCard
+            title="Open-Source Teaching Skills"
+            desc="GitHub repo with all teaching skills — fork and adapt for your classroom"
+            url="https://github.com/anthropics/k12-teacher-skills"
+            tag="GitHub"
+          />
+          <ResourceCard
+            title="K-12 Privacy & Terms"
+            desc="FERPA-aligned Data Processing Addendum and K-12 Terms of Service details"
+            url="https://support.claude.com/en/articles/15926041"
+            tag="Privacy"
+          />
+          <ResourceCard
+            title="Critical Read: We Blocked It"
+            desc="District admin explains why they blocked Claude for Teachers — essential FERPA context"
+            url="https://drjoephillips.substack.com/p/anthropic-launched-claude-for-teachers"
+            tag="Critical"
+          />
+          <ResourceCard
+            title="Playlab.ai"
+            desc="Anthropic ecosystem partner helping teachers build their own AI tools (lab schools network)"
+            url="https://www.playlab.ai/"
+            tag="Partner"
+          />
+          <ResourceCard
+            title="Stanford SCALE AI Evidence"
+            desc="The research Anthropic cites on teacher-side vs. student-side AI impact"
+            url="https://scale.stanford.edu/research-in-action/understanding-evidence-base-ai-k12-education"
+            tag="Research"
+          />
+        </div>
+      </div>
+    ),
+  },
+];
+
+export default function Page() {
+  return <Slideshow slides={slides} storageKey="claude-for-teachers-slide" />;
+}
