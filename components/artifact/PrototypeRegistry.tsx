@@ -26,6 +26,7 @@ const registry: Record<string, ComponentType> = {
   "kinship-magazine-issue-4": dynamic(() => import("@/app/kinship-magazine-issue-4/page")),
   "claude-for-teachers": dynamic(() => import("@/app/claude-for-teachers/page")),
   "ai-gtm-stack": dynamic(() => import("@/app/ai-gtm-stack/page")),
+  "brenda-claude-training": dynamic(() => import("@/app/brenda-claude-training/page")),
 };
 
 export function getPrototypeComponent(slug: string): ComponentType | null {

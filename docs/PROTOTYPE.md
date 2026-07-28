@@ -1,72 +1,34 @@
-# Prototype Brief
+# Prototype Brief — Claude for CAIS: HTML Artifacts & Teacher Skills
 
-> This file is written by Hermes before handing off to the coding agent.
-> It defines scope, constraints, and context for this specific prototype.
-> **Read this before writing any code. It is the single source of truth for what to build.**
+**Firestore UUID:** RSs9QdUEw8OzQBpSKW6B  
+**Artifact URL:** https://quick.buildkinship.dev/artifact/RSs9QdUEw8OzQBpSKW6B  
+**Branch:** prototype/brenda-claude-training-2026-07-28  
+**Type:** other (scrollable guide)  
+**Requester:** Azim (U0AQ7SJRQ93) — for Brenda Montgomery at CAIS
 
----
-
-## Request
-
-_[Hermes fills this in from the user's original request — verbatim]_
-
----
-
-## Prototype Type
-
-- [ ] Survey
-- [ ] Slide deck / presentation
-- [ ] Dashboard page (Hearth — teacher view)
-- [ ] Dashboard page (Horizon — student/parent view)
-- [ ] Data visualisation
-- [ ] Animation / visual concept
-- [ ] 3D / interactive scene
-- [ ] Other: ___
-
-**Read the dedicated guide for your type:**
-- Survey → `docs/surveys.md`
-- Slide deck → `docs/slideshows.md`
-- Dashboard / Animation / 3D / Other → `docs/dashboards.md`
-
----
-
-## Firestore
-
-**Prototype UUID:** `_[Hermes fills this in]_`
-**Artifact URL:** `https://quick.buildkinship.dev/artifact/_[UUID]_`
-
-For surveys, also:
-**Survey slug:** `_[Hermes fills this in — matches key in mock/surveys.ts]_`
-
----
+## Original Request (verbatim)
+"Please create a prototype that I can share with Brenda from CAIS in order to teach her about HTML artifacts and share claude for teachers skills based on this markdown file."
 
 ## Scope
+Build `app/brenda-claude-training/page.tsx` — a polished, mobile-first scrollable training guide for Brenda Montgomery, Director of Accreditation at CAIS.
 
-_[What pages/routes to build. E.g.: "Single page at app/my-deck/page.tsx — no sub-routing needed"]_
+The guide should:
+1. Explain the core concept: Chat vs. HTML artifacts (when to use each)
+2. Surface the Claude for Teachers GitHub skill repo info
+3. Walk through 3 hands-on exercises with copyable prompts
+4. Include the key takeaways at the end
 
----
+## Design requirements
+- Off-white background, warm minimal styling matching the markdown doc's aesthetic
+- Mobile-first, thumb-scrollable on 380px
+- Sticky top progress bar showing section position
+- FadeUp entrance animations on sections as user scrolls (IntersectionObserver)
+- Copyable prompt blocks with "Copy" button that shows ✓ on success
+- Section anchor links in a sticky side nav on desktop (hidden on mobile)
+- Numbered exercise cards with visual distinction
 
-## Content / Research Notes
-
-_[Any research Hermes has done relevant to this prototype's content]_
-
----
-
-## Design Constraints
-
-- Follow the Kinship design system (CLAUDE.md §Design System)
-- Mock data only — no external services or real API calls
-- Mobile-aware layout (test at 1366×768 Chromebook baseline + ~768px)
-- No peer comparison, leaderboards, XP, or streaks
-
----
-
-## Success Criteria
-
-_[Specific things the prototype must demonstrate — filled in by Hermes]_
-
----
-
-## Branch
-
-`prototype/[slug]-[YYYY-MM-DD]`
+## Success criteria
+- Page loads cleanly, no blank screens
+- All "Copy" buttons work
+- Looks polished enough to share externally with a CAIS director
+- Mobile layout works on 380px
