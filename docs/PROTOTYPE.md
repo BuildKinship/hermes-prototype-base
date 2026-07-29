@@ -1,72 +1,34 @@
-# Prototype Brief
+# Prototype Brief: AI-Powered GTM & Sales Workflows
 
-> This file is written by Hermes before handing off to the coding agent.
-> It defines scope, constraints, and context for this specific prototype.
-> **Read this before writing any code. It is the single source of truth for what to build.**
+**Type:** Slide deck
+**UUID:** CecRZcgx3NzLmJORPUkp
+**Artifact URL:** https://quick.buildkinship.dev/artifact/CecRZcgx3NzLmJORPUkp
+**Branch:** prototype/ai-gtm-sales-workflows-2026-07-28
 
----
+## Original Request
+"I need you to build an explainer slideshow for this thread: https://kinship-9xb4888.slack.com/archives/C0ATK34QS8K/p1785282658695459
+I want you to add details on how to build this system that the author is proposing. I want real details."
 
-## Request
-
-_[Hermes fills this in from the user's original request — verbatim]_
-
----
-
-## Prototype Type
-
-- [ ] Survey
-- [ ] Slide deck / presentation
-- [ ] Dashboard page (Hearth — teacher view)
-- [ ] Dashboard page (Horizon — student/parent view)
-- [ ] Data visualisation
-- [ ] Animation / visual concept
-- [ ] 3D / interactive scene
-- [ ] Other: ___
-
-**Read the dedicated guide for your type:**
-- Survey → `docs/surveys.md`
-- Slide deck → `docs/slideshows.md`
-- Dashboard / Animation / 3D / Other → `docs/dashboards.md`
-
----
-
-## Firestore
-
-**Prototype UUID:** `_[Hermes fills this in]_`
-**Artifact URL:** `https://quick.buildkinship.dev/artifact/_[UUID]_`
-
-For surveys, also:
-**Survey slug:** `_[Hermes fills this in — matches key in mock/surveys.ts]_`
-
----
+## Source
+Tweet by Chris Pisarski (@chrispisarski) — Jul 28, 2026
+URL: https://x.com/chrispisarski/status/2082236016161677644
 
 ## Scope
+9-slide explainer deck covering the full system Chris Pisarski describes for building autonomous GTM/sales workflows with Claude Code + MCP integrations.
 
-_[What pages/routes to build. E.g.: "Single page at app/my-deck/page.tsx — no sub-routing needed"]_
-
----
-
-## Content / Research Notes
-
-_[Any research Hermes has done relevant to this prototype's content]_
-
----
-
-## Design Constraints
-
-- Follow the Kinship design system (CLAUDE.md §Design System)
-- Mock data only — no external services or real API calls
-- Mobile-aware layout (test at 1366×768 Chromebook baseline + ~768px)
-- No peer comparison, leaderboards, XP, or streaks
-
----
+Slides:
+1. Cover (dark)
+2. What Is This System? (light)
+3. The Tool Stack (light)
+4. Workflow A: ICP / TAM Mapping (light)
+5. Workflow B: Mail Infrastructure (dark)
+6. Workflow C: Signal-Based Lists (light)
+7. Workflow D: Lookalike Lists (dark)
+8. Workflow E: Champion Tracking (light)
+9. How to Actually Build This (dark)
 
 ## Success Criteria
-
-_[Specific things the prototype must demonstrate — filled in by Hermes]_
-
----
-
-## Branch
-
-`prototype/[slug]-[YYYY-MM-DD]`
+- Every slide has real, specific technical detail — not vague summaries
+- The prompts Chris uses are shown verbatim
+- The tool stack is clearly explained
+- The "How to Build" slide gives real implementation steps

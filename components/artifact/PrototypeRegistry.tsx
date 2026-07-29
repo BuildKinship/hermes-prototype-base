@@ -15,6 +15,7 @@ const registry: Record<string, ComponentType> = {
   // Survey artifacts are served at /artifact/[uuid]/survey/[slug]
   // The /artifact/[uuid] page redirects there when proto.type === "survey"
   //
+  "ai-gtm-sales-workflows": dynamic(() => import("@/app/ai-gtm-sales-workflows/page")),
   // ─── Add new prototypes below this line ────────────────────────────────
   "kinship-magazine-issue-1": dynamic(() => import("@/app/kinship-magazine-issue-1/page")),
   "collective-intelligence-magazine": dynamic(
