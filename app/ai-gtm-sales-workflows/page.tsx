@@ -19,36 +19,42 @@ function CoverAnim() {
     <svg viewBox="0 0 520 130" width="100%" style={{ maxWidth: 520, display: "block" }}>
       <style>{`
         @keyframes gtm_float { 0%,100%{transform:translateY(0px)} 50%{transform:translateY(-7px)} }
-        @keyframes gtm_pulse { 0%,100%{opacity:0.3} 50%{opacity:0.9} }
         @keyframes gtm_dash { to{stroke-dashoffset:-24} }
         .gtm_bob1 { animation: gtm_float 3.0s ease-in-out infinite }
         .gtm_bob2 { animation: gtm_float 3.4s ease-in-out infinite 0.4s }
         .gtm_bob3 { animation: gtm_float 2.8s ease-in-out infinite 0.8s }
         .gtm_bob4 { animation: gtm_float 3.2s ease-in-out infinite 0.2s }
         .gtm_bob5 { animation: gtm_float 3.6s ease-in-out infinite 0.6s }
-        .gtm_pulse { animation: gtm_pulse 1.8s ease-in-out infinite }
         .gtm_dash { animation: gtm_dash 1.2s linear infinite }
       `}</style>
+
+      {/* Dashed lines first (behind nodes) */}
+      <line x1="228" y1="65" x2="99" y2="65" stroke="rgba(255,255,255,0.2)" strokeWidth="1" strokeDasharray="4 4" className="gtm_dash" />
+      <line x1="292" y1="65" x2="421" y2="65" stroke="rgba(255,255,255,0.2)" strokeWidth="1" strokeDasharray="4 4" className="gtm_dash" />
+      <line x1="240" y1="43" x2="144" y2="32" stroke="rgba(255,255,255,0.15)" strokeWidth="1" strokeDasharray="3 4" className="gtm_dash" />
+      <line x1="240" y1="87" x2="144" y2="98" stroke="rgba(255,255,255,0.15)" strokeWidth="1" strokeDasharray="3 4" className="gtm_dash" />
+      <line x1="280" y1="43" x2="376" y2="32" stroke="rgba(255,255,255,0.15)" strokeWidth="1" strokeDasharray="3 4" className="gtm_dash" />
+      <line x1="280" y1="87" x2="376" y2="98" stroke="rgba(255,255,255,0.15)" strokeWidth="1" strokeDasharray="3 4" className="gtm_dash" />
 
       {/* Center: Claude */}
       <g className="gtm_bob3" style={{ transformOrigin: "260px 65px" }}>
         <circle cx="260" cy="65" r="32" fill="rgba(255,255,255,0.18)" stroke="rgba(255,255,255,0.4)" strokeWidth="1.5" />
-        <text x="260" y="60" textAnchor="middle" fontSize="11" fill="rgba(255,255,255,0.95)" fontWeight="bold">CLAUDE</text>
-        <text x="260" y="74" textAnchor="middle" fontSize="9" fill="rgba(255,255,255,0.7)">CODE</text>
+        <text x="260" y="61" textAnchor="middle" fontSize="11" fill="rgba(255,255,255,0.95)" fontWeight="bold">CLAUDE</text>
+        <text x="260" y="75" textAnchor="middle" fontSize="9" fill="rgba(255,255,255,0.7)">CODE</text>
       </g>
 
       {/* Left: HubSpot */}
       <g className="gtm_bob1" style={{ transformOrigin: "75px 65px" }}>
         <circle cx="75" cy="65" r="24" fill="rgba(255,255,255,0.12)" stroke="rgba(255,255,255,0.3)" strokeWidth="1" />
-        <text x="75" y="61" textAnchor="middle" fontSize="8" fill="rgba(255,255,255,0.85)" fontWeight="600">Hub</text>
-        <text x="75" y="72" textAnchor="middle" fontSize="8" fill="rgba(255,255,255,0.85)" fontWeight="600">Spot</text>
+        <text x="75" y="62" textAnchor="middle" fontSize="8" fill="rgba(255,255,255,0.85)" fontWeight="600">Hub</text>
+        <text x="75" y="73" textAnchor="middle" fontSize="8" fill="rgba(255,255,255,0.85)" fontWeight="600">Spot</text>
       </g>
 
       {/* Right: Crustdata */}
       <g className="gtm_bob2" style={{ transformOrigin: "445px 65px" }}>
         <circle cx="445" cy="65" r="24" fill="rgba(255,255,255,0.12)" stroke="rgba(255,255,255,0.3)" strokeWidth="1" />
-        <text x="445" y="61" textAnchor="middle" fontSize="8" fill="rgba(255,255,255,0.85)" fontWeight="600">Crust</text>
-        <text x="445" y="72" textAnchor="middle" fontSize="8" fill="rgba(255,255,255,0.85)" fontWeight="600">data</text>
+        <text x="445" y="62" textAnchor="middle" fontSize="8" fill="rgba(255,255,255,0.85)" fontWeight="600">Crust</text>
+        <text x="445" y="73" textAnchor="middle" fontSize="8" fill="rgba(255,255,255,0.85)" fontWeight="600">data</text>
       </g>
 
       {/* Top-left: Fathom */}
@@ -74,20 +80,6 @@ function CoverAnim() {
         <circle cx="390" cy="108" r="18" fill="rgba(255,255,255,0.10)" stroke="rgba(255,255,255,0.25)" strokeWidth="1" />
         <text x="390" y="112" textAnchor="middle" fontSize="8" fill="rgba(255,255,255,0.8)">GWS</text>
       </g>
-
-      {/* Dashed lines from center to satellites */}
-      {/* Left */}
-      <line x1="228" y1="65" x2="99" y2="65" stroke="rgba(255,255,255,0.2)" strokeWidth="1" strokeDasharray="4 4" className="gtm_dash" />
-      {/* Right */}
-      <line x1="292" y1="65" x2="421" y2="65" stroke="rgba(255,255,255,0.2)" strokeWidth="1" strokeDasharray="4 4" className="gtm_dash" />
-      {/* Top-left */}
-      <line x1="240" y1="43" x2="144" y2="32" stroke="rgba(255,255,255,0.15)" strokeWidth="1" strokeDasharray="3 4" className="gtm_dash" />
-      {/* Bottom-left */}
-      <line x1="240" y1="87" x2="144" y2="98" stroke="rgba(255,255,255,0.15)" strokeWidth="1" strokeDasharray="3 4" className="gtm_dash" />
-      {/* Top-right */}
-      <line x1="280" y1="43" x2="376" y2="32" stroke="rgba(255,255,255,0.15)" strokeWidth="1" strokeDasharray="3 4" className="gtm_dash" />
-      {/* Bottom-right */}
-      <line x1="280" y1="87" x2="376" y2="98" stroke="rgba(255,255,255,0.15)" strokeWidth="1" strokeDasharray="3 4" className="gtm_dash" />
     </svg>
   );
 }
@@ -116,16 +108,37 @@ function Step({ n, title, desc, url }: { n: number; title: string; desc: string;
 function PromptBlock({ children }: { children: ReactNode }) {
   return (
     <div className="rounded-xl border border-[var(--kinship-mid)] bg-[var(--kinship-ink)] px-4 py-3 w-full max-w-2xl">
-      <div className="text-[10px] font-semibold text-[var(--kinship-cream)] opacity-60 uppercase tracking-widest mb-2">Prompt to Claude</div>
-      <div className="text-xs text-[var(--kinship-cream)] leading-relaxed font-mono whitespace-pre-wrap">{children}</div>
+      <div className="text-[10px] font-semibold uppercase tracking-widest mb-2" style={{ color: "rgba(245,240,232,0.5)" }}>Prompt to Claude</div>
+      <div className="text-xs leading-relaxed font-mono whitespace-pre-wrap" style={{ color: "rgba(245,240,232,0.9)" }}>{children}</div>
     </div>
+  );
+}
+
+// ─── Dark prompt block ────────────────────────────────────────────────────────
+function DarkPromptBlock({ children }: { children: ReactNode }) {
+  return (
+    <div className="rounded-xl border border-[rgba(245,240,232,0.3)] bg-[rgba(0,0,0,0.3)] px-4 py-3 w-full max-w-2xl">
+      <div className="text-[10px] font-semibold uppercase tracking-widest mb-2" style={{ color: "rgba(245,240,232,0.5)" }}>Prompt to Claude</div>
+      <div className="text-xs leading-relaxed font-mono whitespace-pre-wrap" style={{ color: "rgba(245,240,232,0.9)" }}>{children}</div>
+    </div>
+  );
+}
+
+// ─── Feature Card (SlideCard with structured content) ───────────────────────
+function FeatureCard({ icon, title, description }: { icon: string; title: string; description: string }) {
+  return (
+    <SlideCard>
+      <div className="text-2xl mb-2">{icon}</div>
+      <div className="font-semibold text-[var(--kinship-ink)] text-sm mb-1">{title}</div>
+      <div className="text-xs text-[var(--kinship-mid)] leading-relaxed">{description}</div>
+    </SlideCard>
   );
 }
 
 // ─── Tool badge ──────────────────────────────────────────────────────────────
 function ToolBadge({ name, role }: { name: string; role: string }) {
   return (
-    <div className="flex items-start gap-2 p-2 rounded-lg border border-[var(--kinship-mid)] bg-white">
+    <div className="flex items-start gap-2 p-3 rounded-xl border border-[var(--kinship-mid)] bg-white">
       <div className="w-8 h-8 rounded-md bg-[var(--kinship-ink)] flex items-center justify-center flex-shrink-0">
         <span className="text-[var(--kinship-cream)] text-xs font-bold">{name[0]}</span>
       </div>
@@ -137,12 +150,18 @@ function ToolBadge({ name, role }: { name: string; role: string }) {
   );
 }
 
-// ─── Dark prompt block ────────────────────────────────────────────────────────
-function DarkPromptBlock({ children }: { children: ReactNode }) {
+// ─── Dark step ───────────────────────────────────────────────────────────────
+function DarkStep({ n, title, desc }: { n: number; title: string; desc: string }) {
   return (
-    <div className="rounded-xl border border-[rgba(245,240,232,0.3)] bg-[rgba(0,0,0,0.3)] px-4 py-3 w-full max-w-2xl">
-      <div className="text-[10px] font-semibold uppercase tracking-widest mb-2" style={{ color: "rgba(245,240,232,0.5)" }}>Prompt to Claude</div>
-      <div className="text-xs leading-relaxed font-mono whitespace-pre-wrap" style={{ color: "rgba(245,240,232,0.9)" }}>{children}</div>
+    <div className="flex gap-3 items-start">
+      <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 text-sm font-bold"
+        style={{ background: "rgba(245,240,232,0.2)", color: "rgba(245,240,232,0.95)" }}>
+        {n}
+      </div>
+      <div>
+        <div className="font-semibold text-sm" style={{ color: "rgba(245,240,232,0.95)" }}>{title}</div>
+        <div className="text-xs mt-0.5 leading-relaxed" style={{ color: "rgba(245,240,232,0.85)" }}>{desc}</div>
+      </div>
     </div>
   );
 }
@@ -195,20 +214,20 @@ const slides: Slide[] = [
           builds outbound lists, and routes leads — all without manual work.
         </p>
         <SlideCardGrid cols={3}>
-          <SlideCard
+          <FeatureCard
             icon="🤖"
             title="Claude Code as the Brain"
             description="Claude Code runs multi-step workflows with spawned subagents that validate and loop until quality thresholds are met."
           />
-          <SlideCard
+          <FeatureCard
             icon="🔌"
             title="MCP = Tool Access"
             description="Model Context Protocol gives Claude read/write access to your real tools: CRM, email, enrichment APIs, Slack, and Sheets."
           />
-          <SlideCard
+          <FeatureCard
             icon="♾️"
-            title="Fully Autonomous Loops"
-            description="Workflows self-verify with holdout tests, score thresholds, and subagent blind-checks — they loop until they pass."
+            title="Self-Validating Loops"
+            description="Workflows use holdout tests and blind-scoring subagents — they loop until they hit accuracy thresholds automatically."
           />
         </SlideCardGrid>
       </div>
@@ -231,7 +250,7 @@ const slides: Slide[] = [
           />
           <ToolBadge
             name="Crustdata MCP"
-            role="People + company enrichment — headcount, dept mix, funding, open roles, tech stack, exec hire detection, reverse email → LinkedIn"
+            role="People + company enrichment — headcount, dept mix, funding, open roles, tech stack, exec hires, reverse email to LinkedIn"
           />
           <ToolBadge
             name="Fathom MCP"
@@ -239,20 +258,21 @@ const slides: Slide[] = [
           />
           <ToolBadge
             name="Instantly MCP"
-            role="Outbound sequencing — add contacts to email sequences, manage campaigns, track reply rates"
+            role="Outbound sequencing — add contacts to email sequences, manage campaigns, track reply rates per inbox"
           />
           <ToolBadge
             name="Slack MCP"
             role="Team comms + alerts — notify AEs of signals, push champion job-change alerts, send drafted first touches"
           />
           <ToolBadge
-            name="Google Workspace CLI"
-            role="Docs + Sheets — push enriched prospect lists to Sheets, write ICP.md + signals.md, share outputs with team"
+            name="Google Workspace"
+            role="Docs + Sheets — push enriched prospect lists to Sheets, write icp.md + signals.md, share outputs with team"
           />
         </div>
         <p className="text-xs text-[var(--kinship-mid)] text-center max-w-lg">
-          Setup: install each MCP server locally, add config to your Claude Code settings, then ask Claude to build workflows across all of them.
-          Each tool gives Claude full API access — reads and writes.
+          Setup: install each MCP server, add to your{" "}
+          <a href="https://docs.anthropic.com/en/docs/claude-code/mcp" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">Claude Code settings</a>,
+          authenticate with API keys or OAuth. Then ask Claude to build workflows that span all of them.
         </p>
       </div>
     ),
@@ -262,15 +282,15 @@ const slides: Slide[] = [
   {
     id: "icp",
     dark: false,
-    label: "3 · ICP / TAM Mapping",
+    label: "3 · ICP Mapping",
     content: (
       <div className="flex flex-col items-center gap-4 w-full">
         <SectionLabel>3 · Workflow A: ICP / TAM Mapping</SectionLabel>
         <SlideTitle title="Let Claude reverse-engineer your ideal customer from closed-won data." size="sm" />
-        <div className="flex flex-col gap-2 w-full max-w-2xl">
-          <Step n={1} title="Export closed-won deals from HubSpot" desc="Pull: company name, deal size, sales cycle length. If you have no closed-won yet: use your best open opps + competitors' customers scraped from their case-study pages and G2." />
-          <Step n={2} title="Enrich every company via Crustdata MCP" desc="Add: industry, headcount by dept, geo, funding stage, tech stack, open roles, exec hires. This reconstructs what each company looked like when they bought." />
-          <Step n={3} title="Run this prompt on the enriched data" desc="Ask Claude to flag patterns, weight by deal size, and write a living ICP document:" />
+        <div className="flex flex-col gap-2.5 w-full max-w-2xl">
+          <Step n={1} title="Export closed-won deals from HubSpot" desc="Pull: company name, deal size, sales cycle length. No closed-won yet? Use best open opps + competitors' customers scraped from their case-study pages and G2." />
+          <Step n={2} title="Enrich every company via Crustdata MCP" desc="Add: industry, headcount by dept, geo, funding stage, tech stack, open roles, exec hires. Reconstruct what each company looked like when they bought." />
+          <Step n={3} title="Run the ICP analysis prompt" desc="Claude flags shared attributes, weights by deal size, drops vanity signals, and writes a living icp.md:" />
         </div>
         <PromptBlock>{`you have ./winners/ (one json per closed-won customer)
 and ./crm_export.csv (deal size + cycle length)
@@ -283,8 +303,7 @@ and ./crm_export.csv (deal size + cycle length)
 4. spawn a subagent to blind-score every winner against icp.md.
    80% of winners must score 70+. loop until they do.`}</PromptBlock>
         <p className="text-xs text-[var(--kinship-mid)] text-center max-w-lg">
-          The subagent self-validates: it scores your own closed-won against the ICP it just wrote.
-          If fewer than 80% score above 70, Claude refines and loops automatically.
+          The subagent self-validates: if fewer than 80% of your own closed-won score above 70 against the ICP Claude wrote, Claude refines and loops automatically.
         </p>
       </div>
     ),
@@ -298,39 +317,39 @@ and ./crm_export.csv (deal size + cycle length)
     content: (
       <div className="flex flex-col items-center gap-5 w-full">
         <SectionLabel dark>4 · Workflow B: Mail Infrastructure</SectionLabel>
-        <SlideTitle title="Cold email infra is ops work Claude can spec for you." size="sm" dark />
+        <SlideTitle title="Cold email infra is ops work. Claude specs it for you." size="sm" dark />
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-2xl">
           <SlideDarkCard>
-            <div className="text-lg mb-1">📬</div>
-            <div className="font-semibold text-sm text-[var(--kinship-cream)]">Domain Strategy</div>
-            <div className="text-xs mt-1" style={{ color: "rgba(245,240,232,0.88)" }}>
-              Never send cold from your main domain. Buy 2–5 alternate domains to start (yourbrand-hq.com, tryyourbrand.com), up to 20–40 at scale. 2–3 inboxes per domain, first-name format only (john@, not sales@, no numbers).
+            <div className="text-2xl mb-2">📬</div>
+            <div className="font-semibold text-sm mb-1" style={{ color: "rgba(245,240,232,0.95)" }}>Domain Strategy</div>
+            <div className="text-xs leading-relaxed" style={{ color: "rgba(245,240,232,0.88)" }}>
+              Never send cold from your main domain. Buy 2–5 alternate domains to start (yourbrand-hq.com, tryyourbrand.com), up to 20–40 at scale. 2–3 inboxes per domain. First-name format only: john@, never sales@, no numbers.
             </div>
           </SlideDarkCard>
           <SlideDarkCard>
-            <div className="text-lg mb-1">🔐</div>
-            <div className="font-semibold text-sm text-[var(--kinship-cream)]">DNS Setup (required)</div>
-            <div className="text-xs mt-1" style={{ color: "rgba(245,240,232,0.88)" }}>
+            <div className="text-2xl mb-2">🔐</div>
+            <div className="font-semibold text-sm mb-1" style={{ color: "rgba(245,240,232,0.95)" }}>DNS Setup (required)</div>
+            <div className="text-xs leading-relaxed" style={{ color: "rgba(245,240,232,0.88)" }}>
               Every domain needs: SPF, DKIM, DMARC + a custom tracking domain (CNAME). Disable open tracking — the pixel hurts deliverability. Track replies only.
             </div>
           </SlideDarkCard>
           <SlideDarkCard>
-            <div className="text-lg mb-1">🔥</div>
-            <div className="font-semibold text-sm text-[var(--kinship-cream)]">Warmup Protocol</div>
-            <div className="text-xs mt-1" style={{ color: "rgba(245,240,232,0.88)" }}>
-              Warmup 2–4 weeks before sending anything. Start at 5–10/day per inbox and ramp. Warmup never stops: after ramp, send ~20 cold + ~30 warmup per inbox daily. Capacity: 1,000 cold/day ≈ 50 inboxes across 20 domains.
+            <div className="text-2xl mb-2">🔥</div>
+            <div className="font-semibold text-sm mb-1" style={{ color: "rgba(245,240,232,0.95)" }}>Warmup Protocol</div>
+            <div className="text-xs leading-relaxed" style={{ color: "rgba(245,240,232,0.88)" }}>
+              Warmup 2–4 weeks before sending anything. Start at 5–10/day per inbox and ramp. Warmup never stops — after ramp, send ~20 cold + ~30 warmup per inbox daily. 1,000 cold/day capacity requires ~50 inboxes across ~20 domains.
             </div>
           </SlideDarkCard>
           <SlideDarkCard>
-            <div className="text-lg mb-1">🛡️</div>
-            <div className="font-semibold text-sm text-[var(--kinship-cream)]">Pre-Campaign Checks</div>
-            <div className="text-xs mt-1" style={{ color: "rgba(245,240,232,0.88)" }}>
-              Before every send: verify the list (bounce rate must stay under 2–3%) + run an inbox placement test (primary vs promotions vs spam). Check for secure email gateways (Proofpoint, Mimecast, Barracuda) — throttle those contacts or switch to LinkedIn campaigns instead.
+            <div className="text-2xl mb-2">🛡️</div>
+            <div className="font-semibold text-sm mb-1" style={{ color: "rgba(245,240,232,0.95)" }}>Pre-Campaign Checks</div>
+            <div className="text-xs leading-relaxed" style={{ color: "rgba(245,240,232,0.88)" }}>
+              Before every send: verify the list (bounce rate must stay under 2–3%) + inbox placement test (primary vs promotions vs spam). Prospects behind Proofpoint, Mimecast, or Barracuda — throttle or switch to LinkedIn campaigns instead.
             </div>
           </SlideDarkCard>
         </div>
-        <p className="text-xs text-center max-w-lg" style={{ color: "rgba(245,240,232,0.6)" }}>
-          Claude can help you spec the full domain/inbox matrix in a Sheet and flag any DNS misconfiguration — give it access via Google Workspace CLI.
+        <p className="text-xs text-center max-w-lg" style={{ color: "rgba(245,240,232,0.55)" }}>
+          Ask Claude to spec the domain/inbox matrix as a Google Sheet via Google Workspace CLI, and flag DNS misconfigurations automatically.
         </p>
       </div>
     ),
@@ -344,11 +363,11 @@ and ./crm_export.csv (deal size + cycle length)
     content: (
       <div className="flex flex-col items-center gap-4 w-full">
         <SectionLabel>5 · Workflow C: Signal-Based Outreach</SectionLabel>
-        <SlideTitle title="Find out which signals actually made prospects reply — then automate the watch." size="sm" />
-        <div className="flex flex-col gap-2 w-full max-w-2xl">
-          <Step n={1} title="Export your full outbound history from Instantly + HubSpot" desc="Every prospect ever contacted: date contacted, replied y/n, meeting y/n, won y/n. Add Fathom call context for accounts that did reply." />
-          <Step n={2} title="Reconstruct signal state at contact date via Crustdata" desc="For each account, look back to what was true on the day you sent: headcount delta prior quarter, days since funding, open roles matching buyer titles, new VP+ hire in prior 90 days." />
-          <Step n={3} title="Run the signal analysis prompt" desc="Claude calculates lift per signal and finds the optimal contact window:" />
+        <SlideTitle title="Find out which signals made prospects reply — then watch for them in real-time." size="sm" />
+        <div className="flex flex-col gap-2.5 w-full max-w-2xl">
+          <Step n={1} title="Export full outbound history from Instantly + HubSpot" desc="Every prospect ever contacted: date, replied y/n, meeting y/n, won y/n. Add Fathom call context for accounts that did engage." />
+          <Step n={2} title="Reconstruct signal state at contact date via Crustdata" desc="For each account, what was true the day you reached out: headcount delta prior quarter, days since last funding, open roles matching buyer titles, new VP+ hire in prior 90 days." />
+          <Step n={3} title="Run the signal analysis prompt" desc="Claude calculates lift per signal and finds the optimal contact window automatically:" />
         </div>
         <PromptBlock>{`you have ./outbound_history.csv (every account ever contacted: date, replied, meeting, won)
 
@@ -356,15 +375,14 @@ and ./crm_export.csv (deal size + cycle length)
    headcount delta prior quarter, days since funding, open roles matching [titles],
    exec hires prior 90 days, posts, all relevant signals
 2. calculate lift per signal: reply rate with signal vs baseline reply rate
-3. calculate each signal's window: median days between signal and the replies it produced
+3. calculate each signal's window: median days between signal and replies it produced
 4. read the reply threads per signal and extract the angle that worked
 5. write ./signals.md: only signals with 1.5x+ lift, each with: lift, window, proven angle.
    everything else gets deleted, not monitored
 6. verify with a subagent: hold out 20% of history, check the ranking predicts reply rate
    on the holdout. loop until it does.`}</PromptBlock>
         <p className="text-xs text-[var(--kinship-mid)] text-center max-w-lg">
-          Once signals.md is written, set up a Crustdata real-time watcher for those signals.
-          When a company fires one, automatically add them to the matching Instantly sequence.
+          Once signals.md is written, create a Crustdata real-time watcher for each signal. When a company fires one, automatically add them to the matching Instantly sequence.
         </p>
       </div>
     ),
@@ -376,29 +394,13 @@ and ./crm_export.csv (deal size + cycle length)
     dark: true,
     label: "6 · Lookalike Lists",
     content: (
-      <div className="flex flex-col items-center gap-4 w-full">
+      <div className="flex flex-col items-center gap-5 w-full">
         <SectionLabel dark>6 · Workflow D: Lookalike Lists</SectionLabel>
-        <SlideTitle title="Find companies that look like your best customers did at the time they bought." size="sm" dark />
-        <div className="flex flex-col gap-2 w-full max-w-2xl">
-          <div className="flex gap-3 items-start">
-            <div className="w-7 h-7 rounded-full bg-[rgba(245,240,232,0.2)] text-[var(--kinship-cream)] text-sm font-bold flex items-center justify-center flex-shrink-0 mt-0.5">1</div>
-            <div>
-              <div className="font-semibold text-[var(--kinship-cream)] text-sm">Rank your customers</div>
-              <div className="text-xs mt-0.5 leading-relaxed" style={{ color: "rgba(245,240,232,0.85)" }}>
-                Score by: ACV × speed-to-close × expansion, minus churn. Only top-third customers become lookalike seeds.
-              </div>
-            </div>
-          </div>
-          <div className="flex gap-3 items-start">
-            <div className="w-7 h-7 rounded-full bg-[rgba(245,240,232,0.2)] text-[var(--kinship-cream)] text-sm font-bold flex items-center justify-center flex-shrink-0 mt-0.5">2</div>
-            <div>
-              <div className="font-semibold text-[var(--kinship-cream)] text-sm">Reconstruct the company at purchase date (not today)</div>
-              <div className="text-xs mt-0.5 leading-relaxed" style={{ color: "rgba(245,240,232,0.85)" }}>
-                Via Crustdata: headcount, dept mix, funding stage, open roles they were hiring for when they bought.
-                Pull Fathom transcripts: extract buying trigger verbatim + observable proxy pain.
-              </div>
-            </div>
-          </div>
+        <SlideTitle title="Find companies that look like your best customers did when they bought." size="sm" dark />
+        <div className="flex flex-col gap-2.5 w-full max-w-2xl">
+          <DarkStep n={1} title="Rank your customers first" desc="Score by: ACV × speed-to-close × expansion, minus churn. Only top-third customers become lookalike seeds — lower-quality wins produce noisy criteria." />
+          <DarkStep n={2} title="Reconstruct the company at purchase date (not today)" desc="Via Crustdata: headcount, dept mix, funding stage, open roles they were hiring for at time of purchase. Pull Fathom transcripts: extract buying trigger verbatim + observable proxy pain." />
+          <DarkStep n={3} title="Run the lookalike prompt on each new closed-won" desc="Claude searches for matching companies, scores them 1–100, and self-validates with a subagent blind-test:" />
         </div>
         <DarkPromptBlock>{`1. check the customer ranks in the top third (ACV × close speed × expansion, minus churn)
 2. reconstruct the company at purchase date via crustdata, not its current state
@@ -409,8 +411,8 @@ and ./crm_export.csv (deal size + cycle length)
 5. score 1-100 on firmographic match × pain-proxy match. keep 70+, cap at 25
 6. verify with a subagent: blind-mix the 25 with 25 random companies that pass basic
    ICP filters. it must identify the real lookalikes 80%+ of the time.
-   if it can't, the criteria are too generic, tighten and loop`}</DarkPromptBlock>
-        <p className="text-xs text-center max-w-lg" style={{ color: "rgba(245,240,232,0.6)" }}>
+   if it can't, the criteria are too generic — tighten and loop.`}</DarkPromptBlock>
+        <p className="text-xs text-center max-w-lg" style={{ color: "rgba(245,240,232,0.55)" }}>
           Output pushed to Google Sheets via Google Workspace CLI, added to HubSpot, or sent directly to Instantly.
         </p>
       </div>
@@ -425,33 +427,41 @@ and ./crm_export.csv (deal size + cycle length)
     content: (
       <div className="flex flex-col items-center gap-4 w-full">
         <SectionLabel>7 · Workflow E: Champion Tracking</SectionLabel>
-        <SlideTitle title="When your champion moves to a new job, get alerted instantly." size="sm" />
+        <SlideTitle title="When your champion moves to a new company, know about it instantly." size="sm" />
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-2xl">
-          <SlideCard
-            icon="📋"
-            title="Step 1: Pull all champions from HubSpot"
-            description="Extract every contact tagged as champion or decision-maker on closed-won deals. Add Fathom context for each."
-          />
-          <SlideCard
-            icon="🔍"
-            title="Step 2: Resolve to LinkedIn profiles"
-            description="Crustdata batch reverse-email lookup maps their email → LinkedIn profile. One-time backfill first, then diff current employer vs deal account."
-          />
-          <SlideCard
-            icon="👁️"
-            title="Step 3: Create Crustdata watchers"
-            description="Set a watcher on each profile. Get a Slack alert whenever: new company, new funding, new hire at their firm, posts mentioning relevant topics."
-          />
-          <SlideCard
-            icon="🤝"
-            title="Step 4: Claude auto-routes and drafts outreach"
-            description="When a job change fires: enrich new company, score vs icp.md, create in HubSpot if 70+, assign original AE, Slack a drafted first touch referencing deal history."
-          />
+          <SlideCard>
+            <div className="text-2xl mb-2">📋</div>
+            <div className="font-semibold text-[var(--kinship-ink)] text-sm mb-1">Step 1: Pull champions from HubSpot</div>
+            <div className="text-xs text-[var(--kinship-mid)] leading-relaxed">
+              Extract every contact tagged as champion or decision-maker on closed-won deals. Pull Fathom transcript context for each — why they bought, in their words.
+            </div>
+          </SlideCard>
+          <SlideCard>
+            <div className="text-2xl mb-2">🔍</div>
+            <div className="font-semibold text-[var(--kinship-ink)] text-sm mb-1">Step 2: Resolve to LinkedIn via Crustdata</div>
+            <div className="text-xs text-[var(--kinship-mid)] leading-relaxed">
+              Batch reverse-email lookup maps their email to LinkedIn profile. Run a one-time backfill first — diff current employer vs the deal account to catch anyone who already moved.
+            </div>
+          </SlideCard>
+          <SlideCard>
+            <div className="text-2xl mb-2">👁️</div>
+            <div className="font-semibold text-[var(--kinship-ink)] text-sm mb-1">Step 3: Create Crustdata profile watchers</div>
+            <div className="text-xs text-[var(--kinship-mid)] leading-relaxed">
+              Set a watcher on each profile. Get a Slack alert whenever: job change, new company funding, new hire made by their company, or posts mentioning signals relevant to your product.
+            </div>
+          </SlideCard>
+          <SlideCard>
+            <div className="text-2xl mb-2">🤝</div>
+            <div className="font-semibold text-[var(--kinship-ink)] text-sm mb-1">Step 4: Claude auto-routes and drafts outreach</div>
+            <div className="text-xs text-[var(--kinship-mid)] leading-relaxed">
+              When a job change fires: enrich new company, score vs icp.md, create in HubSpot if 70+, assign the original AE, Slack a drafted first touch referencing the original deal history.
+            </div>
+          </SlideCard>
         </div>
         <PromptBlock>{`pull fired watchers. for each job change:
 1. enrich the new company + the new email of the champion using crustdata
-2. score the new company against icp.md. below 70 → log it in hubspot, no alert
-3. 70+ → create the company + contact in hubspot, tag champion-landed,
+2. score the new company against icp.md. below 70 → log in hubspot, no alert
+3. 70+ → create company + contact in hubspot, tag champion-landed,
    assign the AE from the original deal
 4. slack the AE: who they are, what they bought, the original deal size,
    what the new company does + a drafted first touch referencing the history
@@ -468,64 +478,57 @@ and ./crm_export.csv (deal size + cycle length)
     content: (
       <div className="flex flex-col items-center gap-5 w-full">
         <SectionLabel dark>8 · How to Actually Build This</SectionLabel>
-        <SlideTitle title="Real implementation steps — no vague 'just use AI' advice." size="sm" dark />
+        <SlideTitle title="Real implementation steps — no vague advice." size="sm" dark />
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-3xl">
           <SlideDarkCard>
-            <div className="font-semibold text-sm text-[var(--kinship-cream)] mb-1">① Install MCP Servers</div>
+            <div className="font-semibold text-sm mb-1" style={{ color: "rgba(245,240,232,0.95)" }}>① Install MCP Servers</div>
             <div className="text-xs leading-relaxed" style={{ color: "rgba(245,240,232,0.88)" }}>
-              Each tool (HubSpot, Crustdata, Fathom, Instantly, Slack, GWS) has an MCP server you add to your{" "}
+              Each tool has an MCP server. Add each to your{" "}
               <a href="https://docs.anthropic.com/en/docs/claude-code/mcp" target="_blank" rel="noopener noreferrer"
-                className="underline underline-offset-1">Claude Code settings</a>.
-              Run <code className="bg-[rgba(255,255,255,0.1)] px-1 rounded">claude mcp add</code> for each.
-              Authenticate each tool — most use OAuth or API keys.
+                className="underline underline-offset-1" style={{ color: "rgba(245,240,232,0.88)" }}>Claude Code settings</a>{" "}
+              via <code className="bg-[rgba(255,255,255,0.1)] px-1 rounded">claude mcp add</code>.
+              Authenticate each tool — most use OAuth or API keys from the provider dashboard.
             </div>
           </SlideDarkCard>
           <SlideDarkCard>
-            <div className="font-semibold text-sm text-[var(--kinship-cream)] mb-1">② Set Up Your Data Directory</div>
+            <div className="font-semibold text-sm mb-1" style={{ color: "rgba(245,240,232,0.95)" }}>② Set Up Your Data Directory</div>
             <div className="text-xs leading-relaxed" style={{ color: "rgba(245,240,232,0.88)" }}>
               Create a local workspace folder (e.g. <code className="bg-[rgba(255,255,255,0.1)] px-1 rounded">~/gtm-agent/</code>).
-              Export your HubSpot data to <code className="bg-[rgba(255,255,255,0.1)] px-1 rounded">crm_export.csv</code> and closed-won deal JSONs to <code className="bg-[rgba(255,255,255,0.1)] px-1 rounded">winners/</code>.
-              Claude reads from and writes to this directory during each workflow run.
+              Export HubSpot data to <code className="bg-[rgba(255,255,255,0.1)] px-1 rounded">crm_export.csv</code> and closed-won deal JSONs to <code className="bg-[rgba(255,255,255,0.1)] px-1 rounded">winners/</code>.
+              Claude reads and writes to this directory during each run.
             </div>
           </SlideDarkCard>
           <SlideDarkCard>
-            <div className="font-semibold text-sm text-[var(--kinship-cream)] mb-1">③ Run the ICP Workflow First</div>
+            <div className="font-semibold text-sm mb-1" style={{ color: "rgba(245,240,232,0.95)" }}>③ Run ICP Workflow First</div>
             <div className="text-xs leading-relaxed" style={{ color: "rgba(245,240,232,0.88)" }}>
-              Start with ICP mapping — it creates <code className="bg-[rgba(255,255,255,0.1)] px-1 rounded">icp.md</code>, which every other workflow depends on.
-              The subagent self-validation loop means it will refine until it passes.
-              This typically runs in 5–15 minutes depending on deal volume.
+              ICP mapping creates <code className="bg-[rgba(255,255,255,0.1)] px-1 rounded">icp.md</code> — every other workflow depends on it. The subagent validation loop refines automatically. Runs in 5–15 minutes depending on deal volume.
             </div>
           </SlideDarkCard>
           <SlideDarkCard>
-            <div className="font-semibold text-sm text-[var(--kinship-cream)] mb-1">④ Signal Analysis Needs History</div>
+            <div className="font-semibold text-sm mb-1" style={{ color: "rgba(245,240,232,0.95)" }}>④ Signal Analysis Needs History</div>
             <div className="text-xs leading-relaxed" style={{ color: "rgba(245,240,232,0.88)" }}>
-              Minimum viable: 50–100 contacted prospects with reply/meeting outcomes.
-              No history yet? Run signal analysis on closed-won instead (what signals existed in the 90 days before each win entered pipeline).
-              Export outbound history from Instantly + HubSpot.
+              Minimum viable: 50–100 contacted prospects with outcome data. No history yet? Run signal analysis on closed-won instead — what signals existed in the 90 days before each win entered pipeline.
             </div>
           </SlideDarkCard>
           <SlideDarkCard>
-            <div className="font-semibold text-sm text-[var(--kinship-cream)] mb-1">⑤ Real-Time Watchers via Crustdata</div>
+            <div className="font-semibold text-sm mb-1" style={{ color: "rgba(245,240,232,0.95)" }}>⑤ Real-Time Watchers via Crustdata</div>
             <div className="text-xs leading-relaxed" style={{ color: "rgba(245,240,232,0.88)" }}>
               After signals.md is written, use the{" "}
-              <a href="https://crustdata.com" target="_blank" rel="noopener noreferrer" className="underline underline-offset-1">Crustdata API</a>{" "}
-              to create webhook watchers for each signal. When triggered, call Claude Code programmatically (via API) to run the routing workflow.
-              Set a Slack webhook for champion alerts.
+              <a href="https://crustdata.com" target="_blank" rel="noopener noreferrer" className="underline underline-offset-1" style={{ color: "rgba(245,240,232,0.88)" }}>Crustdata API</a>{" "}
+              to create webhook watchers per signal. When triggered, run Claude Code programmatically via API. Set a Slack webhook for champion alerts.
             </div>
           </SlideDarkCard>
           <SlideDarkCard>
-            <div className="font-semibold text-sm text-[var(--kinship-cream)] mb-1">⑥ Automate with Scheduled Runs</div>
+            <div className="font-semibold text-sm mb-1" style={{ color: "rgba(245,240,232,0.95)" }}>⑥ Automate with Scheduled Runs</div>
             <div className="text-xs leading-relaxed" style={{ color: "rgba(245,240,232,0.88)" }}>
-              Lookalike list generation and champion backfill run on a schedule (cron job or workflow tool like n8n / Make).
-              Each new closed-won deal triggers the lookalike workflow automatically.
-              Champion job-change watchers run continuously — Crustdata polls LinkedIn daily.
+              Lookalike list generation and champion backfill run on a schedule (cron or n8n/Make). Each new closed-won deal triggers the lookalike workflow automatically. Champion watchers run continuously — Crustdata polls LinkedIn daily.
             </div>
           </SlideDarkCard>
         </div>
-        <p className="text-xs text-center max-w-xl mt-1" style={{ color: "rgba(245,240,232,0.5)" }}>
+        <p className="text-xs text-center max-w-xl" style={{ color: "rgba(245,240,232,0.45)" }}>
           Source: Chris Pisarski (@chrispisarski) on X · Jul 28, 2026 ·{" "}
           <a href="https://x.com/chrispisarski/status/2082236016161677644" target="_blank" rel="noopener noreferrer"
-            className="underline underline-offset-1">Read the original thread ↗</a>
+            className="underline underline-offset-1" style={{ color: "rgba(245,240,232,0.45)" }}>Read the original thread ↗</a>
         </p>
       </div>
     ),
