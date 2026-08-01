@@ -1,72 +1,36 @@
-# Prototype Brief
+# Prototype Brief: YC QM Multi-Agent Explainer
 
-> This file is written by Hermes before handing off to the coding agent.
-> It defines scope, constraints, and context for this specific prototype.
-> **Read this before writing any code. It is the single source of truth for what to build.**
+**Type:** Slide deck
+**UUID:** UV2oXzwXet34K5OCmziX
+**Artifact URL:** https://quick.buildkinship.dev/artifact/UV2oXzwXet34K5OCmziX
+**Branch:** prototype/yc-qm-multi-agent-2026-08-01
+**Requester:** Azim (U0AQ7SJRQ93)
 
----
+## Original Request
 
-## Request
+"I need you to put together a explainer slideshow for this topic: [YC tweet about QM]. Do a thorough research where you look deep into the github repo of this tweet and get some information. Compare that with our brain architecture and give suggestions how to incorporate learnings from this research."
 
-_[Hermes fills this in from the user's original request — verbatim]_
+## Topic
 
----
-
-## Prototype Type
-
-- [ ] Survey
-- [ ] Slide deck / presentation
-- [ ] Dashboard page (Hearth — teacher view)
-- [ ] Dashboard page (Horizon — student/parent view)
-- [ ] Data visualisation
-- [ ] Animation / visual concept
-- [ ] 3D / interactive scene
-- [ ] Other: ___
-
-**Read the dedicated guide for your type:**
-- Survey → `docs/surveys.md`
-- Slide deck → `docs/slideshows.md`
-- Dashboard / Animation / 3D / Other → `docs/dashboards.md`
-
----
-
-## Firestore
-
-**Prototype UUID:** `_[Hermes fills this in]_`
-**Artifact URL:** `https://quick.buildkinship.dev/artifact/_[UUID]_`
-
-For surveys, also:
-**Survey slug:** `_[Hermes fills this in — matches key in mock/surveys.ts]_`
-
----
+Y Combinator open-sourced their internal multi-agent harness called **QM** (github.com/yc-software/qm). It's a "multiplayer agent harness for work" — designed to give every person in a company their own AI agent with isolated memory, files, credentials, and a durable sandbox.
 
 ## Scope
 
-_[What pages/routes to build. E.g.: "Single page at app/my-deck/page.tsx — no sub-routing needed"]_
-
----
-
-## Content / Research Notes
-
-_[Any research Hermes has done relevant to this prototype's content]_
-
----
-
-## Design Constraints
-
-- Follow the Kinship design system (CLAUDE.md §Design System)
-- Mock data only — no external services or real API calls
-- Mobile-aware layout (test at 1366×768 Chromebook baseline + ~768px)
-- No peer comparison, leaderboards, XP, or streaks
-
----
+9-slide explainer deck:
+1. Cover (dark) — QM title + tagline
+2. What Is It? (light) — overview
+3. Key Features (light) — feature grid
+4. Architecture Deep-Dive (light) — how it works
+5. How To Deploy It (light) — steps
+6. Why It Matters (dark) — value proposition
+7. What People Are Saying (light) — quotes
+8. Kinship Brain Comparison (dark) — our brain vs QM
+9. Go Deeper (light) — resources
 
 ## Success Criteria
 
-_[Specific things the prototype must demonstrate — filled in by Hermes]_
-
----
-
-## Branch
-
-`prototype/[slug]-[YYYY-MM-DD]`
+- Each slide is information-dense and standalone
+- All quotes link to their sources
+- Kinship Brain comparison is accurate to our dual-store architecture
+- Architecture slide has an SVG diagram showing the QM stack
+- Resources slide has real, working links
