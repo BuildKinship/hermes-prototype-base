@@ -10,6 +10,34 @@ const nextConfig: NextConfig = {
         destination: "/survey-admin/:slug",
         permanent: true,
       },
+      // Magazine slug routes → artifact UUIDs so the internal auth gate is enforced.
+      // The slug URLs (/kinship-magazine-issue-X) are direct Next.js pages with no auth;
+      // redirecting them to /artifact/[uuid] ensures the internal:true gate always applies.
+      {
+        source: "/kinship-magazine-issue-1",
+        destination: "/artifact/T2mS7LYMqfxoyzNazM9K",
+        permanent: false,
+      },
+      {
+        source: "/kinship-magazine-issue-2",
+        destination: "/artifact/qpObQhfRSgHa6btWJpGq",
+        permanent: false,
+      },
+      {
+        source: "/kinship-magazine-issue-3",
+        destination: "/artifact/ef91d7d568154a66b8d6",
+        permanent: false,
+      },
+      {
+        source: "/kinship-magazine-issue-4",
+        destination: "/artifact/x0qDQQ7t3dT5pqcooYLV",
+        permanent: false,
+      },
+      {
+        source: "/kinship-magazine-issue-5",
+        destination: "/artifact/yKvElerZz0MVyrGV7DZU",
+        permanent: false,
+      },
     ];
   },
   async rewrites() {
