@@ -91,4 +91,11 @@ export interface PrototypeManifest {
   admin_code?: string;
   /** Admin URL if different from the main URL */
   admin_url?: string;
+
+  /**
+   * When true, this artifact requires Google sign-in (@buildkinship.com / @buildkinship.ai)
+   * to view. Non-authenticated visitors see a sign-in gate identical to the gallery wall.
+   * Defaults to false (public, anon auth only).
+   */
+  internal?: boolean;
 }
