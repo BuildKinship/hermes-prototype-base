@@ -57,6 +57,7 @@ export default function ArtifactPage() {
   const [proto, setProto] = useState<FirestorePrototype | null>(null);
   const [notFound, setNotFound] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [permissionDenied, setPermissionDenied] = useState(false);
 
   useEffect(() => {
     // Wait until Firebase auth has resolved AND we have a user (anon or google)
@@ -69,7 +70,17 @@ export default function ArtifactPage() {
       })
       .catch((err) => {
         console.error("Artifact Firestore error:", err);
-        setError(err?.message ?? String(err));
+        // PERMISSION_DENIED means the doc is marked internal and the visitor is not a
+        // Kinship user. Show the sign-in gate rather than a generic error message.
+        const msg: string = err?.message ?? String(err);
+        if (
+          msg.includes("Missing or insufficient permissions") ||
+          msg.includes("PERMISSION_DENIED")
+        ) {
+          setPermissionDenied(true);
+        } else {
+          setError(msg);
+        }
       });
   }, [uuid, user, authLoading]);
 
@@ -79,6 +90,11 @@ export default function ArtifactPage() {
         <p className="text-[var(--kinship-dim)] text-sm">Loading…</p>
       </div>
     );
+  }
+
+  // Firestore returned PERMISSION_DENIED — the doc is internal and visitor is not a Kinship user
+  if (permissionDenied) {
+    return <InternalAccessGate onSignIn={signInWithGoogle} />;
   }
 
   if (notFound) {
