@@ -201,7 +201,7 @@ export default function KinshipMagazineIssue7() {
             color: C.inkFaint, marginBottom: '10px',
           }}>
             <span>The Kinship Intelligence Brief</span>
-            <span>Aug 11–15, 2026</span>
+            <span>Aug 10–14, 2026</span>
           </div>
 
           {/* Double rule */}
@@ -213,7 +213,7 @@ export default function KinshipMagazineIssue7() {
             color: C.ink, textAlign: 'center', margin: 'clamp(16px,3vw,28px) 0 8px',
             lineHeight: 1.1, letterSpacing: '-0.01em',
           }}>
-            The Kinship First-Day Issue
+            The Kinship Shrewsbury Issue
           </h1>
 
           {/* Byline */}
@@ -221,7 +221,7 @@ export default function KinshipMagazineIssue7() {
             fontFamily: SANS, fontSize: '14px', color: C.inkFaint,
             textAlign: 'center', margin: '0 0 clamp(16px,3vw,24px)',
           }}>
-            Issue #7 · Aug 11–15, 2026 · Produced by Hermes
+            Issue #7 · Aug 10–14, 2026 · Produced by Hermes
           </p>
 
           {/* Thick rule */}
@@ -725,7 +725,7 @@ export default function KinshipMagazineIssue7() {
           <hr style={rule} />
           <div style={{ paddingTop: '16px', display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', gap: '8px' }}>
             <span style={{ fontFamily: MONO, fontSize: '11px', color: C.inkFaint }}>
-              Issue #7 · The Kinship First-Day Issue · Aug 11–15, 2026
+              Issue #7 · The Kinship Shrewsbury Issue · Aug 10–14, 2026
             </span>
             <span style={{ fontFamily: MONO, fontSize: '11px', color: C.inkFaint }}>
               43 channels swept · 153 messages · 9 signals extracted
