@@ -32,6 +32,7 @@ const registry: Record<string, ComponentType> = {
   "yc-qm-multi-agent": dynamic(() => import("@/app/yc-qm-multi-agent/page")),
   "kinship-magazine-issue-6": dynamic(() => import("@/app/kinship-magazine-issue-6/page")),
   "kinship-magazine-issue-7": dynamic(() => import("@/app/kinship-magazine-issue-7/page")),
+  "kinship-magazine-issue-8": dynamic(() => import("@/app/kinship-magazine-issue-8/page")),
   "ai-security-briefing": dynamic(() => import("@/app/ai-security-briefing/page")),
 };
 
