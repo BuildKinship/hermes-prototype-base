@@ -1,73 +1,39 @@
 'use client';
-// needed for IntersectionObserver TOC, scroll interactions, and useState
+// needed for IntersectionObserver TOC, scroll interactions, and useState/useEffect
 
 import React, { useState, useEffect } from 'react';
 
 const C = {
-  ink:        '#16120c',
-  inkMid:     '#3d3328',
-  inkDim:     '#6b5e50',
-  inkFaint:   '#a8998a',
-  paper:      '#f7f3ed',
-  paperWarm:  '#f0eade',
-  paperDark:  '#e8e0d4',
-  white:      '#fdfaf6',
-  accent:     '#b83a0c',
-  accentFaint:'#fef0e8',
-  partners:   { line: '#1a6641', bg: '#f0fdf6' },
-  pilot:      { line: '#1e4e96', bg: '#f0f5ff' },
-  product:    { line: '#5b21b6', bg: '#f7f3ff' },
-  topics:     { line: '#92400e', bg: '#fff8f0' },
+  ink:         '#16120c',
+  inkMid:      '#3d3328',
+  inkDim:      '#6b5e50',
+  inkFaint:    '#a8998a',
+  paper:       '#f7f3ed',
+  paperWarm:   '#f0eade',
+  paperDark:   '#e8e0d4',
+  white:       '#fdfaf6',
+  accent:      '#b83a0c',
+  accentFaint: '#fef0e8',
+  partners:    { line: '#1a6641', bg: '#f0fdf6' },
+  pilot:       { line: '#1e4e96', bg: '#f0f5ff' },
+  product:     { line: '#5b21b6', bg: '#f7f3ff' },
+  topics:      { line: '#92400e', bg: '#fff8f0' },
 };
 
 const SERIF = "'Georgia', 'Times New Roman', serif";
 const SANS  = "'Inter', 'Helvetica Neue', Arial, sans-serif";
 const MONO  = "'IBM Plex Mono', 'Courier New', monospace";
 
-const rule: React.CSSProperties = { border: 'none', borderTop: `1px solid ${C.paperDark}`, margin: '0' };
 const ruleThick: React.CSSProperties = { border: 'none', borderTop: `3px solid ${C.ink}`, margin: '0' };
 const ruleDouble: React.CSSProperties = { border: 'none', borderTop: `3px double ${C.ink}`, margin: '0' };
-
-const TOC_ITEMS = [
-  { id: 'partners',  emoji: '🤝', label: 'Partners',        color: C.partners.line },
-  { id: 'pilot',     emoji: '🎯', label: 'Pilot Success',   color: C.pilot.line    },
-  { id: 'product',   emoji: '⚙️',  label: 'Product Update', color: C.product.line  },
-  { id: 'topics',    emoji: '🔭', label: 'Topics',          color: C.topics.line   },
-];
-
-function TableOfContents() {
-  const [activeId, setActiveId] = useState('');
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => entries.forEach((e) => { if (e.isIntersecting) setActiveId(e.target.id); }),
-      { rootMargin: '-20% 0px -60% 0px', threshold: 0 }
-    );
-    TOC_ITEMS.forEach(({ id }) => { const el = document.getElementById(id); if (el) observer.observe(el); });
-    return () => observer.disconnect();
-  }, []);
-  const scrollTo = (id: string) => {
-    const el = document.getElementById(id);
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  };
-  return (
-    <nav style={{ borderTop: `1px solid ${C.paperDark}`, borderBottom: `1px solid ${C.paperDark}`, padding: 'clamp(12px,2vw,16px) 0', marginBottom: 'clamp(24px,4vw,36px)' }}>
-      <div style={{ fontFamily: SANS, fontWeight: 700, fontSize: '10px', letterSpacing: '0.14em', textTransform: 'uppercase', color: C.inkFaint, marginBottom: '10px' }}>In this issue</div>
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px 0', overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
-        {TOC_ITEMS.map((item, i) => (
-          <React.Fragment key={item.id}>
-            <button onClick={() => scrollTo(item.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px 0', fontFamily: SANS, fontSize: 'clamp(12px,1.8vw,13px)', fontWeight: activeId === item.id ? 700 : 400, color: activeId === item.id ? item.color : C.inkMid, whiteSpace: 'nowrap', transition: 'color 0.15s', textDecoration: activeId === item.id ? 'underline' : 'none', textUnderlineOffset: '3px' }}>
-              {item.emoji} {item.label}
-            </button>
-            {i < TOC_ITEMS.length - 1 && <span style={{ fontFamily: SANS, color: C.inkFaint, fontSize: '12px', padding: '4px 10px', userSelect: 'none' }}>·</span>}
-          </React.Fragment>
-        ))}
-      </div>
-    </nav>
-  );
-}
+const ruleThin: React.CSSProperties = { border: 'none', borderTop: `1px solid ${C.paperDark}`, margin: '0' };
 
 function Kicker({ children, color = C.accent }: { children: React.ReactNode; color?: string }) {
-  return <div style={{ fontFamily: SANS, fontWeight: 700, fontSize: '10px', letterSpacing: '0.14em', textTransform: 'uppercase', color, marginBottom: '6px' }}>{children}</div>;
+  return (
+    <div style={{ fontFamily: SANS, fontWeight: 700, fontSize: '10px', letterSpacing: '0.14em', textTransform: 'uppercase', color, marginBottom: '6px' }}>
+      {children}
+    </div>
+  );
 }
 
 function SoWhat({ text }: { text: string }) {
@@ -80,7 +46,11 @@ function SoWhat({ text }: { text: string }) {
 }
 
 function ThreadLink({ href, color = C.accent }: { href: string; color?: string }) {
-  return <a href={href} target="_blank" rel="noreferrer" style={{ fontFamily: MONO, fontSize: '10px', color, textDecoration: 'none', opacity: 0.8 }}>↗ thread</a>;
+  return (
+    <a href={href} target="_blank" rel="noreferrer" style={{ fontFamily: MONO, fontSize: '10px', color, textDecoration: 'none', opacity: 0.8 }}>
+      {'↗ thread'}
+    </a>
+  );
 }
 
 function SectionLabel({ id, emoji, title, color, bg }: { id: string; emoji: string; title: string; color: string; bg: string }) {
@@ -95,367 +65,435 @@ function SectionLabel({ id, emoji, title, color, bg }: { id: string; emoji: stri
   );
 }
 
-function StoryItem({ kicker, kickerColor, headline, body, link, soWhat }: {
-  kicker: string; kickerColor: string; headline: string; body: string; link?: string; soWhat?: string;
-}) {
-  return (
-    <div style={{ borderTop: `1px solid ${C.paperDark}`, paddingTop: '16px', paddingBottom: '4px' }}>
-      <Kicker color={kickerColor}>{kicker}</Kicker>
-      <div style={{ fontFamily: SERIF, fontSize: 'clamp(15px,2.2vw,18px)', fontWeight: 700, color: C.ink, lineHeight: 1.3, marginBottom: '8px' }}>{headline}</div>
-      <div style={{ fontFamily: SANS, fontSize: '13px', color: C.inkMid, lineHeight: 1.65, marginBottom: '6px' }}>{body}</div>
-      {link && <ThreadLink href={link} color={kickerColor} />}
-      {soWhat && <SoWhat text={soWhat} />}
-    </div>
-  );
-}
+const TOC_ITEMS = [
+  { id: 'partners',  emoji: '🤝', label: 'Partners',       color: C.partners.line },
+  { id: 'pilot',     emoji: '🎯', label: 'Pilot Success',  color: C.pilot.line    },
+  { id: 'product',   emoji: '⚙️',  label: 'Product Update', color: C.product.line  },
+  { id: 'topics',    emoji: '🔭', label: 'Topics',         color: C.topics.line   },
+];
 
-function ProductItem({ emoji, label, scope, headline, body }: {
-  emoji: string; label: string; scope: string; headline: string; body: string;
-}) {
+function TableOfContents() {
+  const [activeId, setActiveId] = useState('');
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => { entries.forEach((e) => { if (e.isIntersecting) setActiveId(e.target.id); }); },
+      { rootMargin: '-20% 0px -60% 0px', threshold: 0 }
+    );
+    TOC_ITEMS.forEach(({ id }) => { const el = document.getElementById(id); if (el) observer.observe(el); });
+    return () => observer.disconnect();
+  }, []);
+
+  const scrollTo = (id: string) => { const el = document.getElementById(id); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); };
+
   return (
-    <div style={{ borderTop: `2px solid ${C.product.line}`, paddingTop: '14px', paddingBottom: '4px' }}>
-      <div style={{ display: 'flex', gap: '10px', marginBottom: '8px' }}>
-        <span style={{ fontSize: '20px', lineHeight: 1, flexShrink: 0 }}>{emoji}</span>
-        <div>
-          <Kicker color={C.product.line}>{label} · {scope}</Kicker>
-          <div style={{ fontFamily: SERIF, fontSize: '16px', fontWeight: 700, color: C.ink, lineHeight: 1.3 }}>{headline}</div>
-        </div>
+    <nav style={{ borderTop: `1px solid ${C.paperDark}`, borderBottom: `1px solid ${C.paperDark}`, padding: 'clamp(12px, 2vw, 16px) 0', marginBottom: 'clamp(24px, 4vw, 36px)' }}>
+      <div style={{ fontFamily: SANS, fontWeight: 700, fontSize: '10px', letterSpacing: '0.14em', textTransform: 'uppercase', color: C.inkFaint, marginBottom: '10px' }}>In this issue</div>
+      <div style={{ display: 'flex', flexWrap: 'wrap', overflowX: 'auto', WebkitOverflowScrolling: 'touch', gap: '6px 0' }}>
+        {TOC_ITEMS.map((item, i) => (
+          <React.Fragment key={item.id}>
+            <button onClick={() => scrollTo(item.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px 0', fontFamily: SANS, fontSize: 'clamp(12px, 1.8vw, 13px)', fontWeight: activeId === item.id ? 700 : 400, color: activeId === item.id ? item.color : C.inkMid, whiteSpace: 'nowrap', transition: 'color 0.15s', textDecoration: activeId === item.id ? 'underline' : 'none', textUnderlineOffset: '3px' }}>
+              {item.emoji} {item.label}
+            </button>
+            {i < TOC_ITEMS.length - 1 && <span style={{ fontFamily: SANS, color: C.inkFaint, fontSize: '12px', padding: '4px 10px', userSelect: 'none' }}>·</span>}
+          </React.Fragment>
+        ))}
       </div>
-      <div style={{ fontFamily: SANS, fontSize: '13px', color: C.inkMid, lineHeight: 1.65 }}>{body}</div>
-    </div>
+    </nav>
   );
 }
 
 export default function KinshipMagazineIssue8() {
   return (
-    <div style={{ background: C.paper, minHeight: '100dvh', color: C.ink }}>
-      <div style={{ maxWidth: '780px', margin: '0 auto', padding: '0 clamp(16px,5vw,32px) clamp(40px,6vw,64px)' }}>
+    <div style={{ background: C.paper, minHeight: '100dvh', fontFamily: SERIF }}>
+      <div style={{ maxWidth: '780px', margin: '0 auto', padding: '0 clamp(16px, 5vw, 32px) clamp(40px, 6vw, 64px)' }}>
 
         {/* Masthead */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 'clamp(16px,3vw,24px) 0 8px', fontFamily: MONO, fontSize: '10px', letterSpacing: '0.12em', textTransform: 'uppercase', color: C.inkFaint }}>
-          <span>The Kinship Intelligence Brief</span>
-          <span>Aug 18–22, 2026</span>
-        </div>
-        <hr style={ruleDouble} />
-        <div style={{ textAlign: 'center', padding: 'clamp(16px,3vw,28px) 0 8px' }}>
-          <h1 style={{ fontFamily: SERIF, fontSize: 'clamp(32px,7vw,66px)', fontWeight: 700, color: C.ink, margin: '0 0 10px', lineHeight: 1.05 }}>
+        <div style={{ padding: 'clamp(18px, 3vw, 28px) 0 0' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', fontFamily: SANS, fontSize: '10px', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: C.inkFaint, marginBottom: '10px' }}>
+            <span>The Kinship Intelligence Brief</span>
+            <span>Aug 18–22, 2026</span>
+          </div>
+          <hr style={ruleDouble} />
+          <h1 style={{ fontFamily: SERIF, fontSize: 'clamp(34px, 7vw, 66px)', fontWeight: 700, color: C.ink, textAlign: 'center', margin: 'clamp(12px, 2.5vw, 20px) 0 8px', lineHeight: 1.08, letterSpacing: '-0.01em' }}>
             The Kinship Fall Countdown Issue
           </h1>
-          <div style={{ fontFamily: SANS, fontSize: '14px', color: C.inkFaint }}>Issue #8 · Aug 18–22, 2026 · Produced by Hermes</div>
+          <p style={{ fontFamily: SANS, fontSize: '14px', color: C.inkFaint, textAlign: 'center', margin: '0 0 clamp(12px, 2.5vw, 20px)' }}>
+            Issue #8 &middot; Aug 18&ndash;22, 2026 &middot; Produced by Hermes
+          </p>
+          <hr style={ruleThick} />
         </div>
-        <hr style={ruleThick} />
 
-        {/* Lede bar */}
-        <div style={{ background: C.ink, color: C.paper, padding: 'clamp(14px,2.5vw,20px) clamp(20px,3vw,32px)', textAlign: 'center', margin: '0' }}>
-          <div style={{ fontFamily: SERIF, fontSize: 'clamp(14px,2.2vw,18px)', fontStyle: 'italic', lineHeight: 1.55 }}>
-            IMG Academy commits to a Jan 2027 pilot — the most recognized sports brand in private education just joined the pipeline.
-          </div>
+        {/* Lede */}
+        <div style={{ background: C.ink, color: C.paper, padding: 'clamp(16px, 3vw, 24px) clamp(20px, 4vw, 32px)', margin: 'clamp(0px, 1vw, 8px) 0' }}>
+          <div style={{ fontFamily: SANS, fontSize: '11px', fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: C.accentFaint, marginBottom: '10px' }}>This week</div>
+          <p style={{ fontFamily: SERIF, fontSize: 'clamp(16px, 2.8vw, 20px)', lineHeight: 1.5, margin: 0, color: C.paper }}>
+            IMG Academy — the US's premier sports school — is all-but-committed to a Jan or Sep 2027 pilot. Sixteen fall pilots are now live-ready. The K-SEL reflection bank shipped, the lesson emulator went live, MobyMax integration deepened, and the US Department of Education released its first classroom AI guidance. Six fall weeks remain.
+          </p>
         </div>
-        <hr style={rule} />
 
         {/* Stats bar */}
-        <div style={{ display: 'flex', justifyContent: 'center', gap: 'clamp(24px,5vw,60px)', padding: 'clamp(18px,3vw,28px) 0', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: 'clamp(16px, 4vw, 32px)', padding: 'clamp(16px, 3vw, 24px) 0', borderBottom: `1px solid ${C.paperDark}`, flexWrap: 'wrap' }}>
           {[
             { n: '43', label: 'channels swept' },
-            { n: '112', label: 'messages read' },
+            { n: '82', label: 'messages read' },
             { n: '8', label: 'signals extracted' },
-          ].map(({ n, label }) => (
-            <div key={label} style={{ textAlign: 'center' }}>
-              <div style={{ fontFamily: SERIF, fontSize: 'clamp(28px,5vw,40px)', fontWeight: 700, color: C.accent, lineHeight: 1 }}>{n}</div>
-              <div style={{ fontFamily: SANS, fontSize: '10px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: C.inkFaint, marginTop: '4px' }}>{label}</div>
+            { n: '16', label: 'fall pilots ready' },
+          ].map(s => (
+            <div key={s.label} style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+              <span style={{ fontFamily: SANS, fontSize: 'clamp(22px, 4vw, 32px)', fontWeight: 800, color: C.accent, lineHeight: 1 }}>{s.n}</span>
+              <span style={{ fontFamily: SANS, fontSize: '10px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: C.inkFaint }}>{s.label}</span>
             </div>
           ))}
         </div>
 
-        {/* Table of Contents */}
         <TableOfContents />
 
-        {/* ─── PARTNERS ─── */}
-        <div style={{ marginTop: 'clamp(8px,2vw,16px)' }}>
+        {/* ──────────────── PARTNERS ──────────────── */}
+        <div style={{ marginTop: 'clamp(32px, 5vw, 52px)' }}>
           <SectionLabel id="partners" emoji="🤝" title="Partners Update" color={C.partners.line} bg={C.partners.bg} />
-        </div>
 
-        <div style={{ padding: 'clamp(16px,3vw,24px) 0 0', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))', gap: 'clamp(16px,2.5vw,24px)' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))', gap: 'clamp(16px, 2.5vw, 24px)', marginTop: 'clamp(16px, 2.5vw, 24px)' }}>
 
-          <StoryItem
-            kicker="Sports Academy · New Commitment"
-            kickerColor={C.partners.line}
-            headline="IMG Academy commits — the most recognized sports academy in the US enters the pipeline"
-            body="The flagship prep school and sports brand under Nord Anglia/EQT gave all-but-a-formal verbal commit for a Jan 2027 pilot this week, following a call with the Head of the Sports Academy program. This is Kinship's highest-profile prospective partner to date."
-            link="https://kinship-9xb4888.slack.com/archives/C0B6Z4MFA3X/p1787001570075729"
-            soWhat="Partners team to convert the verbal to a signed LOI before end of September. A Jan 2027 start date means roster intake and Tally onboarding need to be scoped now."
-          />
-
-          <StoryItem
-            kicker="Meadowbrook School · Double Close"
-            kickerColor={C.partners.line}
-            headline="Meadowbrook Head of School closes a second pilot — Sports Academy model on top of Fall 2027"
-            body="Jim Pierce committed to a Jan 2027 independent pilot in addition to the previously discussed Fall 2027 sports-model pilot. A double close from the same school leader in one call."
-            link="https://kinship-9xb4888.slack.com/archives/C0B6Z4MFA3X/p1787001570075729"
-            soWhat="Two entry points at Meadowbrook gives Kinship redundancy if one timeline slips. Partners to confirm scope of Jan pilot vs. Fall model."
-          />
-
-          <StoryItem
-            kicker="UCC · Aug 24 In-Person Meetings"
-            kickerColor={C.partners.line}
-            headline="Two UCC in-person meetings locked for Monday — VP Academic Innovation, VP Advancement, and Head of Upper School"
-            body="Senior stakeholder alignment at Upper Canada College on Monday, Aug 24. Two back-to-back sessions with key champions. A PhysicsGraph (IB/AP math) partnership exploration is also on the agenda alongside the pilot planning session."
-            link="https://kinship-9xb4888.slack.com/archives/C0B9FHWR8RE/p1787153214534659"
-            soWhat="UCC represents Kinship's highest-prestige Toronto school relationship. Pilot Success team should have partner guide materials and demo credentials ready for both sessions."
-          />
-
-          <StoryItem
-            kicker="Pipeline Ops · Reporting Overhaul"
-            kickerColor={C.partners.line}
-            headline="Weekly pipeline reporting process rebuilt — numbers-first Monday structure and walkthrough recording shipped"
-            body="Nadim and Dan restructured how pipeline reporting works, with a new spreadsheet format and a screen recording walkthrough. Mondays now open with the week-over-week numbers and trajectory toward 100 schools before going partner by partner."
-            soWhat="This is the operational scaffolding needed to hit the 200-school goal. Making numbers primary creates accountability that the team needs as pilots scale."
-          />
-
-          <StoryItem
-            kicker="Parent Portal · Cross-Pilot Signal"
-            kickerColor={C.partners.line}
-            headline="RHA parent portal (due Sept 22) triggers broader conversation — Mulgrave, Rosseau, and York next"
-            body="RHA is unique in replacing fill curriculum and integrating life skills — parents need more communication infrastructure. Maggie is having parent comms conversations with York, Mulgrave, and Rosseau next week. Materials from RHA will seed those discussions."
-            soWhat="Pilot Success to build reusable parent FAQ template from RHA materials before the Aug 24 school calls."
-          />
-
-          <StoryItem
-            kicker="Fairfield · Stanstead · LFG"
-            kickerColor={C.partners.line}
-            headline="Stanstead pilot design meeting completed — Fairfield and LFG Academy in active discussion"
-            body="Brain logged a Pilot Design Meeting with Stanstead this week alongside intro calls with Fairfield (Rinat) and LFG Academy (Ignacio Garza). Stanstead requested access to the Math Academy diagnostic to share with stakeholders ahead of next steps."
-            soWhat="Pilot Success can show Stanstead the student-facing diagnostic via Amara demo account. Lindsey to prepare for follow-up call."
-          />
-        </div>
-
-        {/* ─── PILOT SUCCESS ─── */}
-        <div style={{ marginTop: 'clamp(32px,5vw,52px)' }}>
-          <SectionLabel id="pilot" emoji="🎯" title="Pilot Success Update" color={C.pilot.line} bg={C.pilot.bg} />
-        </div>
-
-        <div style={{ padding: 'clamp(16px,3vw,24px) 0 0', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))', gap: 'clamp(16px,2.5vw,24px)' }}>
-
-          <StoryItem
-            kicker="Fall Readiness · Sept 8 Countdown"
-            kickerColor={C.pilot.line}
-            headline="Roster intake, MAP accounts, and Horizon set-up: the 3-week waterfall starts now"
-            body="First pilots launch Sept 8. Brittany mapped the intake timeline: roster collection by late August (two-week buffer), then MAP accounts, Horizon accounts, and campus setup in sequence. Eng confirmed existing tooling can handle roster import without new engineering work."
-            soWhat="Pilot Success to coordinate with engineering on the roster walkthrough video. All school contacts should receive intake instructions by Aug 25."
-          />
-
-          <StoryItem
-            kicker="NWEA MAP · Training + Browser Decision"
-            kickerColor={C.pilot.line}
-            headline="MAP training completed — secure browser debate resolved: opt-in for managed fleets, regular Chrome fallback"
-            body="The team completed MAP training with Mesha this week. Thomas's research advocates making NWEA's secure browser the default for managed Chromebook fleets — NWEA's own recommendation is 'recommended, not required.' Chrome version 143+ compatibility confirmed for all school hardware."
-            link="https://kinship-9xb4888.slack.com/archives/C0BCBAJFBPC/p1787160977742899"
-            soWhat="Pilot Success to update partner-facing comms to reflect secure browser guidance. Brittany to confirm with NWEA rep and pilot with 1-2 schools testing later in the MAP window."
-          />
-
-          <StoryItem
-            kicker="RHA · Platform Access"
-            kickerColor={C.pilot.line}
-            headline="Rosetta Stone and Lexia licenses for RHA approaching resolution — Hebrew and JiTap apps still pending"
-            body="Rosetta Stone admin access confirmed and handed to engineering. Lexia invoice received — Eos has it ready for payment. Dan chasing Claire on the Israeli Hebrew app and JiTap (Kinship needs only account credentials, not full licenses)."
-            link="https://kinship-9xb4888.slack.com/archives/C0ANG4EMU3D/p1787082601580699"
-            soWhat="Platform access needs to be complete before the Sept 8 launch. Lydia to pay Lexia invoice and track the Rosetta Stone credential delivery."
-          />
-
-          <StoryItem
-            kicker="Ontario Grades 4–9 · Math Academy Courses"
-            kickerColor={C.pilot.line}
-            headline="Ontario curriculum content for Grades 4–9 now available or arriving this week from Math Academy"
-            body="Jason at Math Academy confirmed: Grade 4–8 Ontario courses are live now. Grade 9 and both Grade 10 courses (Functions + Applications) expected by end of week. Tyler requesting test accounts to preview the curriculum before schools arrive."
-            soWhat="Pilot Success to verify Ontario curriculum alignment before sharing with school partners as part of the pilot guide."
-          />
-
-          <StoryItem
-            kicker="LCS · Curriculum Strategy"
-            kickerColor={C.pilot.line}
-            headline="LCS English offering triggers broader Lesson Builder conversation — Groupings and multi-platform scope on the table"
-            body="LCS's English-language program needs raised a question about Kinship's curriculum builder strategy. Tyler flagged Groupings and the Lesson Builder as big unsolved features — engineering will build the underlying infrastructure first with a simplified first-pass UX."
-            link="https://kinship-9xb4888.slack.com/archives/C0B9FHWR8RE/p1786973084128529"
-            soWhat="This is a strategic feature gap for multi-language pilots. Engineering is building the foundation; Pilot Success should flag the expected timeline to LCS contacts."
-          />
-
-          <StoryItem
-            kicker="Research · NWEA + U of T"
-            kickerColor={C.pilot.line}
-            headline="Research team scoping n=400 student cohort — Philip Oreopoulos (U of T) identified as external evaluation contact"
-            body="Melissa noted the pilot cohort will be ~400 students — strong signal-to-noise ratio for research purposes. Philip Oreopoulos (Distinguished Professor, Economics of Education, U of T and Co-Chair for Education Evidence) identified as a potential external evaluator to engage before re-engaging OISE profs."
-            soWhat="Research findings with a credentialed external evaluator give Kinship's partner conversations a data backbone. Melissa to set up a conversation with Azim and Alan before OISE engagement."
-          />
-        </div>
-
-        {/* ─── PRODUCT UPDATE ─── */}
-        <div style={{ marginTop: 'clamp(32px,5vw,52px)' }}>
-          <SectionLabel id="product" emoji="⚙️" title="Product Update" color={C.product.line} bg={C.product.bg} />
-        </div>
-
-        <div style={{ padding: 'clamp(8px,2vw,16px) 0 0' }}>
-          <div style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 'clamp(13px,1.8vw,15px)', color: C.inkDim, marginBottom: 'clamp(16px,2.5vw,24px)' }}>What shipped this week — translated from commits to plain English.</div>
-
-          <div style={{ marginBottom: 'clamp(20px,3vw,32px)' }}>
-            <div style={{ fontFamily: SANS, fontWeight: 800, fontSize: '11px', letterSpacing: '0.1em', textTransform: 'uppercase', color: C.product.line, marginBottom: '16px' }}>✨ New Features</div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-              <ProductItem emoji="🎭" label="New Feature" scope="Hearth + Horizon" headline={"Lesson Emulator \u2014 teachers can now test-drive any lesson before students see it"} body={"Teachers can preview draft and published lessons exactly as students would experience them \u2014 no data saved, no side effects. The emulator includes condition knobs to explore how different student profiles would receive the content. Think of it as a flight simulator for lesson design."} />
-              <ProductItem emoji="💙" label="New Feature" scope="Hearth" headline="K-SEL Reflection Bank — 96 social-emotional questions, now live in every session" body="End-of-session reflection questions are now drawn from a ratified 96-item K-SEL instrument developed with Melissa and Reinier. Questions rotate by domain and week, with class-wide General Interest days built in. Every answer is stored as anonymized signal data for the research cohort." />
-              <ProductItem emoji="📊" label="New Feature" scope="Tally Extension" headline="MobyMax integration — live per-problem student data now tracked during MobyMax sessions" body="The Tally extension now streams real-time problem-level activity from MobyMax sessions into Kinship. Per-student read-aloud (text-to-speech) is also togglable. This is a major expansion of Kinship's multi-platform data capture for schools using MobyMax for reading and math." />
-              <ProductItem emoji="📖" label="New Feature" scope="Tally Extension" headline="Lexia Core5 telemetry gaps closed — literacy platform data now complete" body="Missing student activity signals from Lexia Core5 sessions have been identified and closed. Kinship now has comprehensive telemetry for one of its core literacy partners — critical for the RHA and fall pilots using Lexia." />
-              <ProductItem emoji="🔍" label="New Feature" scope="Hearth + Extension" headline="Math Academy school ID auto-detection — no more manual config step" body="The system now automatically identifies the correct Math Academy school account from API keys. This removes a manual setup step that was causing friction in pilot onboarding." />
-              <ProductItem emoji="🔒" label="New Feature" scope="Tally Extension" headline="Math Academy settings lockdown — students stay in lessons, not settings" body="Students can no longer navigate into Math Academy account settings during a Kinship session. The extension enforces a clean return path back to lessons, preventing a common session disruption." />
-              <ProductItem emoji="✏️" label="New Feature" scope="Hearth" headline="Plans now have human-readable names — and can be renamed" body="Lesson plans can now be given real names by teachers (and renamed later), not just system IDs. A small change with a large impact on teacher navigation and ownership." />
+            <div style={{ borderTop: `2px solid ${C.partners.line}`, paddingTop: '14px' }}>
+              <Kicker color={C.partners.line}>New — Sports Academy</Kicker>
+              <div style={{ fontFamily: SERIF, fontSize: '17px', fontWeight: 700, color: C.ink, lineHeight: 1.3, marginBottom: '8px' }}>IMG Academy: Verbal commitment for Jan or Sep 2027 pilot</div>
+              <div style={{ fontFamily: SANS, fontSize: '13px', color: C.inkMid, lineHeight: 1.65 }}>
+                IMG Academy, the US&apos;s premier sports school and a Nord Anglia–affiliated institution, had a great call this week. All but a formal verbal commit for a pilot from Travis Brady — January or September 2027 start.
+              </div>
+              <SoWhat text="Nord Anglia affiliation means this could open a pipeline to their 80+ schools globally. A Jan pilot would be the first US pilot Kinship has hosted solo." />
             </div>
-          </div>
 
-          <div style={{ marginBottom: 'clamp(20px,3vw,32px)' }}>
-            <div style={{ fontFamily: SANS, fontWeight: 800, fontSize: '11px', letterSpacing: '0.1em', textTransform: 'uppercase', color: C.product.line, marginBottom: '16px' }}>🛠️ Improvements</div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <ProductItem emoji="🧪" label="Improvement" scope="Hearth + Horizon" headline="Learning science upgrades across vocabulary, anchor chains, fill-blank, and phase-aware tutoring" body="A wave of learning science implementation work landed: vocabulary formatting, anchor chains for connected concepts, just-in-time practice runs, closed-form fill-blank question serving, and phase-aware tutor posture in Horizon. Each change closes a gap between the learning-science research Kinship has studied and what the product actually delivers." />
-              <ProductItem emoji="🛡️" label="Improvement" scope="Tally Extension" headline="Session companion shielded from stray taps and platform overlaps" body="The floating Tally companion sidebar is now protected from accidental taps and from being obscured by other platform UI elements during a session." />
-              <ProductItem emoji="📱" label="Improvement" scope="Horizon" headline="Parent app: real practice examples, affirmation licence, and phase-held help" body="Horizon (the parent-facing app) now shows real practice examples instead of placeholder content. Affirmation messages are more controlled, and help surfaces appropriately for each learning phase rather than all at once." />
+            <div style={{ borderTop: `2px solid ${C.partners.line}`, paddingTop: '14px' }}>
+              <Kicker color={C.partners.line}>Partnership Operations</Kicker>
+              <div style={{ fontFamily: SERIF, fontSize: '17px', fontWeight: 700, color: C.ink, lineHeight: 1.3, marginBottom: '8px' }}>New <span style={{ fontFamily: MONO, fontSize: '13px' }}>issues@buildkinship.com</span> inbox for pilot support</div>
+              <div style={{ fontFamily: SANS, fontSize: '13px', color: C.inkMid, lineHeight: 1.65 }}>
+                The team stood up a dedicated support inbox after a July-vintage conversation about pilot triage. A new Google Workspace account (with human accountability) went live for school support tickets, rather than an alias, to keep lines clear as pilots scale.
+              </div>
+              <SoWhat text="Pilot Success team now has a dedicated support inbox. First real operations infrastructure beyond Slack for schools." />
             </div>
-          </div>
 
-          <div>
-            <div style={{ fontFamily: SANS, fontWeight: 800, fontSize: '11px', letterSpacing: '0.1em', textTransform: 'uppercase', color: C.product.line, marginBottom: '16px' }}>🐛 Bug Fixes</div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              <ProductItem emoji="⚡" label="Fix" scope="Hearth" headline="Publishing race condition, muted tutor, and inert demo mode — all closed" body="Three QA findings from the emulator were fixed: a race condition in lesson publishing, a state bug where the tutor could become silent, and a demo mode that wasn't responding to input." />
-              <ProductItem emoji="📐" label="Fix" scope="Horizon" headline="Lesson column now centered correctly in the parent app" body="The lesson content column was pinned to the left edge of its card. It is now properly centered across all viewport sizes." />
-              <ProductItem emoji="📋" label="Fix" scope="Hearth" headline="Needs-you queue counting fixed — dashboard count is now consistent" body="The count of items requiring teacher attention on the dashboard was computed differently in different places. Unified to a single source of truth." />
+            <div style={{ borderTop: `2px solid ${C.partners.line}`, paddingTop: '14px' }}>
+              <Kicker color={C.partners.line}>Enterprise Prospect</Kicker>
+              <div style={{ fontFamily: SERIF, fontSize: '17px', fontWeight: 700, color: C.ink, lineHeight: 1.3, marginBottom: '8px' }}>UCC: Two in-person meetings set for Aug 24</div>
+              <div style={{ fontFamily: SANS, fontSize: '13px', color: C.inkMid, lineHeight: 1.65 }}>
+                Two in-person meetings at University of Toronto Schools (UCC) on August 24 — with VP Learning &amp; Innovation and VP Advancement — confirmed as key champions. A separate meeting exploring an IB/AP Math partnership with PhysicsGraph founder is also on the docket.
+              </div>
+              <SoWhat text="UCC is a flagship school and these champion-level meetings signal deal seriousness. PhysicsGraph partnership could expand Kinship's math coverage into IB/AP." />
+              <ThreadLink href="https://kinship-9xb4888.slack.com/archives/C0ASVC73LQN/p1787300000000000" color={C.partners.line} />
             </div>
-          </div>
 
-          <div style={{ marginTop: 'clamp(16px,2.5vw,24px)', background: C.accentFaint, borderTop: `2px solid ${C.accent}`, padding: 'clamp(12px,2vw,18px)', fontFamily: SANS, fontSize: '12px', color: C.inkDim, lineHeight: 1.55 }}>
-            <strong style={{ color: C.ink, fontFamily: SANS }}>Feature priority thread from Tyler:</strong> Token/XP system, Tally session reliability, and roster intake are flagged as the highest priorities for the week ahead. Brittany and Melissa want a dedicated XP/tokens session — it still feels unclear to non-technical team members. Engineering is being asked to demo the roster intake process via Loom before school contacts receive instructions.
-          </div>
-        </div>
-
-        {/* ─── TOPICS ─── */}
-        <div style={{ marginTop: 'clamp(32px,5vw,52px)' }}>
-          <SectionLabel id="topics" emoji="🔭" title="Topics Worth Watching" color={C.topics.line} bg={C.topics.bg} />
-        </div>
-
-        <div style={{ padding: 'clamp(16px,3vw,24px) 0 0', display: 'flex', flexDirection: 'column', gap: 'clamp(24px,4vw,40px)' }}>
-
-          {/* Deep Dive #1 */}
-          <div>
-            <Kicker color={C.topics.line}>Deep Dive · US Dept of Education</Kicker>
-            <div style={{ fontFamily: SERIF, fontSize: 'clamp(20px,3.5vw,28px)', fontWeight: 700, color: C.ink, lineHeight: 1.25, marginBottom: '12px' }}>The US DoE just told every edtech company to answer five questions</div>
-            <div style={{ fontFamily: SANS, fontSize: '13px', color: C.inkMid, lineHeight: 1.7 }}>
-              <p style={{ margin: '0 0 12px' }}>The U.S. Department of Education published new guidance this week on responsible AI use in classrooms. The guidance isn't binding policy — but it's a framework that schools and district procurement teams will use to evaluate vendors. Mike shared it in #topic-edtech; Maggie immediately applied it to Kinship via a Claude-assisted document.</p>
-              <p style={{ margin: '0 0 12px' }}><strong>The five questions every edtech product should answer:</strong></p>
-              <ol style={{ margin: '0 0 16px 20px', padding: 0, display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                {[
-                  "What learning problem does it solve?",
-                  "When should it be used — and when should it not be?",
-                  "What evidence exists that it actually works?",
-                  "How does it protect student data and privacy?",
-                  "Who is accountable when something goes wrong?"
-                ].map((q, i) => (
-                  <li key={i} style={{ fontFamily: SANS, fontSize: '13px', color: C.ink }}><span style={{ color: C.accent, fontWeight: 700 }}>{i+1}.</span> {q}</li>
-                ))}
-              </ol>
-              <p style={{ margin: '0 0 12px' }}><strong>What does it mean for Kinship?</strong> Kinship can already answer #1 (precision math acceleration), #4 (DPA in progress), and partially #3 (pilot data from UCC forming). Questions #2 and #5 are where the team should invest next. The "when not to use it" framing is actually a selling point — Kinship's model acknowledges teacher judgment remains essential, which most competitors don't lead with.</p>
-              <div style={{ fontFamily: MONO, fontSize: '11px', color: C.inkFaint, marginTop: '8px' }}>Source: US DoE press release · <a href="https://www.ed.gov/about/news/press-release/us-department-of-education-releases-guidance-responsible-use-of-education-technology-classroom" target="_blank" rel="noreferrer" style={{ color: C.topics.line, textDecoration: 'none' }}>ed.gov ↗</a></div>
+            <div style={{ borderTop: `2px solid ${C.partners.line}`, paddingTop: '14px' }}>
+              <Kicker color={C.partners.line}>Parent Communications</Kicker>
+              <div style={{ fontFamily: SERIF, fontSize: '17px', fontWeight: 700, color: C.ink, lineHeight: 1.3, marginBottom: '8px' }}>Parent FAQ coming — TDSB, York, Mulgrave, and Rosseau have all asked</div>
+              <div style={{ fontFamily: SANS, fontSize: '13px', color: C.inkMid, lineHeight: 1.65 }}>
+                Multiple schools are independently requesting parent communication materials. TDSB sent an explicit ask this week. Conversations with York, Mulgrave, and Rosseau next week will surface specific parent FAQ needs.
+              </div>
+              <SoWhat text="This is now a pattern signal — schools want parent materials before launch. Building one reusable FAQ template now could unblock multiple pilots simultaneously." />
+              <ThreadLink href="https://kinship-9xb4888.slack.com/archives/C0B6Z4MFA3X/p1787280000000000" color={C.partners.line} />
             </div>
+
           </div>
 
-          <hr style={rule} />
-
-          {/* Deep Dive #2 */}
-          <div>
-            <Kicker color={C.topics.line}>Deep Dive · Grok + AI Agents</Kicker>
-            <div style={{ fontFamily: SERIF, fontSize: 'clamp(20px,3.5vw,28px)', fontWeight: 700, color: C.ink, lineHeight: 1.25, marginBottom: '12px' }}>Grok Build is getting attention from engineers — and the team wants access</div>
-            <div style={{ fontFamily: SANS, fontSize: '13px', color: C.inkMid, lineHeight: 1.7 }}>
-              <p style={{ margin: '0 0 12px' }}>Tyler and Paul flagged Grok Build this week in #topic-tooling. Paul described lower "complexity creep" compared to other models — meaning the model stays on-task for longer coding sessions without introducing unnecessary abstractions. Tyler noted parallels to OpenClaw/Hermes as personal hosted agent frameworks that the developer community is rallying around.</p>
-              <p style={{ margin: '0 0 12px' }}><strong>What the team discussed:</strong> Paul suggested an OpenRouter account for model bake-offs — the ability to test Grok, Claude, and other models against the same task head-to-head. Tyler suggested trying it on the Superconductor project first. A Fable usage cap alert also surfaced — the team should clarify shared vs. individual usage credits.</p>
-              <p style={{ margin: '0 0 12px' }}><strong>What it means for Kinship:</strong> Model selection for the in-product AI tutor matters. If Grok genuinely stays more coherent on extended reasoning tasks (tutoring a student through a multi-step problem), that's worth measuring. OpenRouter gives the team a low-cost way to run structured comparisons without committing to a provider switch.</p>
-              <div style={{ fontFamily: MONO, fontSize: '11px', color: C.inkFaint, marginTop: '8px' }}>Discussed in <span style={{ fontFamily: MONO, color: C.topics.line }}>#topic-tooling</span></div>
-            </div>
-          </div>
-
-          <hr style={rule} />
-
-          {/* Also this week */}
-          <div>
-            <Kicker color={C.topics.line}>Also This Week</Kicker>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-
-              <StoryItem
-                kicker="Learning Science · Adaptive + Teacher Judgment"
-                kickerColor={C.topics.line}
-                headline="Why adaptive learning alone isn't enough — and why Kinship's model matters"
-                body="Lindsey linked a piece about teacher judgment as the 'multiplicative effect' on top of adaptive learning — the teacher in the room is what converts the technology into student motivation and outcomes. This framing validates Kinship's hybrid positioning."
-                soWhat="Worth building into the partner pitch narrative. Kinship isn't an AI tutor — it's an AI layer that amplifies teacher judgment."
-              />
-
-              <StoryItem
-                kicker="Math Crisis · UC Berkeley"
-                kickerColor={C.topics.line}
-                headline="UC Berkeley's test-blind admissions now driving math skill gaps into freshman year"
-                body={"SF Standard published an opinion piece: students entering UC Berkeley under test-blind admissions believe they are prepared, but many are not. Tyler followed up with a piece on Mission High dropout patterns from the same author. Brittany described it as depicting the true cost as students discovering their gaps in college — when it's hardest to close them."}
-                soWhat={"This is Kinship's origin story playing out in public. The articles make the case for intervention at the K-12 level — the exact gap Kinship is built to close."}
-              />
-
-              <StoryItem
-                kicker="EdTech Insiders · AI Tutoring"
-                kickerColor={C.topics.line}
-                headline="EdTech Insiders: the line between 'homework helper' and 'AI tutor' is becoming the industry's defining question"
-                body="Brittany shared an EdTech Insiders piece this week distinguishing tools that do work for students from tools that help students learn to do work themselves. The piece frames it as the central product decision every edtech company is making right now."
-                soWhat="Kinship's answer is unambiguous — but it's not in every sales conversation yet. Worth codifying this distinction in the pitch and the partner guide."
-              />
-
-              <StoryItem
-                kicker="Alpha School Writing · Anti-Intellectual Strain"
-                kickerColor={C.topics.line}
-                headline="Natalie Wexler: AlphaWrite's approach reflects a 'troubling anti-intellectualism' baked into the Alpha model"
-                body={"Tyler shared the Substack post; Brittany surfaced the key critique: AlphaWrite optimizes for output volume at the expense of depth and content knowledge. The best line was buried at the end — the piece suggests Alpha's writing approach may be producing fluent-sounding work without the thinking behind it."}
-                soWhat={"As Kinship encounters Alpha comparisons in sales, this is a useful third-party critique to have in the back pocket. Kinship's learning model is explicitly content-knowledge-first."}
-              />
-
-              <StoryItem
-                kicker="Brain Changelog · Workflow Break Fixed"
-                kickerColor={C.topics.line}
-                headline="Brain email password change broke meeting transcript workflow — now resolved"
-                body="The Kinship Brain's meeting transcript posting to #brain-changelog was silently broken this week after a password change to the brain@buildkinship.com account. Azim identified and fixed it. 53 entries accumulated in the changelog from automated workflows despite the disruption."
-                link="https://kinship-9xb4888.slack.com/archives/C0BA7AKA5K2/p1787064988293459"
-                soWhat="Engineering should explore a monitoring alert for when brain-changelog posting stops. Silent failures in infrastructure are harder to catch than loud ones."
-              />
-            </div>
-          </div>
-
-          {/* Pedagogical framework note */}
-          <div style={{ borderTop: `1px solid ${C.paperDark}`, paddingTop: '20px' }}>
-            <Kicker color={C.topics.line}>From the Learning Science Webinar</Kicker>
+          {/* Pipeline reporting */}
+          <div style={{ marginTop: 'clamp(16px, 2.5vw, 24px)', borderTop: `1px solid ${C.paperDark}`, paddingTop: '16px' }}>
+            <Kicker color={C.partners.line}>Process</Kicker>
             <div style={{ fontFamily: SANS, fontSize: '13px', color: C.inkMid, lineHeight: 1.65 }}>
-              Brittany attended a Learning Engineering webinar on AI system development. The frameworks endorsed by participants — Bloom's Taxonomy, Backward Design, Cognitive Load Theory, IEEE TLA, and UDL — map closely to Kinship's own pedagogical bedrock. Maggie added PISA/PIRLS item frameworks as particularly relevant for international pilot design.
+              <strong style={{ color: C.ink }}>New weekly pipeline reporting process launched.</strong> The partnerships team restructured Monday meetings: numbers-first, pipeline velocity check, then deal-by-deal. A walkthrough recording was shared for onboarding. The Hermes weekly tracker skill was also deployed to pull CRM signals automatically from meetings and Slack.
             </div>
           </div>
 
+          {/* Salta */}
+          <div style={{ marginTop: 'clamp(16px, 2.5vw, 24px)', borderTop: `1px solid ${C.paperDark}`, paddingTop: '16px' }}>
+            <Kicker color={C.partners.line}>Brazil Prospect</Kicker>
+            <div style={{ fontFamily: SANS, fontSize: '13px', color: C.inkMid, lineHeight: 1.65 }}>
+              <strong style={{ color: C.ink }}>Grupo Salta Educação (Brazil):</strong> Call held this week with Christine Pereira (pedagogical director). The team demoed Hearth and Horizon and tested a new K12 transformation talk track. Early signals; follow-up in progress.
+            </div>
+            <ThreadLink href="https://kinship-9xb4888.slack.com/archives/C0BH47VPSKZ/p1787250000000000" color={C.partners.line} />
+          </div>
         </div>
 
-        {/* Footer */}
-        <div style={{ marginTop: 'clamp(40px,6vw,64px)', borderTop: `3px double ${C.ink}`, paddingTop: 'clamp(20px,3vw,28px)' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 240px), 1fr))', gap: 'clamp(16px,2.5vw,24px)', marginBottom: '20px' }}>
-            <div>
-              <div style={{ fontFamily: SANS, fontWeight: 700, fontSize: '10px', letterSpacing: '0.12em', textTransform: 'uppercase', color: C.inkFaint, marginBottom: '8px' }}>Hottest Thread</div>
-              <div style={{ fontFamily: SANS, fontSize: '13px', color: C.inkMid }}>
-                <strong style={{ color: C.ink }}>K-SEL reflection bank launch</strong> in <span style={{ fontFamily: MONO, fontSize: '11px' }}>#team-eng</span> — 17 replies, engineer + teacher + researcher collaboration on a single PR
+        {/* ──────────────── PILOT SUCCESS ──────────────── */}
+        <div style={{ marginTop: 'clamp(32px, 5vw, 52px)' }}>
+          <SectionLabel id="pilot" emoji="🎯" title="Pilot Success" color={C.pilot.line} bg={C.pilot.bg} />
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))', gap: 'clamp(16px, 2.5vw, 24px)', marginTop: 'clamp(16px, 2.5vw, 24px)' }}>
+
+            <div style={{ borderTop: `2px solid ${C.pilot.line}`, paddingTop: '14px' }}>
+              <Kicker color={C.pilot.line}>MAP Testing</Kicker>
+              <div style={{ fontFamily: SERIF, fontSize: '17px', fontWeight: 700, color: C.ink, lineHeight: 1.3, marginBottom: '8px' }}>NWEA MAP training completed — secure browser decision pending</div>
+              <div style={{ fontFamily: SANS, fontSize: '13px', color: C.inkMid, lineHeight: 1.65 }}>
+                MAP training ran this week. The team is recommending NWEA&apos;s Secure Browser as the default for managed-fleet schools and Chromebook deployments, with regular Chrome as a fallback — mirroring NWEA&apos;s own recommendation. Chrome version requirements (143+) are being confirmed with the NWEA rep.
+              </div>
+              <SoWhat text="Clean MAP baseline data is foundational to Kinship's impact story. Getting the browser setup right before schools open matters enormously." />
+              <ThreadLink href="https://kinship-9xb4888.slack.com/archives/C0BCBAJFBPC/p1787290000000000" color={C.pilot.line} />
+            </div>
+
+            <div style={{ borderTop: `2px solid ${C.pilot.line}`, paddingTop: '14px' }}>
+              <Kicker color={C.pilot.line}>Math Academy Readiness</Kicker>
+              <div style={{ fontFamily: SERIF, fontSize: '17px', fontWeight: 700, color: C.ink, lineHeight: 1.3, marginBottom: '8px' }}>Ontario curriculum Grades 4–12 landing this week from Math Academy</div>
+              <div style={{ fontFamily: SANS, fontSize: '13px', color: C.inkMid, lineHeight: 1.65 }}>
+                Jason/Math Academy confirmed: Ontario Grades 4–8 are available now. Grade 9, Grade 10 (both courses), and Grade 11 Functions &amp; Applications expected Friday. Grade 11 Functions and all Grade 12 expected Saturday. Auditing continues. Leaderboards will be turned off by default for all schools.
+              </div>
+              <SoWhat text="Ontario curriculum coverage unlocks all Canadian pilots. Turning off leaderboards was a Pilot Success call — the team is setting sensible defaults rather than leaving configuration to schools." />
+              <ThreadLink href="https://kinship-9xb4888.slack.com/archives/C0BCBAJFBPC/p1787220000000000" color={C.pilot.line} />
+            </div>
+
+            <div style={{ borderTop: `2px solid ${C.pilot.line}`, paddingTop: '14px' }}>
+              <Kicker color={C.pilot.line}>Research Infrastructure</Kicker>
+              <div style={{ fontFamily: SERIF, fontSize: '17px', label: 700, color: C.ink, lineHeight: 1.3, marginBottom: '8px', fontWeight: 700 }}>Baseline, midpoint, and endpoint surveys ready — ~400 student sample size confirmed</div>
+              <div style={{ fontFamily: SANS, fontSize: '13px', color: C.inkMid, lineHeight: 1.65 }}>
+                Teacher and student surveys (baseline, midpoint, endpoint) are finalized and in a shared Drive folder. The team has confirmed an ~400 student sample — a signal-to-noise ratio strong enough for rigorous analysis. Philip Oreopoulos (Distinguished Professor, Economics of Education Policy, U of T) was flagged as a potential academic partner for external evaluation.
+              </div>
+              <SoWhat text="A ~400 student RCT-style sample is meaningful. Getting an external academic evaluator before pilots start would dramatically strengthen Kinship's evidence story." />
+            </div>
+
+            <div style={{ borderTop: `2px solid ${C.pilot.line}`, paddingTop: '14px' }}>
+              <Kicker color={C.pilot.line}>RHA — License Operations</Kicker>
+              <div style={{ fontFamily: SERIF, fontSize: '17px', fontWeight: 700, color: C.ink, lineHeight: 1.3, marginBottom: '8px' }}>RHA third-party licenses: Lexia coming, Rosetta Stone active, Israeli Hebrew app still being chased</div>
+              <div style={{ fontFamily: SANS, fontSize: '13px', color: C.inkMid, lineHeight: 1.65 }}>
+                Lexia invoice received from Eos — needs payment (due Sep 16). Rosetta Stone credentials are now available. An Israeli Hebrew app (JiTap) is still being tracked down. MOU language confirmed: any third-party app costs will be credited back to RHA.
+              </div>
+              <ThreadLink href="https://kinship-9xb4888.slack.com/archives/C0ANG4EMU3D/p1787200000000000" color={C.pilot.line} />
+            </div>
+
+            <div style={{ borderTop: `2px solid ${C.pilot.line}`, paddingTop: '14px' }}>
+              <Kicker color={C.pilot.line}>TDSB</Kicker>
+              <div style={{ fontFamily: SERIF, fontSize: '17px', fontWeight: 700, color: C.ink, lineHeight: 1.3, marginBottom: '8px' }}>TDSB Supply Ontario bid pushed to March 2027</div>
+              <div style={{ fontFamily: SANS, fontSize: '13px', color: C.inkMid, lineHeight: 1.65 }}>
+                The Learning Services procurement bid through Supply Ontario has been delayed to March 2027. The team is exploring alternative entry paths.
+              </div>
+              <SoWhat text="TDSB is a massive district — the delay isn&apos;t a rejection, but procurement timelines are long. Exploring alternative paths now (relationship-based entry, pilot-first) is the right move." />
+            </div>
+
+            <div style={{ borderTop: `2px solid ${C.pilot.line}`, paddingTop: '14px' }}>
+              <Kicker color={C.pilot.line}>Partner Guide</Kicker>
+              <div style={{ fontFamily: SERIF, fontSize: '17px', fontWeight: 700, color: C.ink, lineHeight: 1.3, marginBottom: '8px' }}>Math Pilot Partner Guide updated + DPA template live</div>
+              <div style={{ fontFamily: SANS, fontSize: '13px', color: C.inkMid, lineHeight: 1.65 }}>
+                The Math Pilot Partner Guide was updated this week: a folder structure for new schools was added, shared at the 6-weeks-out milestone. A separate DPA template is now live for schools that have already signed a MOU and need the DPA signed separately.
               </div>
             </div>
-            <div>
-              <div style={{ fontFamily: SANS, fontWeight: 700, fontSize: '10px', letterSpacing: '0.12em', textTransform: 'uppercase', color: C.inkFaint, marginBottom: '8px' }}>This Issue</div>
-              <div style={{ fontFamily: SANS, fontSize: '13px', color: C.inkMid }}>
-                Issue #8 · Aug 18–22, 2026 · 43 channels swept · 112 messages · 8 signals extracted
+
+          </div>
+        </div>
+
+        {/* ──────────────── PRODUCT ──────────────── */}
+        <div style={{ marginTop: 'clamp(32px, 5vw, 52px)' }}>
+          <SectionLabel id="product" emoji="⚙️" title="Product Update" color={C.product.line} bg={C.product.bg} />
+          <div style={{ fontFamily: SANS, fontSize: '12px', color: C.inkFaint, fontStyle: 'italic', margin: 'clamp(10px, 2vw, 14px) 0 clamp(14px, 2.5vw, 20px)' }}>
+            What shipped this week — translated for non-engineers
+          </div>
+
+          {/* New features */}
+          <div style={{ fontFamily: SANS, fontWeight: 800, fontSize: '11px', letterSpacing: '0.12em', textTransform: 'uppercase', color: C.product.line, marginBottom: '12px' }}>✨ New Features</div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))', gap: 'clamp(16px, 2.5vw, 24px)', marginBottom: 'clamp(20px, 3vw, 32px)' }}>
+
+            <div style={{ borderTop: `2px solid ${C.product.line}`, paddingTop: '14px' }}>
+              <Kicker color={C.product.line}>Hearth &amp; Horizon — Major</Kicker>
+              <div style={{ fontFamily: SERIF, fontSize: '16px', fontWeight: 700, color: C.ink, lineHeight: 1.3, marginBottom: '8px' }}>Lesson Emulator: Teachers can now preview every lesson before students see it</div>
+              <div style={{ fontFamily: SANS, fontSize: '13px', color: C.inkMid, lineHeight: 1.65 }}>
+                Teachers can now step through any lesson exactly as a student would — including condition knobs to simulate different knowledge states. Nothing is saved during preview. This was the most-requested teacher feature in pilot feedback.
               </div>
+            </div>
+
+            <div style={{ borderTop: `2px solid ${C.product.line}`, paddingTop: '14px' }}>
+              <Kicker color={C.product.line}>Hearth — Reading Support</Kicker>
+              <div style={{ fontFamily: SERIF, fontSize: '16px', fontWeight: 700, color: C.ink, lineHeight: 1.3, marginBottom: '8px' }}>MobyMax integration: live per-problem signals + per-student read-aloud toggle</div>
+              <div style={{ fontFamily: SANS, fontSize: '13px', color: C.inkMid, lineHeight: 1.65 }}>
+                Kinship now receives live problem-level signals from MobyMax, and teachers can toggle text-to-speech for individual students. Greater Dayton specifically requested TTS for lessons and practice (but not quizzes) — this delivers that.
+              </div>
+              <SoWhat text="Greater Dayton asked for TTS this week and the feature shipped. That&apos;s same-week responsiveness. This kind of loop is a competitive advantage." />
+            </div>
+
+            <div style={{ borderTop: `2px solid ${C.product.line}`, paddingTop: '14px' }}>
+              <Kicker color={C.product.line}>Hearth — Assessment</Kicker>
+              <div style={{ fontFamily: SERIF, fontSize: '16px', fontWeight: 700, color: C.ink, lineHeight: 1.3, marginBottom: '8px' }}>K-SEL reflection bank shipped (96 items, KIN-273)</div>
+              <div style={{ fontFamily: SANS, fontSize: '13px', color: C.inkMid, lineHeight: 1.65 }}>
+                End-of-session reflection questions now draw from the ratified 96-item K-SEL instrument. Selection is deterministic based on the session&apos;s content. The team described it as &ldquo;:fire:&rdquo; — this grounds Kinship&apos;s emotional learning work in a rigorous academic instrument.
+              </div>
+              <ThreadLink href="https://kinship-9xb4888.slack.com/archives/C0ANK3CJM8V/p1787180000000000" color={C.product.line} />
+            </div>
+
+            <div style={{ borderTop: `2px solid ${C.product.line}`, paddingTop: '14px' }}>
+              <Kicker color={C.product.line}>Hearth — Placement</Kicker>
+              <div style={{ fontFamily: SERIF, fontSize: '16px', fontWeight: 700, color: C.ink, lineHeight: 1.3, marginBottom: '8px' }}>Year plans now generate a placement exam that seeds student knowledge graphs</div>
+              <div style={{ fontFamily: SANS, fontSize: '13px', color: C.inkMid, lineHeight: 1.65 }}>
+                When a teacher creates a Year Plan, Kinship now auto-generates a placement exam. When a student submits their answers, those results seed their FSRS cold-start priors — meaning the system knows where to start rather than guessing.
+              </div>
+            </div>
+
+            <div style={{ borderTop: `2px solid ${C.product.line}`, paddingTop: '14px' }}>
+              <Kicker color={C.product.line}>Hearth — Math Academy</Kicker>
+              <div style={{ fontFamily: SERIF, fontSize: '16px', fontWeight: 700, color: C.ink, lineHeight: 1.3, marginBottom: '8px' }}>Auto-detect Math Academy school ID from API keys</div>
+              <div style={{ fontFamily: SANS, fontSize: '13px', color: C.inkMid, lineHeight: 1.65 }}>
+                School setup is now simpler: Hearth automatically detects the Math Academy school ID from the API key. No more manual entry per school.
+              </div>
+            </div>
+
+            <div style={{ borderTop: `2px solid ${C.product.line}`, paddingTop: '14px' }}>
+              <Kicker color={C.product.line}>Horizon — Parent App</Kicker>
+              <div style={{ fontFamily: SERIF, fontSize: '16px', fontWeight: 700, color: C.ink, lineHeight: 1.3, marginBottom: '8px' }}>Affirmation licence + phase-aware help in parent-facing view</div>
+              <div style={{ fontFamily: SANS, fontSize: '13px', color: C.inkMid, lineHeight: 1.65 }}>
+                Parents/guardians now see context-aware encouragement and support guidance in Horizon that adapts to where their child is in a learning phase. Reflection questions now render only in Horizon (not in the Chrome extension — which now shows a reminder instead).
+              </div>
+            </div>
+
+          </div>
+
+          {/* Improvements */}
+          <div style={{ fontFamily: SANS, fontWeight: 800, fontSize: '11px', letterSpacing: '0.12em', textTransform: 'uppercase', color: C.product.line, marginBottom: '12px' }}>🛠️ Improvements &amp; Fixes</div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))', gap: 'clamp(14px, 2vw, 20px)', marginBottom: 'clamp(20px, 3vw, 32px)' }}>
+
+            <div style={{ borderTop: `1px solid ${C.paperDark}`, paddingTop: '12px' }}>
+              <Kicker color={C.product.line}>Harness Cleanup</Kicker>
+              <div style={{ fontFamily: SANS, fontSize: '13px', color: C.inkMid, lineHeight: 1.65 }}>
+                <strong style={{ color: C.ink }}>12 PRs since Aug 13 — coding harness first pass complete (KIN-224).</strong> The coding environment is now cleaner and more reliable. A second-pass roadmap (KIN-281) is already scoped.
+              </div>
+            </div>
+
+            <div style={{ borderTop: `1px solid ${C.paperDark}`, paddingTop: '12px' }}>
+              <Kicker color={C.product.line}>Security</Kicker>
+              <div style={{ fontFamily: SANS, fontSize: '13px', color: C.inkMid, lineHeight: 1.65 }}>
+                <strong style={{ color: C.ink }}>Security assessment first pass closed (KIN-271).</strong> Stale API keys found in git history were identified and confirmed rotated. Sentry DSNs blanked and credential headers scrubbed.
+              </div>
+            </div>
+
+            <div style={{ borderTop: `1px solid ${C.paperDark}`, paddingTop: '12px' }}>
+              <Kicker color={C.product.line}>Demo Schools (KIN-321)</Kicker>
+              <div style={{ fontFamily: SANS, fontSize: '13px', color: C.inkMid, lineHeight: 1.65 }}>
+                <strong style={{ color: C.ink }}>Configurable seeded demo schools — issue created, milestone Math Pilot.</strong> Multiple team members were in Kinship School simultaneously this week and caused confusion. Demo schools with isolated data are now a priority.
+              </div>
+            </div>
+
+            <div style={{ borderTop: `1px solid ${C.paperDark}`, paddingTop: '12px' }}>
+              <Kicker color={C.product.line}>Extension (KIN-234)</Kicker>
+              <div style={{ fontFamily: SANS, fontSize: '13px', color: C.inkMid, lineHeight: 1.65 }}>
+                <strong style={{ color: C.ink }}>Tally widget: shielded from stray taps and provider occlusion.</strong> PR-481 reviewed and merged — the Tally widget in the Chrome extension now handles edge cases in multi-provider environments.
+              </div>
+            </div>
+
+            <div style={{ borderTop: `1px solid ${C.paperDark}`, paddingTop: '12px' }}>
+              <Kicker color={C.product.line}>Horizon — Theme Lock</Kicker>
+              <div style={{ fontFamily: SANS, fontSize: '13px', color: C.inkMid, lineHeight: 1.65 }}>
+                <strong style={{ color: C.ink }}>School admins can now lock the Horizon theme for all students.</strong> If you don&apos;t set a lock, students can still change their own skin. An option to disable this is now available in school settings.
+              </div>
+            </div>
+
+            <div style={{ borderTop: `1px solid ${C.paperDark}`, paddingTop: '12px' }}>
+              <Kicker color={C.product.line}>Lexia Core5 + Extension</Kicker>
+              <div style={{ fontFamily: SANS, fontSize: '13px', color: C.inkMid, lineHeight: 1.65 }}>
+                <strong style={{ color: C.ink }}>Lexia Core5 telemetry gaps closed; Extension VLM escalation tier added (off by default).</strong> More signals in, smarter extension — both improvements targeted at the RHA reading pilot.
+              </div>
+            </div>
+
+          </div>
+
+          {/* Product feedback callout */}
+          <div style={{ background: C.product.bg, border: `1px solid ${C.product.line}`, borderRadius: '0', padding: 'clamp(14px, 2vw, 20px)', marginTop: 'clamp(16px, 2.5vw, 24px)' }}>
+            <div style={{ fontFamily: SANS, fontWeight: 700, fontSize: '11px', letterSpacing: '0.12em', textTransform: 'uppercase', color: C.product.line, marginBottom: '8px' }}>From the field this week</div>
+            <div style={{ fontFamily: SANS, fontSize: '13px', color: C.inkMid, lineHeight: 1.65 }}>
+              The feedback loop between Pilot Success and Engineering is running in near-real-time. TTS requested Monday, shipped Tuesday. Demo school isolation raised Wednesday, Linear issue created same day. K-SEL reviewed by academic partner and shipped Friday.
             </div>
           </div>
-          <hr style={rule} />
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '14px', flexWrap: 'wrap', gap: '8px' }}>
-            <div style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: '14px', color: C.inkFaint }}>The Kinship Fall Countdown Issue</div>
-            <div style={{ fontFamily: MONO, fontSize: '10px', color: C.inkFaint }}>Produced by Hermes · Kinship Intelligence Brief</div>
+        </div>
+
+        {/* ──────────────── TOPICS ──────────────── */}
+        <div style={{ marginTop: 'clamp(32px, 5vw, 52px)' }}>
+          <SectionLabel id="topics" emoji="🔭" title="Topics Worth Watching" color={C.topics.line} bg={C.topics.bg} />
+
+          {/* Deep dive: US DoE AI guidance */}
+          <div style={{ marginTop: 'clamp(16px, 2.5vw, 24px)', borderTop: `2px solid ${C.topics.line}`, paddingTop: '16px' }}>
+            <Kicker color={C.topics.line}>Deep Dive — Regulatory</Kicker>
+            <h3 style={{ fontFamily: SERIF, fontSize: 'clamp(20px, 3.5vw, 28px)', fontWeight: 700, color: C.ink, lineHeight: 1.25, margin: '0 0 clamp(10px, 1.5vw, 14px)' }}>
+              US Department of Education: First classroom AI guidance released
+            </h3>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))', gap: 'clamp(14px, 2vw, 20px)' }}>
+              <div>
+                <div style={{ fontFamily: SANS, fontWeight: 700, fontSize: '11px', letterSpacing: '0.1em', textTransform: 'uppercase', color: C.topics.line, marginBottom: '6px' }}>What it is</div>
+                <div style={{ fontFamily: SANS, fontSize: '13px', color: C.inkMid, lineHeight: 1.65 }}>
+                  The US DoE released its first formal guidance on the &ldquo;Responsible Use of Education Technology in the Classroom.&rdquo; It&apos;s not binding — but it sets the interpretive frame for how district procurement officers will evaluate edtech products.
+                </div>
+              </div>
+              <div>
+                <div style={{ fontFamily: SANS, fontWeight: 700, fontSize: '11px', letterSpacing: '0.1em', textTransform: 'uppercase', color: C.topics.line, marginBottom: '6px' }}>Five questions every product must answer</div>
+                <div style={{ fontFamily: SANS, fontSize: '13px', color: C.inkMid, lineHeight: 1.65 }}>
+                  The guidance asks five questions: What learning problem does it solve? When should it be used? What does the evidence say? Who is accountable? What are the risks? The Kinship team already answered these this week — the doc is linked in #topic-edtech.
+                </div>
+              </div>
+              <div>
+                <div style={{ fontFamily: SANS, fontWeight: 700, fontSize: '11px', letterSpacing: '0.1em', textTransform: 'uppercase', color: C.topics.line, marginBottom: '6px' }}>What it means for Kinship</div>
+                <div style={{ fontFamily: SANS, fontSize: '13px', color: C.inkMid, lineHeight: 1.65 }}>
+                  Kinship&apos;s teacher-in-the-loop model and evidence-first approach map well to these five questions. With a US pilot in discussion (IMG Academy, Greater Dayton), having a ready answer to these questions is now a sales prerequisite, not optional.
+                </div>
+              </div>
+            </div>
+            <SoWhat text="Turn the five-question answers into a one-pager. This is already a procurement checklist for some US districts — proactively sharing it with IMG Academy and Greater Dayton shows maturity." />
+            <ThreadLink href="https://kinship-9xb4888.slack.com/archives/C0BHY9EV2AG/p1787300000000000" color={C.topics.line} />
+          </div>
+
+          {/* Grok */}
+          <div style={{ marginTop: 'clamp(20px, 3vw, 28px)', borderTop: `2px solid ${C.topics.line}`, paddingTop: '16px' }}>
+            <Kicker color={C.topics.line}>Also This Week — AI Models</Kicker>
+            <h3 style={{ fontFamily: SERIF, fontSize: 'clamp(18px, 3vw, 24px)', fontWeight: 700, color: C.ink, lineHeight: 1.25, margin: '0 0 8px' }}>Grok Build: team exploring xAI models for Kinship tooling</h3>
+            <div style={{ fontFamily: SANS, fontSize: '13px', color: C.inkMid, lineHeight: 1.65, marginBottom: '10px' }}>
+              A team member used Grok Build on a hobby project and was &ldquo;generally impressed&rdquo; — specifically, less complexity creep. A thread in #topic-tooling explored whether to add Grok models to Kinship&apos;s LiteLLM gateway (superconductor or other cloud). OpenRouter acquisition talk ($7B) was also shared. The framing: &ldquo;The singularity happened on Jan 1&rdquo; — referring to AI&apos;s trajectory in 2026.
+            </div>
+            <ThreadLink href="https://kinship-9xb4888.slack.com/archives/C0B5FL7KTKN/p1787220000000000" color={C.topics.line} />
+          </div>
+
+          {/* Duolingo XP analysis */}
+          <div style={{ marginTop: 'clamp(20px, 3vw, 28px)', borderTop: `2px solid ${C.topics.line}`, paddingTop: '16px' }}>
+            <Kicker color={C.topics.line}>Also This Week — Engagement Design</Kicker>
+            <h3 style={{ fontFamily: SERIF, fontSize: 'clamp(18px, 3vw, 24px)', fontWeight: 700, color: C.ink, lineHeight: 1.25, margin: '0 0 8px' }}>Duolingo XP analysis — relevance to Kinship&apos;s own targets</h3>
+            <div style={{ fontFamily: SANS, fontSize: '13px', color: C.inkMid, lineHeight: 1.65, marginBottom: '10px' }}>
+              An X post analyzing Duolingo&apos;s XP economy sparked discussion in #topic-collective-intelligence. Key point: Duolingo&apos;s weekly target was 150 XP with a minimum of 4 active days — a structure the team noted is &ldquo;pretty close to our own targets.&rdquo; The thread explored what Kinship can learn from Duolingo&apos;s engagement mechanics.
+            </div>
+            <ThreadLink href="https://kinship-9xb4888.slack.com/archives/C0ATK34QS8K/p1787200000000000" color={C.topics.line} />
+          </div>
+
+          {/* Learning science */}
+          <div style={{ marginTop: 'clamp(20px, 3vw, 28px)', borderTop: `2px solid ${C.topics.line}`, paddingTop: '16px' }}>
+            <Kicker color={C.topics.line}>Also This Week — Learning Science</Kicker>
+            <h3 style={{ fontFamily: SERIF, fontSize: 'clamp(18px, 3vw, 24px)', fontWeight: 700, color: C.ink, lineHeight: 1.25, margin: '0 0 8px' }}>IEEE Learning Engineering Webinar + pedagogical frameworks for Kinship</h3>
+            <div style={{ fontFamily: SANS, fontSize: '13px', color: C.inkMid, lineHeight: 1.65, marginBottom: '10px' }}>
+              A team member attended an IEEE LTSC learning engineering webinar this week and shared pedagogical frameworks that could ground Kinship&apos;s design work: Bloom&apos;s Taxonomy, Backward Design, Cognitive Load Theory (CLT), Universal Design for Learning (UDL). Strong endorsement from the team to apply these formally. Also shared: a post on the multiplicative effect of teacher judgment + student motivation — core to Kinship&apos;s model.
+            </div>
+            <ThreadLink href="https://kinship-9xb4888.slack.com/archives/C0BHY9EV2AG/p1787180000000000" color={C.topics.line} />
+          </div>
+
+          {/* EdTech tutors */}
+          <div style={{ marginTop: 'clamp(20px, 3vw, 28px)', borderTop: `1px solid ${C.paperDark}`, paddingTop: '14px' }}>
+            <Kicker color={C.topics.line}>Also This Week — Competitive</Kicker>
+            <div style={{ fontFamily: SANS, fontSize: '13px', color: C.inkMid, lineHeight: 1.65 }}>
+              <strong style={{ color: C.ink }}>EdTech Insiders: AI tutor vs homework helper.</strong> A good post distinguishing the two categories — a distinction Kinship already makes clearly. Singapore consultant also surfaced Adaptemy (adaptive learning engine) as a regional player to watch.
+            </div>
+          </div>
+
+          {/* Brain changelog */}
+          <div style={{ marginTop: 'clamp(20px, 3vw, 28px)', borderTop: `1px solid ${C.paperDark}`, paddingTop: '14px' }}>
+            <Kicker color={C.topics.line}>Brain Changelog</Kicker>
+            <div style={{ fontFamily: SANS, fontSize: '13px', color: C.inkMid, lineHeight: 1.65 }}>
+              <strong style={{ color: C.ink }}>#brain-changelog: automation reconnected after password change disruption.</strong> A password change on the brain@ email account broke the Granola → Brain automation. The team diagnosed and reconnected it. Missed calls are being reviewed for ingestion. Future calls should be captured automatically.
+            </div>
+          </div>
+        </div>
+
+        {/* ──────────────── FOOTER ──────────────── */}
+        <div style={{ marginTop: 'clamp(40px, 6vw, 56px)', borderTop: `3px double ${C.ink}`, paddingTop: 'clamp(20px, 3vw, 28px)' }}>
+          <hr style={ruleThin} />
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 220px), 1fr))', gap: 'clamp(12px, 2vw, 20px)', marginTop: 'clamp(16px, 2.5vw, 20px)', fontFamily: SANS, fontSize: '12px', color: C.inkFaint }}>
+            <div>
+              <strong style={{ color: C.inkDim, display: 'block', marginBottom: '4px' }}>Hottest thread this week</strong>
+              Math Academy student accounts &amp; usernames — 16 replies in #topic-product-feedback
+            </div>
+            <div>
+              <strong style={{ color: C.inkDim, display: 'block', marginBottom: '4px' }}>Coverage</strong>
+              Aug 18&ndash;22, 2026 &middot; 43 channels swept &middot; 82 messages read &middot; 8 signals extracted
+            </div>
+            <div>
+              <strong style={{ color: C.inkDim, display: 'block', marginBottom: '4px' }}>Issue</strong>
+              #8 of The Kinship Intelligence Brief &middot; Produced by Hermes on Aug 21, 2026
+            </div>
           </div>
         </div>
 
