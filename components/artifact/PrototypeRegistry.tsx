@@ -34,6 +34,8 @@ const registry: Record<string, ComponentType> = {
   "kinship-magazine-issue-7": dynamic(() => import("@/app/kinship-magazine-issue-7/page")),
   "ai-security-briefing": dynamic(() => import("@/app/ai-security-briefing/page")),
   "kinship-crm-schema": dynamic(() => import("@/app/kinship-crm-schema/page")),
+  "kinship-magazine-issue-8": dynamic(() => import("@/app/kinship-magazine-issue-8/page")),
+  "kinship-magazine-issue-9": dynamic(() => import("@/app/kinship-magazine-issue-9/page")),
   // ─── End new prototypes ────────────────────────────────────────────────────
 };
 

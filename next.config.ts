@@ -48,6 +48,16 @@ const nextConfig: NextConfig = {
         destination: "/artifact/z7bjiiw8ZjIUX8gYWpcI",
         permanent: false,
       },
+      {
+        source: "/kinship-magazine-issue-8",
+        destination: "/artifact/CSaxdOGWyUHfykZBenfU",
+        permanent: false,
+      },
+      {
+        source: "/kinship-magazine-issue-9",
+        destination: "/artifact/Ak28ekSbt5npyVnVIvv9",
+        permanent: false,
+      },
     ];
   },
   async rewrites() {
