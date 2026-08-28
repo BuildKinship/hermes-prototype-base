@@ -122,10 +122,10 @@ function AlertBox({ label, headline, body, color }: { label: string; headline: s
 
 // ── Table of Contents ────────────────────────────────────────────────────────
 const TOC_ITEMS = [
-  { id:'partners',  emoji:'\uD83E\uDD1D', label:'Partners',        color: C.partners.line },
-  { id:'pilot',     emoji:'\uD83C\uDFAF', label:'Pilot Success',   color: C.pilot.line    },
-  { id:'product',   emoji:'\u2699\uFE0F',  label:'Product',         color: C.product.line  },
-  { id:'topics',    emoji:'\uD83D\uDD2D', label:'Topics',           color: C.topics.line   },
+  { id:'partners',  emoji:'🤝', label:'Partners',        color: C.partners.line },
+  { id:'pilot',     emoji:'🎯', label:'Pilot Success',   color: C.pilot.line    },
+  { id:'product',   emoji:'⚙️',  label:'Product',         color: C.product.line  },
+  { id:'topics',    emoji:'🔭', label:'Topics',           color: C.topics.line   },
 ];
 
 function TableOfContents() {
@@ -232,7 +232,7 @@ export default function KinshipMagazineIssue10() {
             🤝 PARTNERS UPDATE
         ════════════════════════════════════════════════════════════════ */}
         <div style={{ marginTop:'clamp(32px,5vw,52px)' }}>
-          <SectionLabel id="partners" emoji="\uD83E\uDD1D" title="Partners Update" color={C.partners.line} bg={C.partners.bg} />
+          <SectionLabel id="partners" emoji="🤝" title="Partners Update" color={C.partners.line} bg={C.partners.bg} />
           <div style={{ padding:'clamp(16px,2.5vw,24px) 0',
             display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(min(100%, 320px), 1fr))',
             gap:'clamp(16px,2.5vw,24px)' }}>
@@ -298,7 +298,7 @@ export default function KinshipMagazineIssue10() {
             🎯 PILOT SUCCESS UPDATE
         ════════════════════════════════════════════════════════════════ */}
         <div style={{ marginTop:'clamp(32px,5vw,52px)' }}>
-          <SectionLabel id="pilot" emoji="\uD83C\uDFAF" title="Pilot Success Update" color={C.pilot.line} bg={C.pilot.bg} />
+          <SectionLabel id="pilot" emoji="🎯" title="Pilot Success Update" color={C.pilot.line} bg={C.pilot.bg} />
 
           {/* Launch status table */}
           <div style={{ padding:'clamp(16px,2.5vw,24px) 0 0' }}>
@@ -394,7 +394,7 @@ export default function KinshipMagazineIssue10() {
             ⚙️ PRODUCT UPDATE
         ════════════════════════════════════════════════════════════════ */}
         <div style={{ marginTop:'clamp(32px,5vw,52px)' }}>
-          <SectionLabel id="product" emoji="\u2699\uFE0F" title="Product Update" color={C.product.line} bg={C.product.bg} />
+          <SectionLabel id="product" emoji="⚙️" title="Product Update" color={C.product.line} bg={C.product.bg} />
           <div style={{ padding:'clamp(12px,2vw,20px) 0 0' }}>
             <div style={{ fontFamily:SANS, fontSize:'11px', letterSpacing:'0.1em', textTransform:'uppercase',
               color:C.inkFaint, marginBottom:'16px' }}>What shipped this week</div>
@@ -474,7 +474,7 @@ export default function KinshipMagazineIssue10() {
             🔭 TOPICS WORTH WATCHING
         ════════════════════════════════════════════════════════════════ */}
         <div style={{ marginTop:'clamp(32px,5vw,52px)' }}>
-          <SectionLabel id="topics" emoji="\uD83D\uDD2D" title="Topics Worth Watching" color={C.topics.line} bg={C.topics.bg} />
+          <SectionLabel id="topics" emoji="🔭" title="Topics Worth Watching" color={C.topics.line} bg={C.topics.bg} />
           <div style={{ padding:'clamp(16px,2.5vw,24px) 0' }}>
 
             {/* DEEP DIVE: Khanmigo study */}
