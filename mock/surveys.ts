@@ -42,6 +42,111 @@ export interface SurveyConfig {
 }
 
 export const SURVEYS: Record<string, SurveyConfig> = {
+  "the-signal-survey": {
+    slug: "the-signal-survey",
+    title: "The Signal — What did you notice?",
+    description:
+      "You just decoded part of an unknown language. Take two minutes to tell us what you experienced.",
+    adminCode: "",
+    thankYouTitle: "Signal received.",
+    thankYouMessage:
+      "Your responses help us understand how people experience adaptive learning. We will follow up if you left an email.",
+    questions: [
+      {
+        id: "name",
+        type: "short-text",
+        title: "What's your name?",
+        description: "First name is fine.",
+        required: true,
+        placeholder: "Your name",
+        maxLength: 100,
+      },
+      {
+        id: "role",
+        type: "single-choice",
+        title: "What's your role?",
+        required: true,
+        options: [
+          { id: "leader", label: "School or district leader" },
+          { id: "curriculum", label: "Curriculum coordinator" },
+          { id: "teacher", label: "Math teacher" },
+          { id: "educator", label: "Other educator" },
+          { id: "parent", label: "Parent" },
+        ],
+      },
+      {
+        id: "adaptation",
+        type: "single-choice",
+        title: "When the system adjusted after your answer, what did you notice?",
+        description: "The engine was changing your path based on what you got right and wrong.",
+        required: true,
+        options: [
+          { id: "surprising", label: "It felt surprising — I didn't expect it to change" },
+          { id: "natural", label: "It felt natural — like talking with a good tutor" },
+          { id: "unsure", label: "I wasn't sure what changed" },
+          { id: "didnt-notice", label: "I didn't notice any adjustment" },
+        ],
+      },
+      {
+        id: "engagement",
+        type: "rating",
+        title: "How engaged did you feel during The Signal?",
+        required: true,
+        ratingMax: 5,
+        ratingLabels: { low: "Detached", high: "Fully absorbed" },
+      },
+      {
+        id: "resonated",
+        type: "multiple-choice",
+        title: "Which part of the experience stuck with you most?",
+        description: "Select all that apply.",
+        required: true,
+        options: [
+          { id: "graph", label: "Seeing my knowledge graph at the end" },
+          { id: "inferred", label: "Working out rules nobody taught me" },
+          { id: "different", label: "Getting a different result from the person next to me" },
+          { id: "clicked", label: "The signal finally making sense mid-session" },
+          { id: "misconception", label: "Learning that an error changed what came next" },
+        ],
+      },
+      {
+        id: "conviction",
+        type: "rating",
+        title: "After The Signal, how convinced are you that students learn better when the system adapts to them individually?",
+        required: true,
+        ratingMax: 10,
+        ratingLabels: { low: "Not convinced", high: "Completely convinced" },
+      },
+      {
+        id: "biggest_question",
+        type: "long-text",
+        title: "What's the biggest question you have about bringing something like this to your school or students?",
+        required: false,
+        placeholder: "No wrong answers — we want the real questions.",
+        maxLength: 2000,
+      },
+      {
+        id: "next_step",
+        type: "single-choice",
+        title: "What would you most like to do next?",
+        required: true,
+        options: [
+          { id: "math-academy", label: "See how Math Academy maps mathematical knowledge the same way" },
+          { id: "data", label: "Understand the data it would give me as a teacher" },
+          { id: "classroom", label: "Discuss how it would work in my classroom" },
+          { id: "processing", label: "Nothing right now — still processing" },
+        ],
+      },
+      {
+        id: "email",
+        type: "email",
+        title: "Where should we follow up with you?",
+        description: "Optional — only if you'd like to hear more.",
+        required: false,
+        placeholder: "you@school.edu",
+      },
+    ],
+  },
   demo: {
     slug: "demo",
     title: "Kinship Teacher Feedback",
