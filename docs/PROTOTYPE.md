@@ -1,72 +1,55 @@
-# Prototype Brief
+# The Signal — Interactive Prototype
 
-> This file is written by Hermes before handing off to the coding agent.
-> It defines scope, constraints, and context for this specific prototype.
-> **Read this before writing any code. It is the single source of truth for what to build.**
+## Identity
+- **UUID:** 4vDzn0wx9KsWcFzYLVnK
+- **Artifact URL:** https://quick.buildkinship.dev/artifact/4vDzn0wx9KsWcFzYLVnK
+- **Slug:** the-signal
+- **Branch:** prototype/the-signal-interactive-2026-09-01
+- **Type:** other (interactive demo)
+- **Requested by:** Azim
 
----
+## What It Is
+A full-fidelity port of "The Signal" adaptive alien-language learning demo into the Kinship prototype engine.
 
-## Request
+The Signal is a 38-node knowledge graph adaptive learning experience built by the Kinship team for Math Academy. Participants decode an unknown visual language — their path through the material adapts in real time based on what they demonstrate they know.
 
-_[Hermes fills this in from the user's original request — verbatim]_
+## What's Inside
 
----
+### The Engine
+- **38-node knowledge graph** with prerequisite edges (required + soft anyOf)
+- **Adaptive routing**: retrieval scheduling, error-triggered remediation, shelving, near/structural/combinatorial transfer
+- **Placement**: 3 opening questions establish a prior hypothesis, then everything tests whether that hypothesis holds
+- **Mastery model**: distinct gain/loss rates per evidence type (recognition, discrimination, application, retrieval, transfer, generation, inference)
 
-## Prototype Type
+### The Activity Types
+- `teach` — direct instruction with Continue
+- `recognition` / `selection` — identify a symbol or choose the matching glyph
+- `contrast` / `discrimination` — distinguish near-similar forms
+- `inference` — work out a rule from examples
+- `decode` — translate a glyph sequence to English
+- `transfer` — apply a rule to a novel form
+- `generation` — tap symbols to build a sequence
+- `freebuild` — compose any valid message from your learned symbols (validated against a grammar)
+- `remediation` — targeted repair after repeated errors
 
-- [ ] Survey
-- [ ] Slide deck / presentation
-- [ ] Dashboard page (Hearth — teacher view)
-- [ ] Dashboard page (Horizon — student/parent view)
-- [ ] Data visualisation
-- [ ] Animation / visual concept
-- [ ] 3D / interactive scene
-- [ ] Other: ___
+### The Results Screen
+- Full knowledge graph visualisation (path/mastery/frontier modes)
+- Node-by-node story: when each idea was met, whether it was inferred, shelved, retrieved, repaired
+- 7 progressive reveals explaining adaptive learning concepts
+- Facilitator mode: overlay 5 sample learner paths
+- Personal message display: the sentence the user composed at the end
 
-**Read the dedicated guide for your type:**
-- Survey → `docs/surveys.md`
-- Slide deck → `docs/slideshows.md`
-- Dashboard / Animation / 3D / Other → `docs/dashboards.md`
+## Technical
+- Ported from `TheSignal-v2_1.jsx` (source) and `the-signal-v2.html` (compiled bundle)
+- Single `app/the-signal/page.tsx` — all engine, UI, data inline (~2500 lines)
+- Uses `'use client'` — fully browser-side, no server state
+- CSS via inline styles using the Signal palette (ink/mid/dim/cream/paper)
+- Registered in `PrototypeRegistry.tsx` as `"the-signal"`
 
----
-
-## Firestore
-
-**Prototype UUID:** `_[Hermes fills this in]_`
-**Artifact URL:** `https://quick.buildkinship.dev/artifact/_[UUID]_`
-
-For surveys, also:
-**Survey slug:** `_[Hermes fills this in — matches key in mock/surveys.ts]_`
-
----
-
-## Scope
-
-_[What pages/routes to build. E.g.: "Single page at app/my-deck/page.tsx — no sub-routing needed"]_
-
----
-
-## Content / Research Notes
-
-_[Any research Hermes has done relevant to this prototype's content]_
-
----
-
-## Design Constraints
-
-- Follow the Kinship design system (CLAUDE.md §Design System)
-- Mock data only — no external services or real API calls
-- Mobile-aware layout (test at 1366×768 Chromebook baseline + ~768px)
-- No peer comparison, leaderboards, XP, or streaks
-
----
-
-## Success Criteria
-
-_[Specific things the prototype must demonstrate — filled in by Hermes]_
-
----
-
-## Branch
-
-`prototype/[slug]-[YYYY-MM-DD]`
+## Design Notes
+- The Signal palette (ink `#3D1A4E`, cream `#F5F0E8`) is native to the demo, not Kinship brand
+- `Shell` component caps width at 620px (standard) or 1000px (wide — results screen)
+- `Wordmark` component renders "THE SIGNAL" logotype + right-aligned session label
+- Knowledge graph SVG is viewBox 930×720, responsive with compact/full modes
+- All animations via CSS classes (sig-arrive, sig-fade, sig-rise, sig-pulse, sig-frontier, sig-trace)
+- Seeded PRNG (mulberry32) ensures reproducibility per session seed
