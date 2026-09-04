@@ -68,6 +68,11 @@ const nextConfig: NextConfig = {
         destination: "/artifact/fQPTvVDordNXoevFY7uZ",
         permanent: false,
       },
+      {
+        source: "/kinship-magazine-issue-12",
+        destination: "/artifact/9b9f52db67244a54a635",
+        permanent: false,
+      },
     ];
   },
   async rewrites() {
